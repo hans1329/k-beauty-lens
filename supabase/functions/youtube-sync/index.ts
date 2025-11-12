@@ -31,20 +31,25 @@ serve(async (req) => {
     console.log(`Syncing YouTube channel: ${channelId}`);
 
     // Fetch channel information
+    console.log(`Fetching channel data for: ${channelId}`);
     const channelResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`
     );
 
+    console.log(`YouTube API response status: ${channelResponse.status}`);
+
     if (!channelResponse.ok) {
       const errorText = await channelResponse.text();
-      console.error('YouTube API error:', errorText);
-      throw new Error(`YouTube API error: ${channelResponse.status}`);
+      console.error('YouTube API error response:', errorText);
+      throw new Error(`YouTube API returned status ${channelResponse.status}: ${errorText}`);
     }
 
     const channelData = await channelResponse.json();
+    console.log(`Channel data received:`, JSON.stringify(channelData, null, 2));
 
     if (!channelData.items || channelData.items.length === 0) {
-      throw new Error('Channel not found');
+      console.error('No channel found in YouTube API response');
+      throw new Error(`Channel not found for ID: ${channelId}. Please verify the channel ID is correct.`);
     }
 
     const channel = channelData.items[0];
