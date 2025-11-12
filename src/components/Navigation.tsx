@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import logoImage from "@/assets/logo_linkk.png";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +21,7 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-primary" />
+            <img src={logoImage} alt="Linkkbeauty" className="h-8 w-8" />
             <span className="text-xl font-bold gradient-text">Linkkbeauty</span>
           </Link>
 
@@ -54,7 +55,7 @@ const Navigation = () => {
               <div className="flex flex-col gap-6 mt-8">
                 {/* Mobile Logo */}
                 <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                  <Sparkles className="h-6 w-6 text-primary" />
+                  <img src={logoImage} alt="Linkkbeauty" className="h-8 w-8" />
                   <span className="text-xl font-bold gradient-text">Linkkbeauty</span>
                 </Link>
 
