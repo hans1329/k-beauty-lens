@@ -1,30 +1,27 @@
 import { Search, TrendingUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 const HeroSection = () => {
-  return (
-    <section className="relative overflow-hidden py-20 px-6">
+  return <section className="relative overflow-hidden py-20 px-6">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-instagram" />
       
       {/* Floating decorative elements */}
       <div className="absolute top-20 left-10 w-20 h-20 rounded-full bg-primary/20 blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-secondary/20 blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-secondary/20 blur-3xl animate-float" style={{
+      animationDelay: "1s"
+    }} />
       
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium">AI-Powered Beauty Creator Analytics</span>
-          </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
+          
+          <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl">
             Connect with
             <br />
             <span className="text-white drop-shadow-lg">K-Beauty Creators</span>
           </h1>
           
-          <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow">
+          <p className="text-white/90 max-w-2xl mx-auto drop-shadow text-lg">
             Discover and analyze Korean beauty YouTubers through advanced AI. 
             Match your brand with the perfect creators for global success.
           </p>
@@ -57,8 +54,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
