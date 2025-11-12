@@ -4,24 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import Navigation from "@/components/Navigation";
+
+const VERIFIED_CHANNELS = [
+  { name: "PONY Syndrome", id: "UCxv8kXBd8qEq-oXXwXsR6Rw" },
+  { name: "Edward Avila", id: "UC1i-VQpB2dXZf-TsyF34SsQ" },
+  { name: "Joan Kim", id: "UCbCJZT4uDBjdoiGSwODZ_lQ" },
+  { name: "RISABAE", id: "UCNin3KUqjwIQjmjKcw1T-Vg" },
+  { name: "Soyoon", id: "UCBmS_9qUyjH33AzlzDU2cSg" },
+  { name: "씬님 (Ssin)", id: "UCDxH50RHI2dg7jJGZPc3wDQ" },
+  { name: "다영 (Dayoung)", id: "UCbwVqd3BLujU5WXqiF_oCJA" },
+  { name: "레오제이 (Leojay)", id: "UCGv6x0y3qkf0a8eouMAzVqw" },
+];
 
 const Admin = () => {
   const [channelId, setChannelId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [syncingChannelId, setSyncingChannelId] = useState<string | null>(null);
 
-  const handleSync = async () => {
-    if (!channelId.trim()) {
+  const handleSync = async (channelIdToSync?: string) => {
+    const targetChannelId = channelIdToSync || channelId.trim();
+    
+    if (!targetChannelId) {
       toast.error("Please enter a valid YouTube channel ID");
       return;
     }
 
     setIsLoading(true);
+    if (channelIdToSync) {
+      setSyncingChannelId(channelIdToSync);
+    }
 
     try {
       const { data, error } = await supabase.functions.invoke('youtube-sync', {
-        body: { channelId: channelId.trim() }
+        body: { channelId: targetChannelId }
       });
 
       if (error) {
@@ -31,12 +48,15 @@ const Admin = () => {
       }
 
       toast.success(data.message || 'Channel synced successfully!');
-      setChannelId("");
+      if (!channelIdToSync) {
+        setChannelId("");
+      }
     } catch (err) {
       console.error('Unexpected error:', err);
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
+      setSyncingChannelId(null);
     }
   };
 
@@ -78,7 +98,7 @@ const Admin = () => {
               </div>
 
               <Button
-                onClick={handleSync}
+                onClick={() => handleSync()}
                 disabled={isLoading || !channelId.trim()}
                 className="w-full rounded-full"
               >
@@ -91,6 +111,50 @@ const Admin = () => {
                   'Sync Channel'
                 )}
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Verified K-Beauty Channels</CardTitle>
+              <CardDescription>
+                Quick add popular K-Beauty YouTube channels
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3">
+                {VERIFIED_CHANNELS.map((channel) => (
+                  <div
+                    key={channel.id}
+                    className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium">{channel.name}</p>
+                      <p className="text-xs text-muted-foreground">{channel.id}</p>
+                    </div>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleSync(channel.id);
+                      }}
+                      disabled={isLoading}
+                      size="sm"
+                      className="rounded-full"
+                    >
+                      {syncingChannelId === channel.id ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="h-4 w-4" />
+                          Quick Add
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -111,15 +175,6 @@ const Admin = () => {
                 <p className="text-muted-foreground">
                   Go to the channel page, right-click → View Page Source, and search for "externalId"
                 </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Example Channel IDs (K-Beauty)</h3>
-                <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Pony Syndrome: UCxv8kXBd8qEq-oXXwXsR6Rw</li>
-                  <li>Edward Avila: UC1i-VQpB2dXZf-TsyF34SsQ</li>
-                  <li>Joan Kim: UCbCJZT4uDBjdoiGSwODZ_lQ</li>
-                </ul>
               </div>
             </CardContent>
           </Card>
