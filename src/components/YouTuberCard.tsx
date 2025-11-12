@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 
 interface YouTuberCardProps {
+  id?: string;
   name: string;
   channel: string;
   subscribers: string;
@@ -19,6 +21,7 @@ interface YouTuberCardProps {
 }
 
 const YouTuberCard = ({
+  id,
   name,
   channel,
   subscribers,
@@ -30,8 +33,10 @@ const YouTuberCard = ({
   thumbnail,
   channelUrl,
 }: YouTuberCardProps) => {
+  const creatorId = id || channel.replace('@', '');
+  
   return (
-    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-glow glass border-border/50">
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-glow glass border-border/50 cursor-pointer">
       <div className="relative h-48 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-primary opacity-10" />
         <img
@@ -107,9 +112,11 @@ const YouTuberCard = ({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <Button className="flex-1" size="sm">
-            View Analysis
-          </Button>
+          <Link to={`/creator/${creatorId}`} className="flex-1">
+            <Button className="w-full" size="sm">
+              View Analysis
+            </Button>
+          </Link>
           <Button
             variant="outline"
             size="sm"
