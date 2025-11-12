@@ -45,7 +45,7 @@ const YouTuberCard = ({
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
         <div className="absolute top-3 right-3">
-          <Badge className="glass border-primary/20 bg-background/80">
+          <Badge className="bg-primary text-white border-0 shadow-lg">
             {engagement}% Engagement
           </Badge>
         </div>
