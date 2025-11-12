@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, TrendingUp, Users, Eye, Heart, MessageCircle, Calendar, Award } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
 
 const CreatorDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // Sample detailed data - this would come from API with YouTube Data
   const creatorData = {
@@ -115,12 +116,14 @@ const CreatorDetail = () => {
 
       <div className="container mx-auto max-w-7xl px-6 py-6 space-y-6">
         {/* Back Button */}
-        <Link to="/">
-          <Button variant="ghost" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Creators
-          </Button>
-        </Link>
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="rounded-full"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
 
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
