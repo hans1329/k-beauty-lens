@@ -40,8 +40,12 @@ const Navigation = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost">Sign In</Button>
-            <Button>Get Started</Button>
+            <Button variant="ghost" asChild>
+              <Link to="/auth">Sign In</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/auth">Get Started</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu */}
@@ -75,11 +79,11 @@ const Navigation = () => {
 
                 {/* Mobile Actions */}
                 <div className="flex flex-col gap-3 pt-4 border-t border-border">
-                  <Button variant="ghost" className="w-full justify-start" onClick={() => setIsOpen(false)}>
-                    Sign In
+                  <Button variant="ghost" className="w-full justify-start" asChild onClick={() => setIsOpen(false)}>
+                    <Link to="/auth">Sign In</Link>
                   </Button>
-                  <Button className="w-full" onClick={() => setIsOpen(false)}>
-                    Get Started
+                  <Button className="w-full" asChild onClick={() => setIsOpen(false)}>
+                    <Link to="/auth">Get Started</Link>
                   </Button>
                 </div>
               </div>
