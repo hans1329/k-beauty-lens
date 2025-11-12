@@ -1,11 +1,55 @@
+import { useEffect, useState } from "react";
 import HeroSection from "@/components/HeroSection";
 import FilterBar from "@/components/FilterBar";
 import YouTuberCard from "@/components/YouTuberCard";
 import StatsSection from "@/components/StatsSection";
 import Navigation from "@/components/Navigation";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+interface Creator {
+  id: string;
+  channel_id: string;
+  channel_name: string;
+  subscriber_count: number;
+  total_views: number;
+  video_count: number;
+  description: string;
+  thumbnail_url: string;
+}
 
 const Index = () => {
-  // Sample data for demonstration
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCreators();
+  }, []);
+
+  const fetchCreators = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('creators')
+        .select('*')
+        .order('subscriber_count', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching creators:', error);
+        toast.error('Failed to load creators');
+        return;
+      }
+
+      setCreators(data || []);
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Sample data for demonstration (fallback if no data)
   const sampleYouTubers = [
     {
       name: "Jisoo Beauty",
@@ -105,11 +149,35 @@ const Index = () => {
         </div>
 
         {/* YouTuber Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sampleYouTubers.map((youtuber, index) => (
-            <YouTuberCard key={index} {...youtuber} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : creators.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {creators.map((creator) => (
+              <YouTuberCard
+                key={creator.id}
+                name={creator.channel_name}
+                channel={`@${creator.channel_id}`}
+                subscribers={formatNumber(creator.subscriber_count)}
+                avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))}
+                engagement={calculateEngagement(creator)}
+                skinTone="Light"
+                style={["Natural"]}
+                brands={[]}
+                thumbnail={creator.thumbnail_url}
+                channelUrl={`https://youtube.com/channel/${creator.channel_id}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">
+              No creators found. Add some channels in the admin panel to get started!
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
@@ -131,5 +199,23 @@ const Index = () => {
     </div>
   );
 };
+
+// Helper functions
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toString();
+}
+
+function calculateEngagement(creator: Creator): number {
+  // Simple engagement calculation based on views to subscribers ratio
+  if (creator.subscriber_count === 0) return 0;
+  const avgViews = creator.total_views / (creator.video_count || 1);
+  const ratio = (avgViews / creator.subscriber_count) * 100;
+  return Math.min(Math.round(ratio), 100);
+}
 
 export default Index;
