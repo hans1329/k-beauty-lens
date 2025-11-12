@@ -110,6 +110,23 @@ const CreatorDetail = () => {
     { name: "Other", value: 2, color: "hsl(var(--accent))" },
   ];
 
+  // ROI & Business Metrics
+  const roiMetrics = {
+    estimatedCPM: { min: 3, max: 8, average: 5.5 },
+    collaborationCost: { min: 25000, max: 125000, currency: "USD" },
+    estimatedReach: { min: 850000, max: 2500000 },
+    conversionRate: { min: 2.5, max: 4.2, average: 3.4 },
+    marketPosition: 12, // Top 12%
+    sponsoredPerformance: [
+      { month: "Jan", views: 920, engagement: 95 },
+      { month: "Feb", views: 1100, engagement: 97 },
+      { month: "Mar", views: 880, engagement: 92 },
+      { month: "Apr", views: 1250, engagement: 98 },
+      { month: "May", views: 1050, engagement: 94 },
+      { month: "Jun", views: 1180, engagement: 96 },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navigation />
@@ -196,13 +213,244 @@ const CreatorDetail = () => {
 
         {/* Detailed Analytics Tabs */}
         <Tabs defaultValue="performance" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 rounded-full">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 rounded-full">
+            <TabsTrigger value="roi" className="rounded-full">ROI & Cost</TabsTrigger>
             <TabsTrigger value="performance" className="rounded-full">Performance</TabsTrigger>
             <TabsTrigger value="videos" className="rounded-full">Recent Videos</TabsTrigger>
             <TabsTrigger value="brands" className="rounded-full">Brand Analysis</TabsTrigger>
             <TabsTrigger value="sentiment" className="rounded-full">Sentiment</TabsTrigger>
             <TabsTrigger value="audience" className="rounded-full">Audience</TabsTrigger>
           </TabsList>
+
+          {/* ROI & Cost Tab */}
+          <TabsContent value="roi" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="border-border/50 backdrop-blur-sm bg-card/80">
+                <CardHeader>
+                  <CardTitle>Estimated CPM</CardTitle>
+                  <CardDescription>Cost per 1,000 impressions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold gradient-text">
+                        ${roiMetrics.estimatedCPM.average}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">Average CPM</p>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Range:</span>
+                      <span className="font-semibold">
+                        ${roiMetrics.estimatedCPM.min} - ${roiMetrics.estimatedCPM.max}
+                      </span>
+                    </div>
+                    <Badge variant="secondary" className="w-full justify-center rounded-full">
+                      Based on K-Beauty Industry Average
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 backdrop-blur-sm bg-card/80">
+                <CardHeader>
+                  <CardTitle>Collaboration Cost</CardTitle>
+                  <CardDescription>Estimated partnership investment</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold gradient-text">
+                        ${(roiMetrics.collaborationCost.min / 1000).toFixed(0)}K - ${(roiMetrics.collaborationCost.max / 1000).toFixed(0)}K
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">Per Collaboration</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Based on:</span>
+                        <span className="font-semibold">2.5M subscribers</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Rate per sub:</span>
+                        <span className="font-semibold">$0.01 - $0.05</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 backdrop-blur-sm bg-card/80">
+                <CardHeader>
+                  <CardTitle>Market Position</CardTitle>
+                  <CardDescription>Ranking among K-Beauty creators</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold gradient-text">
+                        Top {roiMetrics.marketPosition}%
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">Among Similar Creators</p>
+                    </div>
+                    <Progress value={100 - roiMetrics.marketPosition} className="h-3" />
+                    <Badge variant="secondary" className="w-full justify-center rounded-full">
+                      Elite Tier Creator
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="border-border/50 backdrop-blur-sm bg-card/80">
+                <CardHeader>
+                  <CardTitle>Estimated Reach</CardTitle>
+                  <CardDescription>Potential audience per collaboration</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Minimum Reach</span>
+                      <span className="text-xl font-bold">
+                        {(roiMetrics.estimatedReach.min / 1000000).toFixed(1)}M views
+                      </span>
+                    </div>
+                    <Progress value={34} className="h-2" />
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Maximum Reach</span>
+                      <span className="text-xl font-bold">
+                        {(roiMetrics.estimatedReach.max / 1000000).toFixed(1)}M views
+                      </span>
+                    </div>
+                    <Progress value={100} className="h-2" />
+                  </div>
+                  <div className="space-y-2 pt-4 border-t border-border">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Avg. Conversion Rate</span>
+                      <span className="font-semibold text-primary">{roiMetrics.conversionRate.average}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Estimated Conversions</span>
+                      <span className="font-semibold">
+                        {((roiMetrics.estimatedReach.min * roiMetrics.conversionRate.average) / 100 / 1000).toFixed(1)}K - {((roiMetrics.estimatedReach.max * roiMetrics.conversionRate.average) / 100 / 1000).toFixed(1)}K
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 backdrop-blur-sm bg-card/80">
+                <CardHeader>
+                  <CardTitle>Sponsored Content Performance</CardTitle>
+                  <CardDescription>Brand collaboration vs regular content</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={roiMetrics.sponsoredPerformance}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="views"
+                        stroke="hsl(var(--chart-1))"
+                        strokeWidth={2}
+                        dot={{ fill: "hsl(var(--chart-1))" }}
+                        name="Views (K)"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="engagement"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        dot={{ fill: "hsl(var(--primary))" }}
+                        name="Engagement %"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-semibold text-primary">+8.5%</span> higher engagement on sponsored content vs regular videos
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-border/50 backdrop-blur-sm bg-card/80">
+              <CardHeader>
+                <CardTitle>ROI Calculation Methodology</CardTitle>
+                <CardDescription>How these estimates are generated</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Award className="h-4 w-4 text-primary" />
+                      Data Sources
+                    </h4>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>YouTube Data API for public metrics</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>K-Beauty industry benchmark data (2024)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>AI analysis of content and engagement patterns</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>Historical performance trends</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                      Estimation Factors
+                    </h4>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>Subscriber count and growth rate</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>Average views and engagement rate</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>Content category and niche positioning</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>Audience demographics and loyalty metrics</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">Note:</span> All estimates are based on industry averages and AI predictions. 
+                    Actual collaboration costs and performance may vary. For precise analytics, request direct data access from the creator.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-6">
