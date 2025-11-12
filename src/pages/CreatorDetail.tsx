@@ -113,80 +113,83 @@ const CreatorDetail = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navigation />
 
-      <div className="container mx-auto max-w-7xl px-6 py-8 space-y-8">
+      <div className="container mx-auto max-w-7xl px-6 py-6 space-y-6">
+        {/* Back Button */}
+        <Link to="/">
+          <Button variant="ghost" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Creators
+          </Button>
+        </Link>
+
         {/* Profile Header */}
-        <Card className="border-border/50 backdrop-blur-sm bg-card/80 overflow-hidden">
-          <div className="h-32 bg-gradient-primary"></div>
-          <CardContent className="pt-0">
-            <div className="flex flex-col md:flex-row gap-6 items-start md:items-end -mt-16 md:-mt-12">
-              <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-elegant">
-                <AvatarImage src={creatorData.thumbnail} alt={creatorData.name} />
-                <AvatarFallback>{creatorData.name[0]}</AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 space-y-4 pt-4 md:pt-0">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <h1 className="text-3xl font-bold gradient-text">{creatorData.name}</h1>
-                    <p className="text-muted-foreground">{creatorData.channel}</p>
-                  </div>
-                  <a href={creatorData.channelUrl} target="_blank" rel="noopener noreferrer">
-                    <Button className="gap-2 rounded-full">
-                      <ExternalLink className="h-4 w-4" />
-                      Visit Channel
-                    </Button>
-                  </a>
-                </div>
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+          <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-primary/20 shadow-elegant">
+            <AvatarImage src={creatorData.thumbnail} alt={creatorData.name} />
+            <AvatarFallback>{creatorData.name[0]}</AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1 space-y-4">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold gradient-text">{creatorData.name}</h1>
+                <p className="text-muted-foreground text-lg">{creatorData.channel}</p>
+              </div>
+              <a href={creatorData.channelUrl} target="_blank" rel="noopener noreferrer">
+                <Button className="gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  Visit Channel
+                </Button>
+              </a>
+            </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      Subscribers
-                    </div>
-                    <div className="text-2xl font-bold">{creatorData.subscribers}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Eye className="h-4 w-4" />
-                      Total Views
-                    </div>
-                    <div className="text-2xl font-bold">{creatorData.totalViews}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <TrendingUp className="h-4 w-4" />
-                      Avg Views
-                    </div>
-                    <div className="text-2xl font-bold">{creatorData.avgViews}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Award className="h-4 w-4" />
-                      Engagement
-                    </div>
-                    <div className="text-2xl font-bold">{creatorData.engagement}%</div>
-                  </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Users className="h-4 w-4" />
+                  Subscribers
                 </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="rounded-full">
-                    {creatorData.skinTone} Skin Tone
-                  </Badge>
-                  {creatorData.style.map((s) => (
-                    <Badge key={s} variant="outline" className="rounded-full">
-                      {s}
-                    </Badge>
-                  ))}
-                  <Badge variant="outline" className="rounded-full gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {creatorData.uploadFrequency}
-                  </Badge>
+                <div className="text-2xl font-bold">{creatorData.subscribers}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Eye className="h-4 w-4" />
+                  Total Views
                 </div>
+                <div className="text-2xl font-bold">{creatorData.totalViews}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <TrendingUp className="h-4 w-4" />
+                  Avg Views
+                </div>
+                <div className="text-2xl font-bold">{creatorData.avgViews}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Award className="h-4 w-4" />
+                  Engagement
+                </div>
+                <div className="text-2xl font-bold">{creatorData.engagement}%</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="rounded-full">
+                {creatorData.skinTone} Skin Tone
+              </Badge>
+              {creatorData.style.map((s) => (
+                <Badge key={s} variant="outline" className="rounded-full">
+                  {s}
+                </Badge>
+              ))}
+              <Badge variant="outline" className="rounded-full gap-1">
+                <Calendar className="h-3 w-3" />
+                {creatorData.uploadFrequency}
+              </Badge>
+            </div>
+          </div>
+        </div>
 
         {/* Detailed Analytics Tabs */}
         <Tabs defaultValue="performance" className="space-y-6">
