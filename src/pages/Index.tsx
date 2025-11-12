@@ -2,6 +2,7 @@ import HeroSection from "@/components/HeroSection";
 import FilterBar from "@/components/FilterBar";
 import YouTuberCard from "@/components/YouTuberCard";
 import StatsSection from "@/components/StatsSection";
+import Navigation from "@/components/Navigation";
 
 const Index = () => {
   // Sample data for demonstration
@@ -82,6 +83,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <Navigation />
       <HeroSection />
       
       <div className="container mx-auto max-w-7xl px-6 py-12 space-y-12">

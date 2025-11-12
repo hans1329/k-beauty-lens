@@ -18,13 +18,13 @@ const HeroSection = () => {
             <span className="text-sm font-medium">AI-Powered Beauty Creator Analytics</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
             Connect with
             <br />
-            <span className="gradient-text">K-Beauty Creators</span>
+            <span className="text-white drop-shadow-lg">K-Beauty Creators</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow">
             Discover and analyze Korean beauty YouTubers through advanced AI. 
             Match your brand with the perfect creators for global success.
           </p>

@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Navigation from "@/components/Navigation";
 import {
   BarChart,
   Bar,
@@ -110,17 +111,7 @@ const CreatorDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Header */}
-      <div className="border-b border-border/50 backdrop-blur-sm bg-background/80 sticky top-0 z-10">
-        <div className="container mx-auto max-w-7xl px-6 py-4">
-          <Link to="/">
-            <Button variant="ghost" className="gap-2 rounded-full">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Creators
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <Navigation />
 
       <div className="container mx-auto max-w-7xl px-6 py-8 space-y-8">
         {/* Profile Header */}
