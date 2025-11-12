@@ -10,9 +10,9 @@ const Navigation = () => {
 
   const navItems = [
     { label: "Discover", href: "/" },
-    { label: "Analytics", href: "#analytics" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "About", href: "#about" },
+    { label: "Analytics", href: "/analytics" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "About", href: "/about" },
   ];
 
   return (
@@ -21,20 +21,20 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoImage} alt="Linkkbeauty" className="h-8 w-8" />
-            <span className="text-xl font-bold gradient-text">Linkk·beauty</span>
+            <img src={logoImage} alt="Link·kbeauty" className="h-8 w-8" />
+            <span className="text-xl font-bold gradient-text">Link·kbeauty</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
+                to={item.href}
                 className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -59,21 +59,21 @@ const Navigation = () => {
               <div className="flex flex-col gap-6 mt-8">
                 {/* Mobile Logo */}
                 <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                  <img src={logoImage} alt="Linkkbeauty" className="h-8 w-8" />
-                  <span className="text-xl font-bold gradient-text">Linkk·beauty</span>
+                  <img src={logoImage} alt="Link·kbeauty" className="h-8 w-8" />
+                  <span className="text-xl font-bold gradient-text">Link·kbeauty</span>
                 </Link>
 
                 {/* Mobile Nav Items */}
                 <div className="flex flex-col gap-4">
                   {navItems.map((item) => (
-                    <a
+                    <Link
                       key={item.label}
-                      href={item.href}
+                      to={item.href}
                       onClick={() => setIsOpen(false)}
                       className="text-lg font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
                     >
                       {item.label}
-                    </a>
+                    </Link>
                   ))}
                 </div>
 

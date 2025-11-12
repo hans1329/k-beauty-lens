@@ -29,8 +29,8 @@ const Auth = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-2">
-          <img src={logoImage} alt="Linkkbeauty" className="h-10 w-10" />
-          <span className="text-2xl font-bold gradient-text">Linkk·beauty</span>
+          <img src={logoImage} alt="Link·kbeauty" className="h-10 w-10" />
+          <span className="text-2xl font-bold gradient-text">Link·kbeauty</span>
         </Link>
 
         {/* Auth Card */}
