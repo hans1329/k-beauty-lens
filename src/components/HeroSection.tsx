@@ -5,7 +5,7 @@ const HeroSection = () => {
   return (
     <section className="relative overflow-hidden py-20 px-6">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-hero" />
+      <div className="absolute inset-0 bg-gradient-instagram" />
       
       {/* Floating decorative elements */}
       <div className="absolute top-20 left-10 w-20 h-20 rounded-full bg-primary/20 blur-3xl animate-float" />
