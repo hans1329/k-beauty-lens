@@ -22,7 +22,7 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img src={logoImage} alt="Linkkbeauty" className="h-8 w-8" />
-            <span className="text-xl font-bold gradient-text">Linkkbeauty</span>
+            <span className="text-xl font-bold gradient-text">Linkk·beauty</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -60,7 +60,7 @@ const Navigation = () => {
                 {/* Mobile Logo */}
                 <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
                   <img src={logoImage} alt="Linkkbeauty" className="h-8 w-8" />
-                  <span className="text-xl font-bold gradient-text">Linkkbeauty</span>
+                  <span className="text-xl font-bold gradient-text">Linkk·beauty</span>
                 </Link>
 
                 {/* Mobile Nav Items */}

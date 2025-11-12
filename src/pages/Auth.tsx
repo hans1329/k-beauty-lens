@@ -30,7 +30,7 @@ const Auth = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-2">
           <img src={logoImage} alt="Linkkbeauty" className="h-10 w-10" />
-          <span className="text-2xl font-bold gradient-text">Linkkbeauty</span>
+          <span className="text-2xl font-bold gradient-text">Linkk·beauty</span>
         </Link>
 
         {/* Auth Card */}
