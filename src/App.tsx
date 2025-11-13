@@ -16,7 +16,7 @@ import Creators from "./pages/Creators";
 import Videos from "./pages/Videos";
 import AnalyticsAdmin from "./pages/AnalyticsAdmin";
 import AdminUsers from "./pages/AdminUsers";
-
+import AdminEnergy from "./pages/AdminEnergy";
 import MySearches from "./pages/MySearches";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +43,7 @@ const App = () => (
           <Route path="/admin/videos" element={<Videos />} />
           <Route path="/admin/analytics" element={<AnalyticsAdmin />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/energy" element={<AdminEnergy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User, Settings as SettingsIcon } from "lucide-react";
+import { Menu, X, LogOut, User, Settings as SettingsIcon, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Progress } from "@/components/ui/progress";
 import { UserAvatar } from "@/components/UserAvatar";
 import logoImage from "@/assets/logo_linkk.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,8 @@ const Navigation = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [energyUsed, setEnergyUsed] = useState(0);
+  const [energyLimit, setEnergyLimit] = useState(13);
   const location = window.location.pathname;
 
   useEffect(() => {
@@ -32,6 +35,7 @@ const Navigation = () => {
       if (session?.user) {
         checkAdminStatus(session.user.id);
         loadAvatar(session.user.id);
+        loadEnergyUsage();
       }
     });
 
@@ -42,9 +46,11 @@ const Navigation = () => {
         if (session?.user) {
           checkAdminStatus(session.user.id);
           loadAvatar(session.user.id);
+          loadEnergyUsage();
         } else {
           setIsAdmin(false);
           setAvatarUrl("");
+          setEnergyUsed(0);
         }
       }
     );
@@ -72,6 +78,22 @@ const Navigation = () => {
     
     if (data?.avatar_url) {
       setAvatarUrl(data.avatar_url);
+    }
+  };
+
+  const loadEnergyUsage = async () => {
+    const { data } = await supabase
+      .from('api_quota_usage')
+      .select('quota_used, quota_limit')
+      .eq('date', new Date().toISOString().split('T')[0])
+      .maybeSingle();
+    
+    if (data) {
+      setEnergyUsed(data.quota_used);
+      setEnergyLimit(data.quota_limit);
+    } else {
+      setEnergyUsed(0);
+      setEnergyLimit(13);
     }
   };
 
@@ -153,6 +175,22 @@ const Navigation = () => {
                       </p>
                     </div>
                   </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">Daily Energy</span>
+                      </div>
+                      <span className="text-sm font-bold">
+                        {energyLimit - energyUsed}/{energyLimit}
+                      </span>
+                    </div>
+                    <Progress value={((energyLimit - energyUsed) / energyLimit) * 100} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Resets at midnight
+                    </p>
+                  </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/my-searches" className="cursor-pointer">
