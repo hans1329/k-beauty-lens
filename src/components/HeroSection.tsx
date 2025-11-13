@@ -64,15 +64,16 @@ const HeroSection = () => {
           <CardContent className="p-0">
             <div className="relative">
               <Input 
-                type="text"
-                name="search-query"
+                type="search"
+                name="search"
                 placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"}
                 value={channelId} 
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading} 
-                autoComplete="new-password"
+                role="searchbox"
+                aria-label="Search YouTube channel"
                 data-lpignore="true"
-                data-form-type="other"
+                data-form-type="search"
                 className="w-full bg-background/30 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0" 
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
