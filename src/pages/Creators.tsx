@@ -54,6 +54,8 @@ const Creators = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<string>("last_synced_at");
   const [currentPage, setCurrentPage] = useState(1);
+  const [resyncingCreatorId, setResyncingCreatorId] = useState<string | null>(null);
+  const [isSyncingAll, setIsSyncingAll] = useState(false);
   const itemsPerPage = 20;
 
   const handleSync = async (channelIdToSync?: string) => {
@@ -170,6 +172,55 @@ const Creators = () => {
     }
   };
 
+  const handleResyncCreator = async (channelId: string, creatorId: string) => {
+    setResyncingCreatorId(creatorId);
+    try {
+      await handleSync(channelId);
+      toast.success('Creator re-synced successfully');
+      loadCreators();
+    } catch (error) {
+      console.error('Error re-syncing creator:', error);
+      toast.error('Failed to re-sync creator');
+    } finally {
+      setResyncingCreatorId(null);
+    }
+  };
+
+  const handleSyncAll = async () => {
+    if (creators.length === 0) {
+      toast.error('No creators to sync');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to re-sync all ${creators.length} creators? This may take several minutes.`)) {
+      return;
+    }
+
+    setIsSyncingAll(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const creator of creators) {
+      try {
+        await handleSync(creator.channel_id);
+        successCount++;
+        toast.success(`Synced ${successCount}/${creators.length}: ${creator.channel_name}`);
+      } catch (error) {
+        console.error(`Failed to sync ${creator.channel_name}:`, error);
+        failCount++;
+      }
+    }
+
+    setIsSyncingAll(false);
+    loadCreators();
+    
+    if (failCount === 0) {
+      toast.success(`All ${successCount} creators synced successfully!`);
+    } else {
+      toast.error(`Synced ${successCount} creators, ${failCount} failed`);
+    }
+  };
+
   const paginatedCreators = filteredCreators.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -229,13 +280,13 @@ const Creators = () => {
                 <CardDescription>Browse and manage synced creators</CardDescription>
               </div>
               <Button
-                onClick={loadCreators}
-                disabled={isLoadingCreators}
+                onClick={handleSyncAll}
+                disabled={isSyncingAll}
                 size="sm"
                 variant="outline"
                 className="rounded-full"
               >
-                {isLoadingCreators ? (
+                {isSyncingAll ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <RefreshCw className="h-4 w-4" />
@@ -314,19 +365,36 @@ const Creators = () => {
                             {new Date(creator.last_synced_at).toLocaleDateString()}
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              onClick={() => handleDeleteCreator(creator.id)}
-                              disabled={deletingCreatorId === creator.id}
-                              size="sm"
-                              variant="ghost"
-                              className="rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
-                            >
-                              {deletingCreatorId === creator.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </Button>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                onClick={() => handleResyncCreator(creator.channel_id, creator.id)}
+                                disabled={resyncingCreatorId === creator.id || isSyncingAll}
+                                size="sm"
+                                variant="ghost"
+                                className="rounded-full hover:bg-primary/10 hover:text-primary"
+                                title="Re-sync this creator"
+                              >
+                                {resyncingCreatorId === creator.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <RefreshCw className="h-4 w-4" />
+                                )}
+                              </Button>
+                              <Button
+                                onClick={() => handleDeleteCreator(creator.id)}
+                                disabled={deletingCreatorId === creator.id || isSyncingAll}
+                                size="sm"
+                                variant="ghost"
+                                className="rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                                title="Delete this creator"
+                              >
+                                {deletingCreatorId === creator.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
