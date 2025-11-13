@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -129,6 +129,12 @@ const Navigation = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer">
+                      <SettingsIcon className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
@@ -195,6 +201,17 @@ const Navigation = () => {
                           </p>
                         </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start gap-2"
+                        asChild
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Link to="/settings">
+                          <SettingsIcon className="h-4 w-4" />
+                          Settings
+                        </Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         className="w-full justify-start gap-2"

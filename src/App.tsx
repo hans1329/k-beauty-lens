@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Analytics from "./pages/Analytics";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
+import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 import Creators from "./pages/Creators";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/about" element={<About />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/creators" element={<Creators />} />
