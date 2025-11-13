@@ -34,6 +34,7 @@ serve(async (req) => {
 
     // Parse channel identifier (URL, handle, or ID)
     let actualChannelId = channelId.trim();
+    let userProvidedHandle = null; // Store user's original handle input
     let apiUrl = '';
     
     // Check if it's a URL
@@ -44,6 +45,7 @@ serve(async (req) => {
       const handleMatch = actualChannelId.match(/@([^/\?]+)/);
       if (handleMatch) {
         const handle = handleMatch[1];
+        userProvidedHandle = `@${handle}`; // Preserve user's input
         console.log(`Extracted handle: @${handle}`);
         apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&forHandle=${handle}&key=${YOUTUBE_API_KEY}`;
       } else {
@@ -60,10 +62,11 @@ serve(async (req) => {
     } 
     // Check if it's a handle (@username)
     else if (actualChannelId.startsWith('@')) {
+      userProvidedHandle = actualChannelId; // Preserve user's input
       const handle = actualChannelId.substring(1);
-      console.log(`Using handle: @${handle}`);
+      console.log(`Using handle: ${actualChannelId}`);
       apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&forHandle=${handle}&key=${YOUTUBE_API_KEY}`;
-    } 
+    }
     // Assume it's a channel ID (UCxxxxx)
     else {
       console.log(`Using channel ID: ${actualChannelId}`);
@@ -122,7 +125,7 @@ serve(async (req) => {
         description: snippet.description,
         thumbnail_url: snippet.thumbnails?.high?.url,
         country: snippet.country,
-        custom_url: snippet.customUrl,
+        custom_url: userProvidedHandle || snippet.customUrl, // Use user's input if available
         published_at: snippet.publishedAt,
         last_synced_at: new Date().toISOString(),
       }, { onConflict: 'channel_id' })
