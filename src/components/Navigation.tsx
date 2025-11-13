@@ -126,6 +126,7 @@ const Navigation = () => {
   const baseNavItems = [
     { label: "Discover", href: "/" },
     { label: "Analytics", href: "/analytics" },
+    { label: "Rewards", href: "/rewards" },
     { label: "Energy", href: "/pricing" },
     { label: "About", href: "/about" },
   ];

@@ -18,7 +18,9 @@ import Videos from "./pages/Videos";
 import AnalyticsAdmin from "./pages/AnalyticsAdmin";
 import AdminUsers from "./pages/AdminUsers";
 import AdminEnergy from "./pages/AdminEnergy";
+import AdminRewards from "./pages/AdminRewards";
 import MySearches from "./pages/MySearches";
+import Rewards from "./pages/Rewards";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,8 @@ const App = () => (
           <Route path="/admin/analytics" element={<AnalyticsAdmin />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/energy" element={<AdminEnergy />} />
+          <Route path="/admin/rewards" element={<AdminRewards />} />
+          <Route path="/rewards" element={<Rewards />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
