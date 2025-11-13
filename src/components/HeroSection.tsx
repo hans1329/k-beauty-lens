@@ -12,6 +12,7 @@ const HeroSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [analyzingChannelId, setAnalyzingChannelId] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const handleSync = async () => {
     const targetChannelId = channelId.trim();
     if (!targetChannelId) {
@@ -77,9 +78,9 @@ const HeroSection = () => {
               handleSync();
             }
           }} className="relative">
-              <Input type="text" name="search-query" id="youtube-search" placeholder="" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0" />
-              <button type="submit" disabled={isLoading || !channelId.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 disabled:opacity-50 transition-opacity" aria-label="Search">
-                {isLoading ? <Loader2 className="h-6 w-6 md:h-7 md:w-7 animate-spin text-pink-400" /> : <Search className="h-6 w-6 md:h-7 md:w-7 text-pink-400" />}
+              <Input type="text" name="search-query" id="youtube-search" placeholder="" value={channelId} onChange={e => setChannelId(e.target.value)} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0" />
+              <button type="submit" disabled={isLoading || !channelId.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 disabled:opacity-50 transition-all" aria-label="Search">
+                {isLoading ? <Loader2 className={`h-6 w-6 md:h-7 md:w-7 animate-spin ${isFocused ? 'text-white' : 'text-pink-400'}`} /> : <Search className={`h-6 w-6 md:h-7 md:w-7 ${isFocused ? 'text-white' : 'text-pink-400'}`} />}
               </button>
             </form>
           </CardContent>
