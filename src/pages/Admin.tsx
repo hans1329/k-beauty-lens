@@ -8,7 +8,7 @@ import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const VERIFIED_CHANNELS = [
-  { name: "PONY Syndrome", handle: "@ponysmakeup" },
+  { name: "PONY Syndrome", handle: "@PONYMakeup" },
   { name: "Edward Avila", handle: "@Edward_Avila" },
   { name: "Joan Kim", handle: "@joankeem" },
   { name: "Soyoon", handle: "@soy00n" },
