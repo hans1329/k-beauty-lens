@@ -255,7 +255,11 @@ const CreatorDetail = () => {
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold gradient-text">{creator.channel_name}</h1>
-                <p className="text-muted-foreground text-lg">{creator.custom_url || `@${creator.channel_name}`}</p>
+                <p className="text-muted-foreground text-lg">
+                  {creator.custom_url 
+                    ? (creator.custom_url.startsWith('@') ? creator.custom_url : `@${creator.custom_url}`)
+                    : `@${creator.channel_name}`}
+                </p>
                 {creator.description && (
                   <p className="text-sm text-muted-foreground mt-2 max-w-2xl line-clamp-2">
                     {creator.description}
@@ -332,7 +336,7 @@ const CreatorDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Videos</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Recent Videos</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{videos.length}</div>
@@ -628,6 +632,40 @@ const CreatorDetail = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Footer */}
+        <footer className="mt-12 pt-8 pb-6 border-t border-border/50">
+          <div className="space-y-6">
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <a 
+                href="/privacy" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Privacy
+              </a>
+              <a 
+                href="/terms" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Terms
+              </a>
+              <a 
+                href="/contact" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contact
+              </a>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Fantagram Inc. © 2025. All rights reserved.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                131 Continental Dr. Suite 305, City of Newark, DE 19713 U.S.A.
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
