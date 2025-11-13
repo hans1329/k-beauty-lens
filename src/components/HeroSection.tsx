@@ -63,17 +63,33 @@ const HeroSection = () => {
         <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-0.5 md:mx-0">
           <CardContent className="p-0">
             <div className="relative">
+              {/* Hidden fake fields to trick password managers */}
+              <input 
+                type="text" 
+                autoComplete="username" 
+                style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }}
+                tabIndex={-1}
+                aria-hidden="true"
+              />
+              <input 
+                type="password" 
+                autoComplete="new-password" 
+                style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }}
+                tabIndex={-1}
+                aria-hidden="true"
+              />
               <Input 
-                type="search"
-                name="search"
+                type="text"
+                name="youtube-channel-search"
+                id="youtube-channel-search"
                 placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"}
                 value={channelId} 
                 onChange={e => setChannelId(e.target.value)} 
-                disabled={isLoading} 
-                role="searchbox"
-                aria-label="Search YouTube channel"
+                disabled={isLoading}
+                autoComplete="off"
+                data-1p-ignore
                 data-lpignore="true"
-                data-form-type="search"
+                data-form-type="other"
                 className="w-full bg-background/30 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0" 
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
