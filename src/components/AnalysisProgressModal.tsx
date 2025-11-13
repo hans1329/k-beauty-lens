@@ -147,7 +147,7 @@ const AnalysisProgressModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-background/30 backdrop-blur-3xl border-white/5">
+      <DialogContent className="sm:max-w-md bg-background/10 backdrop-blur-3xl border-white/5" hideClose>
         <DialogHeader>
           <DialogTitle className="text-white">Analyzing YouTube Channel</DialogTitle>
           <DialogDescription className="text-white/80">
