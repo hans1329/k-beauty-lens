@@ -1,10 +1,13 @@
-import { ExternalLink, TrendingUp, Users, Eye, Heart } from "lucide-react";
+import { ExternalLink, TrendingUp, Users, Eye, Heart, EyeOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface YouTuberCardProps {
   id?: string;
@@ -18,6 +21,8 @@ interface YouTuberCardProps {
   brands: string[];
   thumbnail: string;
   channelUrl: string;
+  isVisible?: boolean;
+  onVisibilityChange?: () => void;
 }
 
 const YouTuberCard = ({
@@ -32,8 +37,57 @@ const YouTuberCard = ({
   brands,
   thumbnail,
   channelUrl,
+  isVisible = true,
+  onVisibilityChange,
 }: YouTuberCardProps) => {
   const creatorId = id || channel.replace('@', '');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  useEffect(() => {
+    checkAdminStatus();
+  }, []);
+
+  const checkAdminStatus = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', session.user.id)
+      .eq('role', 'admin')
+      .single();
+    
+    setIsAdmin(!!data);
+  };
+
+  const toggleVisibility = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!id) return;
+    
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('creators')
+        .update({ is_visible: !isVisible })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success(isVisible ? 'Creator hidden' : 'Creator visible');
+      if (onVisibilityChange) {
+        onVisibilityChange();
+      }
+    } catch (error) {
+      console.error('Error updating visibility:', error);
+      toast.error('Failed to update visibility');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
   
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-glow glass border-border/50 cursor-pointer">
@@ -44,7 +98,22 @@ const YouTuberCard = ({
           alt={name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleVisibility}
+              disabled={isUpdating}
+              className="h-8 w-8 bg-background/80 hover:bg-background rounded-full shadow-elegant"
+            >
+              {isVisible ? (
+                <Eye className="h-4 w-4" />
+              ) : (
+                <EyeOff className="h-4 w-4" />
+              )}
+            </Button>
+          )}
           <Badge className="bg-primary text-white border-0 shadow-lg">
             {engagement}% Engagement
           </Badge>

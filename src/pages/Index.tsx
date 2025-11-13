@@ -18,6 +18,7 @@ interface Creator {
   description: string;
   thumbnail_url: string;
   custom_url: string;
+  is_visible: boolean;
 }
 
 const Index = () => {
@@ -33,6 +34,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from('creators')
         .select('*')
+        .eq('is_visible', true)
         .order('subscriber_count', { ascending: false });
 
       if (error) {
@@ -164,7 +166,7 @@ const Index = () => {
               return (
                 <YouTuberCard
                   key={creator.id}
-                  id={creator.channel_id}
+                  id={creator.id}
                   name={creator.channel_name}
                   channel={displayHandle}
                   subscribers={formatNumber(creator.subscriber_count)}
@@ -175,6 +177,8 @@ const Index = () => {
                   brands={[]}
                   thumbnail={creator.thumbnail_url}
                   channelUrl={`https://youtube.com/channel/${creator.channel_id}`}
+                  isVisible={creator.is_visible}
+                  onVisibilityChange={fetchCreators}
                 />
               );
             })}

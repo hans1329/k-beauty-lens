@@ -111,6 +111,7 @@ export type Database = {
           custom_url: string | null
           description: string | null
           id: string
+          is_visible: boolean
           last_synced_at: string | null
           published_at: string | null
           subscriber_count: number | null
@@ -127,6 +128,7 @@ export type Database = {
           custom_url?: string | null
           description?: string | null
           id?: string
+          is_visible?: boolean
           last_synced_at?: string | null
           published_at?: string | null
           subscriber_count?: number | null
@@ -143,6 +145,7 @@ export type Database = {
           custom_url?: string | null
           description?: string | null
           id?: string
+          is_visible?: boolean
           last_synced_at?: string | null
           published_at?: string | null
           subscriber_count?: number | null
