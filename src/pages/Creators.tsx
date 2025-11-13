@@ -303,12 +303,14 @@ const Creators = () => {
 
     for (const creator of creators) {
       try {
+        setAnalyzingCreatorId(creator.id); // Show loading on current creator
         await handleAnalyzeCreator(creator.id, creator.channel_name);
         successCount++;
-        toast.success(`Analyzed ${successCount}/${creators.length}: ${creator.channel_name}`);
       } catch (error) {
         console.error(`Failed to analyze ${creator.channel_name}:`, error);
         failCount++;
+      } finally {
+        setAnalyzingCreatorId(null); // Clear loading after each creator
       }
     }
 
