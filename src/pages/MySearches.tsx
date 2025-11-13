@@ -54,21 +54,29 @@ const MySearches = () => {
 
       if (searchError) throw searchError;
 
+      if (!searchesData || searchesData.length === 0) {
+        setSearches([]);
+        return;
+      }
+
       // Fetch creator details for each search
-      const channelIds = searchesData?.map(s => s.channel_id) || [];
+      const channelIds = searchesData.map(s => s.channel_id);
       const { data: creatorsData, error: creatorsError } = await supabase
         .from("creators")
         .select("*")
         .in("channel_id", channelIds);
 
-      if (creatorsError) throw creatorsError;
+      if (creatorsError) {
+        console.error("Error fetching creators:", creatorsError);
+      }
 
       // Merge creator data with search history
-      const enrichedSearches = searchesData?.map(search => ({
+      const enrichedSearches = searchesData.map(search => ({
         ...search,
         creator: creatorsData?.find(c => c.channel_id === search.channel_id)
-      })) || [];
+      }));
 
+      console.log("Loaded searches:", enrichedSearches);
       setSearches(enrichedSearches);
     } catch (error) {
       console.error("Error loading search history:", error);
@@ -98,7 +106,7 @@ const MySearches = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto max-w-7xl px-6 py-12 mt-16">
+      <div className="container mx-auto max-w-7xl px-6 py-8">
         <Button
           variant="outline"
           size="icon"
@@ -135,8 +143,46 @@ const MySearches = () => {
             {searches.map((search) => {
               const creator = search.creator;
               
-              // If creator data is not available, skip this search
-              if (!creator) return null;
+              // If creator data is not available, use search data as fallback
+              if (!creator) {
+                console.log("No creator data for:", search);
+                return (
+                  <div key={search.id} className="relative">
+                    <Button
+                      onClick={() => deleteSearch(search.id)}
+                      variant="outline"
+                      size="icon"
+                      className="absolute top-2 right-2 z-10 rounded-full bg-background/80 hover:bg-background shadow-lg"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Card className="overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4 mb-4">
+                          {search.channel_thumbnail && (
+                            <img
+                              src={search.channel_thumbnail}
+                              alt={search.channel_name}
+                              className="w-16 h-16 rounded-full object-cover"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground">
+                              {search.channel_name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Searched on {new Date(search.searched_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Creator data not available yet
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              }
 
               const displayHandle = creator.custom_url
                 ? creator.custom_url.startsWith('@')
