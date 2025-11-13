@@ -143,8 +143,13 @@ const CreatorDetail = () => {
   const [brandMentions, setBrandMentions] = useState<BrandMention[]>([]);
   const [keywords, setKeywords] = useState<VideoKeyword[]>([]);
   const [isEnglish, setIsEnglish] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatedVideos, setTranslatedVideos] = useState<Video[]>([]);
+  const [translatedBrands, setTranslatedBrands] = useState<BrandMention[]>([]);
 
   const t = isEnglish ? translations.en : translations.ko;
+  const displayVideos = isEnglish && translatedVideos.length > 0 ? translatedVideos : videos;
+  const displayBrands = isEnglish && translatedBrands.length > 0 ? translatedBrands : brandMentions;
 
   useEffect(() => {
     if (id) {
@@ -299,6 +304,70 @@ const CreatorDetail = () => {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const translateContent = async (targetLang: string) => {
+    if (isTranslating) return;
+    
+    setIsTranslating(true);
+    try {
+      // Collect all texts to translate
+      const videoTitles = videos.map(v => v.title);
+      const videoDescriptions = videos.map(v => v.description || '');
+      const brandNames = brandMentions.map(b => b.brand_name);
+      const brandProducts = brandMentions.map(b => b.product_name || '');
+      const brandContexts = brandMentions.map(b => b.context || '');
+
+      const allTexts = [
+        ...videoTitles,
+        ...videoDescriptions,
+        ...brandNames,
+        ...brandProducts,
+        ...brandContexts
+      ].filter(text => text && text.trim().length > 0);
+
+      const { data, error } = await supabase.functions.invoke('translate-content', {
+        body: { texts: allTexts, targetLanguage: targetLang }
+      });
+
+      if (error) throw error;
+
+      const translations = data.translations;
+      let idx = 0;
+
+      // Apply translations to videos
+      const newVideos = videos.map(video => ({
+        ...video,
+        title: translations[idx++] || video.title,
+        description: translations[idx++] || video.description
+      }));
+
+      // Apply translations to brands
+      const newBrands = brandMentions.map(brand => ({
+        ...brand,
+        brand_name: translations[idx++] || brand.brand_name,
+        product_name: translations[idx++] || brand.product_name,
+        context: translations[idx++] || brand.context
+      }));
+
+      setTranslatedVideos(newVideos);
+      setTranslatedBrands(newBrands);
+      toast.success('Translation completed');
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast.error('Translation failed. Please try again.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const handleLanguageToggle = () => {
+    const newLang = !isEnglish;
+    setIsEnglish(newLang);
+    
+    if (newLang && translatedVideos.length === 0) {
+      translateContent('en');
+    }
+  };
+
   const channelUrl = `https://youtube.com/channel/${creator.channel_id}`;
 
   return (
@@ -318,10 +387,15 @@ const CreatorDetail = () => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => setIsEnglish(!isEnglish)}
+            onClick={handleLanguageToggle}
+            disabled={isTranslating}
             className="rounded-full"
           >
-            {isEnglish ? 'KOR' : 'ENG'}
+            {isTranslating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              isEnglish ? 'KOR' : 'ENG'
+            )}
           </Button>
         </div>
 
@@ -448,7 +522,7 @@ const CreatorDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {videos.slice(0, 10).map((video) => (
+                  {displayVideos.slice(0, 10).map((video) => (
                     <div key={video.id} className="flex gap-4 p-4 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors">
                       <img 
                         src={video.thumbnail_url} 
@@ -562,7 +636,7 @@ const CreatorDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {brandMentions.slice(0, 10).map((mention, index) => (
+                  {displayBrands.slice(0, 10).map((mention, index) => (
                     <div key={index} className="p-4 rounded-lg border border-border/50 bg-accent/20">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-semibold">{mention.brand_name}</h4>
