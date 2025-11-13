@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search } from "lucide-react";
+import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const Navigation = () => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
@@ -168,8 +168,8 @@ const Navigation = () => {
             })}
           </div>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* User Actions */}
+          <div className="flex items-center gap-3">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -278,119 +278,6 @@ const Navigation = () => {
             )}
           </div>
 
-          {/* Mobile Menu */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <div className="flex flex-col gap-6 mt-8">
-                {/* Mobile Logo */}
-                <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                  <img src={logoImage} alt="Link·kbeauty" className="h-8 w-8" />
-                  <span className="text-xl font-bold gradient-text">Link·kbeauty</span>
-                </Link>
-
-                {/* Mobile Nav Items */}
-                <div className="flex flex-col gap-4">
-                  {navItems.map((item) => {
-                    const isActive = location === item.href || 
-                      (item.href !== '/' && location.startsWith(item.href));
-                    return (
-                      <Link
-                        key={item.label}
-                        to={item.href}
-                        onClick={() => setIsOpen(false)}
-                        className={`text-lg font-medium transition-colors py-2 ${
-                          isActive 
-                            ? 'text-primary font-semibold' 
-                            : 'text-foreground/80 hover:text-foreground'
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-
-                {/* Mobile Actions */}
-                <div className="flex flex-col gap-3 pt-4 border-t border-border">
-                  {user ? (
-                    <>
-                      <div className="flex items-center gap-3 px-3 py-2">
-                        <UserAvatar
-                          avatarUrl={avatarUrl}
-                          email={user.email}
-                          size="md"
-                        />
-                        <div className="flex flex-col">
-                          <p className="text-sm font-medium">
-                            {user.user_metadata?.full_name || "User"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start gap-2"
-                        asChild
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Link to="/my-searches">
-                          <User className="h-4 w-4" />
-                          My Searches
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start gap-2"
-                        asChild
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Link to="/settings">
-                          <SettingsIcon className="h-4 w-4" />
-                          Settings
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start gap-2"
-                        onClick={() => {
-                          handleSignOut();
-                          setIsOpen(false);
-                        }}
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign out
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        asChild
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Link to="/auth">Sign In</Link>
-                      </Button>
-                      <Button
-                        className="w-full rounded-full"
-                        asChild
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Link to="/auth">Get Started</Link>
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </nav>
