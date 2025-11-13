@@ -146,6 +146,7 @@ const CreatorDetail = () => {
   const [isTranslating, setIsTranslating] = useState(false);
   const [translatedVideos, setTranslatedVideos] = useState<Video[]>([]);
   const [translatedBrands, setTranslatedBrands] = useState<BrandMention[]>([]);
+  const [visibleVideosCount, setVisibleVideosCount] = useState(10);
 
   const t = isEnglish ? translations.en : translations.ko;
   const displayVideos = isEnglish && translatedVideos.length > 0 ? translatedVideos : videos;
@@ -522,7 +523,7 @@ const CreatorDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {displayVideos.slice(0, 10).map((video) => (
+                  {displayVideos.slice(0, visibleVideosCount).map((video) => (
                     <div key={video.id} className="flex gap-4 p-4 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors">
                       <img 
                         src={video.thumbnail_url} 
@@ -563,6 +564,17 @@ const CreatorDetail = () => {
                     </div>
                   ))}
                 </div>
+                {displayVideos.length > visibleVideosCount && (
+                  <div className="flex justify-center mt-6">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setVisibleVideosCount(prev => prev + 10)}
+                      className="rounded-full"
+                    >
+                      Load More Videos
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
