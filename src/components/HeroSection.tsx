@@ -81,7 +81,7 @@ const HeroSection = () => {
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading}
                 autoComplete="off"
-                className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60" 
+                className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0" 
               />
               <button
                 type="submit"
