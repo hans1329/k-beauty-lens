@@ -82,17 +82,17 @@ const Admin = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="channelId" className="text-sm font-medium">
-                  Channel ID
+                  Channel ID, Handle, or URL
                 </label>
                 <Input
                   id="channelId"
-                  placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
+                  placeholder="UCxxxxxx or @username or https://youtube.com/@username"
                   value={channelId}
                   onChange={(e) => setChannelId(e.target.value)}
                   disabled={isLoading}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Find the channel ID in the YouTube channel URL or page source
+                  Accepts: Channel ID (UCxxxxx), Handle (@username), or Full URL
                 </p>
               </div>
 

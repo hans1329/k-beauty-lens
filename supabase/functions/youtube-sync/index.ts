@@ -30,9 +30,45 @@ serve(async (req) => {
 
     console.log(`Syncing YouTube channel: ${channelId}`);
 
+    // Parse channel identifier (URL, handle, or ID)
+    let actualChannelId = channelId.trim();
+    let apiUrl = '';
+    
+    // Check if it's a URL
+    if (actualChannelId.includes('youtube.com') || actualChannelId.includes('youtu.be')) {
+      console.log('Detected YouTube URL, extracting identifier');
+      
+      // Extract handle from URL like youtube.com/@username
+      const handleMatch = actualChannelId.match(/@([^/\?]+)/);
+      if (handleMatch) {
+        const handle = handleMatch[1];
+        console.log(`Extracted handle: @${handle}`);
+        apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&forHandle=${handle}&key=${YOUTUBE_API_KEY}`;
+      } else {
+        // Extract channel ID from URL like youtube.com/channel/UCxxxxxx
+        const channelMatch = actualChannelId.match(/\/channel\/([^/\?]+)/);
+        if (channelMatch) {
+          actualChannelId = channelMatch[1];
+          console.log(`Extracted channel ID: ${actualChannelId}`);
+          apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${actualChannelId}&key=${YOUTUBE_API_KEY}`;
+        } else {
+          throw new Error('Could not extract channel ID or handle from URL. Please use channel ID (UCxxxxx), handle (@username), or full URL.');
+        }
+      }
+    } 
+    // Check if it's a handle (@username)
+    else if (actualChannelId.startsWith('@')) {
+      const handle = actualChannelId.substring(1);
+      console.log(`Using handle: @${handle}`);
+      apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&forHandle=${handle}&key=${YOUTUBE_API_KEY}`;
+    } 
+    // Assume it's a channel ID (UCxxxxx)
+    else {
+      console.log(`Using channel ID: ${actualChannelId}`);
+      apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${actualChannelId}&key=${YOUTUBE_API_KEY}`;
+    }
+
     // Fetch channel information
-    console.log(`Fetching channel data for: ${channelId}`);
-    const apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`;
     console.log('API URL (key masked):', apiUrl.replace(YOUTUBE_API_KEY, 'MASKED'));
     
     const channelResponse = await fetch(apiUrl);
@@ -64,11 +100,11 @@ serve(async (req) => {
     const snippet = channel.snippet;
     const statistics = channel.statistics;
 
-    // Upsert creator data
+    // Upsert creator data (use the actual channel ID from API response)
     const { data: creator, error: creatorError } = await supabase
       .from('creators')
       .upsert({
-        channel_id: channelId,
+        channel_id: channel.id,
         channel_name: snippet.title,
         subscriber_count: parseInt(statistics.subscriberCount || '0'),
         total_views: parseInt(statistics.viewCount || '0'),
