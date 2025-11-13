@@ -92,7 +92,17 @@ serve(async (req) => {
 
     if (!channelData.items || channelData.items.length === 0) {
       console.error('No channel found in YouTube API response');
-      throw new Error(`CHANNEL_NOT_FOUND: No YouTube channel found with handle ${channelId}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'CHANNEL_NOT_FOUND',
+          message: `No YouTube channel found with handle ${channelId}`
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
     }
 
     const channel = channelData.items[0];

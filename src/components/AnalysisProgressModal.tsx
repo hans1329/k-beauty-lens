@@ -61,7 +61,15 @@ const AnalysisProgressModal = ({
 
         if (cancelled) return;
 
-        if (error) throw error;
+        // Check for error response
+        if (error) {
+          throw error;
+        }
+        
+        // Check if response indicates channel not found
+        if (data && data.error === 'CHANNEL_NOT_FOUND') {
+          throw new Error('CHANNEL_NOT_FOUND');
+        }
 
         // Update user_searches with actual channel data
         if (data?.creator) {
@@ -105,10 +113,23 @@ const AnalysisProgressModal = ({
         if (cancelled) return;
         
         console.error('Analysis error:', err);
-        const errorMessage = err instanceof Error ? err.message : "Analysis failed";
+        let errorMessage = "Analysis failed";
+        
+        // Check if error has specific type
+        if (err && typeof err === 'object' && 'message' in err) {
+          const errorData = err as any;
+          
+          if (errorData.error === 'CHANNEL_NOT_FOUND') {
+            errorMessage = 'Channel not found';
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+        }
         
         // User-friendly error messages
-        if (errorMessage.includes("CHANNEL_NOT_FOUND")) {
+        if (errorMessage.includes("CHANNEL_NOT_FOUND") || errorMessage.includes("Channel not found")) {
           toast("Channel not found", {
             description: "We couldn't find this YouTube channel. Please check the handle and try again."
           });
