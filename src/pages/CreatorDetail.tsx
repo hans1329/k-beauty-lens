@@ -268,16 +268,22 @@ const CreatorDetail = () => {
     try {
       setLoading(true);
 
-      // Load creator info (using custom_url from URL, case-insensitive)
+      // Load creator info (case-insensitive search using ilike)
       const normalizedUrl = id.toLowerCase();
       const customUrl = normalizedUrl.startsWith('@') ? normalizedUrl : `@${normalizedUrl}`;
+      
       const { data: creatorData, error: creatorError } = await supabase
         .from('creators')
         .select('*')
-        .eq('custom_url', customUrl)
-        .single();
+        .ilike('custom_url', customUrl)
+        .maybeSingle();
 
       if (creatorError) throw creatorError;
+      if (!creatorData) {
+        toast.error('Creator not found');
+        setLoading(false);
+        return;
+      }
       setCreator(creatorData);
 
       // Load videos
