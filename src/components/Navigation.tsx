@@ -202,7 +202,7 @@ const Navigation = () => {
                         style={{
                           width: `${((energyLimit - energyUsed) / energyLimit) * 100}%`,
                           backgroundSize: "200% 100%",
-                          animation: "gradient-flow 8s linear infinite",
+                          animation: "gradient-flow 3s linear infinite",
                           transition: "width 0.5s ease-out",
                         }}
                       />
