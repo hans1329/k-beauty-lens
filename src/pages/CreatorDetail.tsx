@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, TrendingUp, Users, Eye, Heart, MessageCircle, Calendar, VideoIcon, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, TrendingUp, Users, Eye, Heart, MessageCircle, Calendar, VideoIcon, Loader2, Trash2, Gift } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -210,7 +210,8 @@ const CreatorDetail = () => {
         
         const rewardAmount = rewardSetting?.setting_value || 5;
         toast.success("Daily Quest Complete!", {
-          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`
+          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`,
+          icon: <Gift className="h-5 w-5" />
         });
       }
       
