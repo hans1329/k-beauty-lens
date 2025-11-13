@@ -9,7 +9,7 @@ import Navigation from "@/components/Navigation";
 
 const VERIFIED_CHANNELS = [
   { name: "PONY Syndrome", handle: "@ponysmakeup" },
-  { name: "Edward Avila", handle: "@edward_avila" },
+  { name: "Edward Avila", handle: "@Edward_Avila" },
   { name: "Joan Kim", handle: "@joankeem" },
   { name: "Soyoon", handle: "@soy00n" },
   { name: "씬님 (Ssin)", handle: "@Hines382" },
