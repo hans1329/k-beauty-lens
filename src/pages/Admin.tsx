@@ -8,13 +8,13 @@ import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const VERIFIED_CHANNELS = [
-  { name: "PONY Syndrome", handle: "@PONYMakeup" },
+  { name: "PONY Makeup", handle: "@PONYMakeup" },
   { name: "Edward Avila", handle: "@Edward_Avila" },
-  { name: "Joan Kim", handle: "@joankeem" },
+  { name: "Joan Kim", handle: "https://www.youtube.com/user/joankeem" },
   { name: "Soyoon", handle: "@soy00n" },
-  { name: "씬님 (Ssin)", handle: "@Hines382" },
-  { name: "다예 Daily Daye", handle: "@DailyDaye" },
-  { name: "레오제이 (Leojay)", handle: "@leojay_" },
+  { name: "씬님 (Ssin)", handle: "https://www.youtube.com/user/Hines382" },
+  { name: "다예 Daily Daye", handle: "https://www.youtube.com/c/다예DailyDaye" },
+  { name: "레오제이 (LeoJ)", handle: "https://www.youtube.com/c/LeoJMakeup" },
 ];
 
 interface Creator {
