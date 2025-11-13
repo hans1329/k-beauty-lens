@@ -168,9 +168,28 @@ const CreatorDetail = () => {
   useEffect(() => {
     if (id) {
       loadCreatorData();
+      deductVisitEnergy();
     }
     checkAdminStatus();
   }, [id]);
+
+  const deductVisitEnergy = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+      const { data: energyCost } = await supabase
+        .from('energy_costs')
+        .select('cost')
+        .eq('action_type', 'visit_creator')
+        .single();
+      
+      const cost = energyCost?.cost || 1;
+      await (supabase as any).rpc('increment_quota_usage', { quota_cost: cost });
+    } catch (error) {
+      console.error("Error deducting visit energy:", error);
+    }
+  };
 
   const checkAdminStatus = async () => {
     const { data: { user } } = await supabase.auth.getUser();
