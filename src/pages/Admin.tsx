@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Plus, RefreshCw } from "lucide-react";
+import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const VERIFIED_CHANNELS = [
@@ -33,6 +33,7 @@ const Admin = () => {
   const [syncingChannelId, setSyncingChannelId] = useState<string | null>(null);
   const [creators, setCreators] = useState<Creator[]>([]);
   const [isLoadingCreators, setIsLoadingCreators] = useState(false);
+  const [deletingCreatorId, setDeletingCreatorId] = useState<string | null>(null);
 
   const handleSync = async (channelIdToSync?: string) => {
     const targetChannelId = channelIdToSync || channelId.trim();
@@ -95,6 +96,30 @@ const Admin = () => {
   useEffect(() => {
     loadCreators();
   }, []);
+
+  const handleDeleteCreator = async (creatorId: string) => {
+    if (!confirm('Are you sure you want to delete this creator and all their videos?')) {
+      return;
+    }
+
+    setDeletingCreatorId(creatorId);
+    try {
+      const { error } = await supabase
+        .from('creators')
+        .delete()
+        .eq('id', creatorId);
+
+      if (error) throw error;
+
+      toast.success('Creator deleted successfully');
+      loadCreators();
+    } catch (error) {
+      console.error('Error deleting creator:', error);
+      toast.error('Failed to delete creator');
+    } finally {
+      setDeletingCreatorId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -245,8 +270,23 @@ const Admin = () => {
                           {creator.subscriber_count.toLocaleString()} subscribers • {creator.video_count} videos
                         </p>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(creator.last_synced_at).toLocaleDateString()}
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground text-right">
+                          {new Date(creator.last_synced_at).toLocaleDateString()}
+                        </div>
+                        <Button
+                          onClick={() => handleDeleteCreator(creator.id)}
+                          disabled={deletingCreatorId === creator.id}
+                          size="sm"
+                          variant="ghost"
+                          className="rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          {deletingCreatorId === creator.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
                   ))}
