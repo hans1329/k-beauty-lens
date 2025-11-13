@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -160,6 +161,7 @@ const CreatorDetail = () => {
   const [visibleVideosCount, setVisibleVideosCount] = useState(10);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState("videos");
 
   const t = isEnglish ? translations.en : translations.ko;
   const displayVideos = isEnglish && translatedVideos.length > 0 ? translatedVideos : videos;
@@ -637,16 +639,37 @@ const CreatorDetail = () => {
         </div>
 
         {/* Analytics Tabs */}
-        <Tabs defaultValue="videos" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 rounded-full p-1">
-            <TabsTrigger value="videos" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.videosTab}</TabsTrigger>
-            <TabsTrigger value="brands" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.brandsTab}</TabsTrigger>
-            <TabsTrigger value="keywords" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.keywordsTab}</TabsTrigger>
-            <TabsTrigger value="sentiment" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.sentimentTab}</TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          {/* Mobile Dropdown */}
+          <div className="md:hidden">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full rounded-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="videos">{t.videosTab}</SelectItem>
+                <SelectItem value="brands">{t.brandsTab}</SelectItem>
+                <SelectItem value="keywords">{t.keywordsTab}</SelectItem>
+                <SelectItem value="sentiment">{t.sentimentTab}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Videos Tab */}
-          <TabsContent value="videos" className="space-y-6">
+          {/* Desktop Tabs */}
+          <div className="hidden md:block">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4 rounded-full p-1">
+                <TabsTrigger value="videos" className="rounded-full">{t.videosTab}</TabsTrigger>
+                <TabsTrigger value="brands" className="rounded-full">{t.brandsTab}</TabsTrigger>
+                <TabsTrigger value="keywords" className="rounded-full">{t.keywordsTab}</TabsTrigger>
+                <TabsTrigger value="sentiment" className="rounded-full">{t.sentimentTab}</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === "videos" && (
+            <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader className="pb-2 md:pb-3">
@@ -735,10 +758,12 @@ const CreatorDetail = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+          )}
 
           {/* Brands Tab */}
-          <TabsContent value="brands" className="space-y-4 md:space-y-6">
+          {activeTab === "brands" && (
+          <div className="space-y-4 md:space-y-6">
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
                 <CardTitle>{t.topBrandMentions}</CardTitle>
@@ -828,10 +853,12 @@ const CreatorDetail = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+          )}
 
           {/* Keywords Tab */}
-          <TabsContent value="keywords" className="space-y-4 md:space-y-6">
+          {activeTab === "keywords" && (
+          <div className="space-y-4 md:space-y-6">
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
                 <CardTitle>{t.topKeywords}</CardTitle>
@@ -886,10 +913,12 @@ const CreatorDetail = () => {
                 </CardContent>
               </Card>
             )}
-          </TabsContent>
+          </div>
+          )}
 
           {/* Sentiment Tab */}
-          <TabsContent value="sentiment" className="space-y-4 md:space-y-6">
+          {activeTab === "sentiment" && (
+          <div className="space-y-4 md:space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader>
@@ -956,8 +985,9 @@ const CreatorDetail = () => {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+          )}
+        </div>
 
         {/* Footer */}
         <footer className="mt-12 pt-8 pb-6 border-t border-border/50">
