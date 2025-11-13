@@ -193,8 +193,9 @@ const CreatorDetail = () => {
       const result = quotaResult?.[0];
       
       if (result?.is_exceeded) {
-        toast.error("All Energy Exhausted", {
-          description: "Both daily and purchased energy depleted. Daily energy resets at midnight."
+        toast.error("Energy Depleted", {
+          description: "Daily energy refreshes at midnight (KST). You can purchase additional energy to continue exploring.",
+          duration: 5000,
         });
         return;
       }
@@ -268,14 +269,13 @@ const CreatorDetail = () => {
     try {
       setLoading(true);
 
-      // Load creator info (case-insensitive search using ilike)
-      const normalizedUrl = id.toLowerCase();
-      const customUrl = normalizedUrl.startsWith('@') ? normalizedUrl : `@${normalizedUrl}`;
+      // Load creator info (case-sensitive)
+      const customUrl = id.startsWith('@') ? id : `@${id}`;
       
       const { data: creatorData, error: creatorError } = await supabase
         .from('creators')
         .select('*')
-        .ilike('custom_url', customUrl)
+        .eq('custom_url', customUrl)
         .maybeSingle();
 
       if (creatorError) throw creatorError;
