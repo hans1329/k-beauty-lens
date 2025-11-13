@@ -1,41 +1,32 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AnalysisProgressModal from "./AnalysisProgressModal";
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [channelId, setChannelId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [analyzingChannelId, setAnalyzingChannelId] = useState("");
   const handleSync = async () => {
     const targetChannelId = channelId.trim();
     if (!targetChannelId) {
       toast.error("Please enter a valid YouTube channel ID");
       return;
     }
-    setIsLoading(true);
-    try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('youtube-sync', {
-        body: {
-          channelId: targetChannelId
-        }
-      });
-      if (error) {
-        console.error('Sync error:', error);
-        toast.error(`Failed to sync channel: ${error.message}`);
-        return;
-      }
-      toast.success(data.message || 'Channel synced successfully!');
-      setChannelId("");
-    } catch (err) {
-      console.error('Unexpected error:', err);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
+    
+    setAnalyzingChannelId(targetChannelId);
+    setShowProgressModal(true);
+    setChannelId("");
+  };
+
+  const handleAnalysisComplete = (completedChannelId: string) => {
+    setShowProgressModal(false);
+    navigate(`/analysis/${completedChannelId}`);
   };
   return <section className="relative overflow-hidden py-12 md:py-20 px-0 md:px-6">
       {/* Background gradient */}
@@ -99,6 +90,13 @@ const HeroSection = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AnalysisProgressModal
+        open={showProgressModal}
+        onOpenChange={setShowProgressModal}
+        onComplete={handleAnalysisComplete}
+        channelId={analyzingChannelId}
+      />
     </section>;
 };
 export default HeroSection;
