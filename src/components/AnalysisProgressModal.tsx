@@ -98,7 +98,7 @@ const AnalysisProgressModal = ({
           toast.success(data?.message || "Analysis completed successfully");
           
           setTimeout(() => {
-            onComplete(channelId);
+            onComplete(data?.creator?.id || channelId);
           }, 1000);
         }
       } catch (err) {

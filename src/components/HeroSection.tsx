@@ -43,9 +43,9 @@ const HeroSection = () => {
     setChannelId("");
   };
 
-  const handleAnalysisComplete = (completedChannelId: string) => {
+  const handleAnalysisComplete = (creatorId: string) => {
     setShowProgressModal(false);
-    navigate(`/analysis/${completedChannelId}`);
+    navigate(`/creator/${creatorId}`);
   };
   return <section className="relative overflow-hidden py-12 md:py-20 px-0 md:px-6">
       {/* Background gradient */}
