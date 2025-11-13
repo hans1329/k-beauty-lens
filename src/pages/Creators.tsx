@@ -218,28 +218,6 @@ const Creators = () => {
                 )}
               </Button>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {VERIFIED_CHANNELS.map((channel) => (
-                <Button
-                  key={channel.handle}
-                  onClick={() => handleSync(channel.handle)}
-                  disabled={isLoading}
-                  size="sm"
-                  variant="outline"
-                  className="rounded-full"
-                >
-                  {syncingChannelId === channel.handle ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <>
-                      <Plus className="h-3 w-3 mr-1" />
-                      {channel.name}
-                    </>
-                  )}
-                </Button>
-              ))}
-            </div>
           </CardContent>
         </Card>
 
