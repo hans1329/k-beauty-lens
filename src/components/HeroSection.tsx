@@ -43,6 +43,46 @@ const HeroSection = () => {
       return;
     }
 
+    // Check if creator already exists
+    setIsLoading(true);
+    try {
+      const { data: existingCreator } = await supabase
+        .from('creators')
+        .select('id, channel_name')
+        .eq('custom_url', targetChannelId)
+        .maybeSingle();
+
+      if (existingCreator) {
+        toast("Creator already exists", {
+          description: `${existingCreator.channel_name} is already in our database. Redirecting...`
+        });
+        
+        // Save search to database
+        try {
+          await supabase.from("user_searches").insert({
+            user_id: session.user.id,
+            channel_id: targetChannelId,
+            channel_name: existingCreator.channel_name,
+            channel_thumbnail: null
+          });
+        } catch (error) {
+          console.error("Error saving search:", error);
+        }
+
+        setChannelId("");
+        setIsLoading(false);
+        
+        // Navigate to existing creator page
+        setTimeout(() => {
+          navigate(`/creator/${existingCreator.id}`);
+        }, 1000);
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking existing creator:", error);
+    }
+    setIsLoading(false);
+
     // Save search to database
     try {
       await supabase.from("user_searches").insert({
