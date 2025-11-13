@@ -130,14 +130,30 @@ Return structured data with brand exposure scoring.`
 
     // Store brand mentions in database
     if (extraction.brand_mentions && extraction.brand_mentions.length > 0) {
-      const brandInserts = extraction.brand_mentions.map((mention: any) => ({
-        video_id: videoId,
-        brand_name: mention.brand_name,
-        product_name: mention.product_name || null,
-        mention_count: mention.mention_count || 1,
-        sentiment: mention.sentiment,
-        context: mention.context || null
-      }));
+      // Remove duplicates by brand_name and sum mention_counts
+      const brandMap = new Map();
+      extraction.brand_mentions.forEach((mention: any) => {
+        const key = mention.brand_name;
+        if (brandMap.has(key)) {
+          const existing = brandMap.get(key);
+          existing.mention_count += (mention.mention_count || 1);
+          // Keep the most detailed context
+          if (mention.context && mention.context.length > (existing.context?.length || 0)) {
+            existing.context = mention.context;
+          }
+        } else {
+          brandMap.set(key, {
+            video_id: videoId,
+            brand_name: mention.brand_name,
+            product_name: mention.product_name || null,
+            mention_count: mention.mention_count || 1,
+            sentiment: mention.sentiment,
+            context: mention.context || null
+          });
+        }
+      });
+
+      const brandInserts = Array.from(brandMap.values());
 
       const { error: brandError } = await supabase
         .from('brand_mentions')
@@ -153,12 +169,21 @@ Return structured data with brand exposure scoring.`
 
     // Store keywords in database
     if (extraction.keywords && extraction.keywords.length > 0) {
-      const keywordInserts = extraction.keywords.map((kw: any) => ({
-        video_id: videoId,
-        keyword: kw.keyword,
-        keyword_type: kw.keyword_type,
-        confidence: kw.confidence || null
-      }));
+      // Remove duplicates by keyword
+      const keywordMap = new Map();
+      extraction.keywords.forEach((kw: any) => {
+        const key = kw.keyword;
+        if (!keywordMap.has(key)) {
+          keywordMap.set(key, {
+            video_id: videoId,
+            keyword: kw.keyword,
+            keyword_type: kw.keyword_type,
+            confidence: kw.confidence || null
+          });
+        }
+      });
+
+      const keywordInserts = Array.from(keywordMap.values());
 
       const { error: keywordError } = await supabase
         .from('video_keywords')
