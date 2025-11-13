@@ -61,14 +61,22 @@ const HeroSection = () => {
           </p>
         </div>
 
-        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-2 md:mx-0">
-          <CardContent className="pt-4 pb-4 px-4 md:pt-4 md:pb-4 md:px-6">
+        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-1 md:mx-0">
+          <CardContent className="pt-4 pb-4 px-3 md:px-6">
             <div className="flex flex-row gap-2 md:gap-3 items-center">
-              <Input placeholder="@username or https://youtube.com/@username" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} autoComplete="off" className="flex-1 bg-background/60 backdrop-blur rounded-full h-16 md:h-14 text-base" onKeyDown={e => {
-              if (e.key === 'Enter' && !isLoading && channelId.trim()) {
-                handleSync();
-              }
-            }} />
+              <Input 
+                placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"}
+                value={channelId} 
+                onChange={e => setChannelId(e.target.value)} 
+                disabled={isLoading} 
+                autoComplete="off" 
+                className="flex-1 bg-background/60 backdrop-blur rounded-full h-16 md:h-14 text-base px-4 md:px-6" 
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !isLoading && channelId.trim()) {
+                    handleSync();
+                  }
+                }} 
+              />
               <Button onClick={handleSync} disabled={isLoading || !channelId.trim()} className="rounded-full h-16 w-16 md:h-14 md:w-14 flex-shrink-0" size="icon">
                 {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
               </Button>
