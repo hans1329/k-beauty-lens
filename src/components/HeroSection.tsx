@@ -65,15 +65,15 @@ const HeroSection = () => {
           </p>
         </div>
 
-        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40">
-          <CardContent className="pt-6 space-y-4">
+        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full">
+          <CardContent className="pt-6 pb-6 px-8 space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
                 placeholder="@username or https://youtube.com/@username"
                 value={channelId}
                 onChange={(e) => setChannelId(e.target.value)}
                 disabled={isLoading}
-                className="flex-1 bg-background/60 backdrop-blur"
+                className="flex-1 bg-background/60 backdrop-blur rounded-full"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
                     handleSync();
@@ -99,9 +99,6 @@ const HeroSection = () => {
                 )}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              💡 Try: @PONYMakeup, @Edward_Avila, or paste any YouTube channel URL
-            </p>
           </CardContent>
         </Card>
       </div>
