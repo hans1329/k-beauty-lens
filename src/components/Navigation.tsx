@@ -201,7 +201,7 @@ const Navigation = () => {
                         className="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 transition-all duration-500 ease-out animate-gradient-flow"
                         style={{
                           width: `${((energyLimit - energyUsed) / energyLimit) * 100}%`,
-                          backgroundSize: "200% 200%",
+                          backgroundSize: "200% 100%",
                         }}
                       />
                       <div className="absolute inset-0 flex items-center justify-end pr-2">
