@@ -1,6 +1,6 @@
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Users, Eye, ArrowLeft, Trophy } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, ArrowLeft, Trophy, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -57,7 +57,8 @@ const Analytics = () => {
         
         const rewardAmount = rewardSetting?.setting_value || 5;
         toast.success("Daily Quest Complete!", {
-          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`
+          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`,
+          icon: <Gift className="h-5 w-5" />
         });
       }
 
