@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +10,31 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
-const FilterBar = () => {
+interface FilterBarProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  sortBy: string;
+  onSortChange: (sort: string) => void;
+  skinTone: string;
+  onSkinToneChange: (tone: string) => void;
+  style: string;
+  onStyleChange: (style: string) => void;
+  activeFilters: Array<{ key: string; label: string; value: string }>;
+  onRemoveFilter: (key: string) => void;
+}
+
+const FilterBar = ({
+  searchQuery,
+  onSearchChange,
+  sortBy,
+  onSortChange,
+  skinTone,
+  onSkinToneChange,
+  style,
+  onStyleChange,
+  activeFilters,
+  onRemoveFilter,
+}: FilterBarProps) => {
   return (
     <div className="w-full space-y-4">
       {/* Search and Filter Controls */}
@@ -18,13 +42,27 @@ const FilterBar = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, style, or brand..."
+            placeholder="Search by name or description..."
             className="pl-10"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         
         <div className="flex gap-3">
-          <Select defaultValue="all">
+          <Select value={sortBy} onValueChange={onSortChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="subscribers-desc">Subscribers: High to Low</SelectItem>
+              <SelectItem value="subscribers-asc">Subscribers: Low to High</SelectItem>
+              <SelectItem value="name-asc">Name: A to Z</SelectItem>
+              <SelectItem value="name-desc">Name: Z to A</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={skinTone} onValueChange={onSkinToneChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Skin Tone" />
             </SelectTrigger>
@@ -37,7 +75,7 @@ const FilterBar = () => {
             </SelectContent>
           </Select>
 
-          <Select defaultValue="all">
+          <Select value={style} onValueChange={onStyleChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Style" />
             </SelectTrigger>
@@ -49,25 +87,26 @@ const FilterBar = () => {
               <SelectItem value="soft">Soft & Romantic</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button variant="outline" size="icon">
-            <SlidersHorizontal className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
       {/* Active Filters */}
-      <div className="flex flex-wrap gap-2">
-        <span className="text-sm text-muted-foreground">Active filters:</span>
-        <Badge variant="secondary" className="gap-1">
-          Subscribers: 100K+
-          <button className="ml-1 hover:text-destructive">×</button>
-        </Badge>
-        <Badge variant="secondary" className="gap-1">
-          Engagement: High
-          <button className="ml-1 hover:text-destructive">×</button>
-        </Badge>
-      </div>
+      {activeFilters.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-sm text-muted-foreground">Active filters:</span>
+          {activeFilters.map((filter) => (
+            <Badge key={filter.key} variant="secondary" className="gap-1">
+              {filter.label}: {filter.value}
+              <button 
+                className="ml-1 hover:text-destructive"
+                onClick={() => onRemoveFilter(filter.key)}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

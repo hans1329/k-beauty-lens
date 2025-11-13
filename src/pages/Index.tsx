@@ -22,11 +22,51 @@ interface Creator {
 }
 const Index = () => {
   const [creators, setCreators] = useState<Creator[]>([]);
+  const [filteredCreators, setFilteredCreators] = useState<Creator[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('subscribers-desc');
+  const [skinTone, setSkinTone] = useState('all');
+  const [style, setStyle] = useState('all');
   useEffect(() => {
     fetchCreators();
   }, []);
+
+  // Apply filters and sorting
+  useEffect(() => {
+    let result = [...creators];
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (creator) =>
+          creator.channel_name.toLowerCase().includes(query) ||
+          creator.description?.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'subscribers-desc':
+          return b.subscriber_count - a.subscriber_count;
+        case 'subscribers-asc':
+          return a.subscriber_count - b.subscriber_count;
+        case 'name-asc':
+          return a.channel_name.localeCompare(b.channel_name);
+        case 'name-desc':
+          return b.channel_name.localeCompare(a.channel_name);
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredCreators(result);
+  }, [creators, searchQuery, sortBy, skinTone, style]);
   const fetchCreators = async () => {
     try {
       const {
@@ -41,11 +81,33 @@ const Index = () => {
         return;
       }
       setCreators(data || []);
+      setFilteredCreators(data || []);
     } catch (err) {
       console.error('Unexpected error:', err);
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Generate active filters
+  const activeFilters = [
+    ...(searchQuery ? [{ key: 'search', label: 'Search', value: searchQuery }] : []),
+    ...(skinTone !== 'all' ? [{ key: 'skinTone', label: 'Skin Tone', value: skinTone }] : []),
+    ...(style !== 'all' ? [{ key: 'style', label: 'Style', value: style }] : []),
+  ];
+
+  const handleRemoveFilter = (key: string) => {
+    switch (key) {
+      case 'search':
+        setSearchQuery('');
+        break;
+      case 'skinTone':
+        setSkinTone('all');
+        break;
+      case 'style':
+        setStyle('all');
+        break;
     }
   };
 
@@ -142,14 +204,25 @@ const Index = () => {
             </div>
           </div>
           
-          <FilterBar />
+          <FilterBar 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            skinTone={skinTone}
+            onSkinToneChange={setSkinTone}
+            style={style}
+            onStyleChange={setStyle}
+            activeFilters={activeFilters}
+            onRemoveFilter={handleRemoveFilter}
+          />
         </div>
 
         {/* YouTuber Grid/List */}
         {isLoading ? <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div> : creators.length > 0 ? <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
-            {creators.map(creator => {
+          </div> : filteredCreators.length > 0 ? <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
+            {filteredCreators.map(creator => {
           const displayHandle = creator.custom_url ? creator.custom_url.startsWith('@') ? creator.custom_url : `@${creator.custom_url}` : `@${creator.channel_name}`;
           return <YouTuberCard key={creator.id} id={creator.id} name={creator.channel_name} channel={displayHandle} subscribers={formatNumber(creator.subscriber_count)} avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))} engagement={calculateEngagement(creator)} skinTone="Light" style={["Natural"]} brands={[]} thumbnail={creator.thumbnail_url} channelUrl={`https://youtube.com/channel/${creator.channel_id}`} isVisible={creator.is_visible} onVisibilityChange={fetchCreators} variant={viewMode === 'grid' ? 'vertical' : 'horizontal'} />;
         })}
