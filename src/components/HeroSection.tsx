@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AnalysisProgressModal from "./AnalysisProgressModal";
+import logoRed from "@/assets/logo_linkk_red.png";
 const HeroSection = () => {
   const navigate = useNavigate();
   const [channelId, setChannelId] = useState("");
@@ -180,7 +181,12 @@ const HeroSection = () => {
               handleSync();
             }
           }} className="relative">
-              <Input type="text" name="search-query" id="youtube-search" placeholder="" value={channelId} onChange={e => setChannelId(e.target.value)} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className={`w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg font-bold px-4 pr-12 md:px-6 md:pr-14 border-0 placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0 transition-colors caret-white ${isFocused ? 'text-white' : 'text-white/80'}`} />
+              <img 
+                src={logoRed} 
+                alt="Linkk Logo" 
+                className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 h-6 w-6 md:h-7 md:w-7 z-10"
+              />
+              <Input type="text" name="search-query" id="youtube-search" placeholder="" value={channelId} onChange={e => setChannelId(e.target.value)} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className={`w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg font-bold pl-12 pr-12 md:pl-16 md:pr-14 border-0 placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0 transition-colors caret-white ${isFocused ? 'text-white' : 'text-white/80'}`} />
               <button type="submit" disabled={isLoading || !channelId.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 disabled:opacity-50 transition-all" aria-label="Search">
                 {isLoading ? <Loader2 className={`h-6 w-6 md:h-7 md:w-7 animate-spin ${isFocused ? 'text-white' : 'text-pink-400'}`} /> : <Search className={`h-6 w-6 md:h-7 md:w-7 ${isFocused ? 'text-white' : 'text-pink-400'}`} />}
               </button>
