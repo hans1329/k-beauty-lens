@@ -43,6 +43,13 @@ const HeroSection = () => {
       return;
     }
 
+    // Increment quota usage (1 per search)
+    try {
+      await (supabase as any).rpc('increment_quota_usage', { quota_cost: 1 });
+    } catch (error) {
+      console.error("Error updating quota:", error);
+    }
+
     // Check if creator already exists
     setIsLoading(true);
     try {
