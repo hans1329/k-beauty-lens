@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, TrendingUp, Users, Eye, Heart, MessageCircle, Calendar, VideoIcon, Loader2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, TrendingUp, Users, Eye, Heart, MessageCircle, Calendar, VideoIcon, Loader2, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import Navigation from "@/components/Navigation";
 import {
   BarChart,
@@ -147,6 +158,8 @@ const CreatorDetail = () => {
   const [translatedVideos, setTranslatedVideos] = useState<Video[]>([]);
   const [translatedBrands, setTranslatedBrands] = useState<BrandMention[]>([]);
   const [visibleVideosCount, setVisibleVideosCount] = useState(10);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const t = isEnglish ? translations.en : translations.ko;
   const displayVideos = isEnglish && translatedVideos.length > 0 ? translatedVideos : videos;
@@ -156,7 +169,48 @@ const CreatorDetail = () => {
     if (id) {
       loadCreatorData();
     }
+    checkAdminStatus();
   }, [id]);
+
+  const checkAdminStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setIsAdmin(false);
+      return;
+    }
+
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    setIsAdmin(!!roleData);
+  };
+
+  const handleDeleteCreator = async () => {
+    if (!creator) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      const { error } = await supabase
+        .from('creators')
+        .delete()
+        .eq('id', creator.id);
+
+      if (error) throw error;
+
+      toast.success('Creator deleted successfully');
+      navigate('/creators');
+    } catch (error) {
+      console.error('Error deleting creator:', error);
+      toast.error('Failed to delete creator');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const loadCreatorData = async () => {
     try {
@@ -422,12 +476,46 @@ const CreatorDetail = () => {
                   </p>
                 )}
               </div>
-              <a href={channelUrl} target="_blank" rel="noopener noreferrer">
-                <Button className="rounded-full gap-2">
-                  <ExternalLink className="h-4 w-4" />
-                  {t.visitChannel}
-                </Button>
-              </a>
+              <div className="flex gap-2">
+                <a href={channelUrl} target="_blank" rel="noopener noreferrer">
+                  <Button className="rounded-full gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    {t.visitChannel}
+                  </Button>
+                </a>
+                {isAdmin && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="icon"
+                        className="rounded-full"
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Creator</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this creator? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteCreator}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
