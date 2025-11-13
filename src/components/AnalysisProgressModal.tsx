@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, Loader2, XCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AnalysisStep {
   id: string;
@@ -45,24 +47,72 @@ const AnalysisProgressModal = ({
     let cancelled = false;
 
     const runAnalysis = async () => {
-      for (let i = 0; i < steps.length; i++) {
-        if (cancelled) break;
-
-        setCurrentStepIndex(i);
+      try {
+        // Step 1: Fetch channel information
+        setCurrentStepIndex(0);
         setSteps(prev => prev.map((step, idx) => ({
           ...step,
-          status: idx === i ? "processing" : idx < i ? "completed" : "pending"
+          status: idx === 0 ? "processing" : "pending"
         })));
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
+        const { data, error } = await supabase.functions.invoke('youtube-sync', {
+          body: { channelId }
+        });
 
-      if (!cancelled) {
-        setSteps(prev => prev.map(step => ({ ...step, status: "completed" })));
-        setIsCompleted(true);
-        setTimeout(() => {
-          onComplete(channelId);
-        }, 1000);
+        if (cancelled) return;
+
+        if (error) throw error;
+
+        // Update user_searches with actual channel data
+        if (data?.creator) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            await supabase
+              .from('user_searches')
+              .update({
+                channel_name: data.creator.channel_name,
+                channel_thumbnail: data.creator.thumbnail_url
+              })
+              .eq('user_id', session.user.id)
+              .eq('channel_id', channelId);
+          }
+        }
+
+        // Mark all steps as processing sequentially
+        for (let i = 1; i < steps.length; i++) {
+          if (cancelled) break;
+          
+          setCurrentStepIndex(i);
+          setSteps(prev => prev.map((step, idx) => ({
+            ...step,
+            status: idx === i ? "processing" : idx < i ? "completed" : "pending"
+          })));
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        if (!cancelled) {
+          setSteps(prev => prev.map(step => ({ ...step, status: "completed" })));
+          setIsCompleted(true);
+          
+          toast.success(data?.message || "Analysis completed successfully");
+          
+          setTimeout(() => {
+            onComplete(channelId);
+          }, 1000);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        
+        console.error('Analysis error:', err);
+        const errorMessage = err instanceof Error ? err.message : "Analysis failed";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        
+        setSteps(prev => prev.map(step => ({
+          ...step,
+          status: step.status === "processing" ? "error" : step.status
+        })));
       }
     };
 
@@ -82,10 +132,10 @@ const AnalysisProgressModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-background/80 backdrop-blur-xl border-white/20">
         <DialogHeader>
-          <DialogTitle>Analyzing YouTube Channel</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-foreground">Analyzing YouTube Channel</DialogTitle>
+          <DialogDescription className="text-foreground/70">
             Please wait while we analyze the channel data
           </DialogDescription>
         </DialogHeader>
