@@ -8,7 +8,7 @@ import { Loader2, Plus } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const VERIFIED_CHANNELS = [
-  { name: "PONY Syndrome", id: "UCxv8kXBd8qEq-oXXwXsR6Rw" },
+  { name: "PONY Syndrome", id: "UCT-_4GqC-yLY1xtTHhwY0hA" },
   { name: "Edward Avila", id: "UC1i-VQpB2dXZf-TsyF34SsQ" },
   { name: "Joan Kim", id: "UCAo41QETLlwvJ-oqjmEPt8A" },
   { name: "Soyoon", id: "UCBmS_9qUyjH33AzlzDU2cSg" },
