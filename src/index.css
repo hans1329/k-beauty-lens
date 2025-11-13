@@ -194,17 +194,6 @@ All colors MUST be HSL.
     background-clip: text;
   }
 
-  /* Center toast notifications */
-  [data-sonner-toaster] {
-    left: 50% !important;
-    top: 25% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-  
-  [data-sonner-toaster][data-y-position="top"] {
-    top: 25% !important;
-  }
-
   /* Energy bar gradient animation */
   @keyframes gradient-flow {
     0% {
