@@ -13,11 +13,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <Navigation />
       
       <SidebarProvider>
-        <div className="flex w-full">
+        <div className="flex w-full min-h-[calc(100vh-64px)]">
           <AdminSidebar />
           
           <div className="flex-1 flex flex-col">
-            <header className="h-14 border-b flex items-center px-6">
+            <header className="h-14 border-b flex items-center px-6 sticky top-0 bg-background z-10">
               <SidebarTrigger />
             </header>
             
