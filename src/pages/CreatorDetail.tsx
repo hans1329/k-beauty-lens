@@ -199,6 +199,20 @@ const CreatorDetail = () => {
         return;
       }
       
+      // Show reward notification if given
+      if (result?.reward_given) {
+        const { data: rewardSetting } = await supabase
+          .from('reward_settings')
+          .select('setting_value')
+          .eq('setting_key', 'daily_completion_reward')
+          .single();
+        
+        const rewardAmount = rewardSetting?.setting_value || 5;
+        toast.success("Daily Quest Complete!", {
+          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`
+        });
+      }
+      
       // Show energy consumption notification
       const remaining = result?.quota_limit - result?.current_usage;
       const energyType = result?.used_purchased ? "Purchased Energy" : "Daily Energy";
