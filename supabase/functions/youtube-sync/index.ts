@@ -103,7 +103,6 @@ serve(async (req) => {
         }
       );
     }
-    }
 
     const channel = channelData.items[0];
     const snippet = channel.snippet;
