@@ -224,7 +224,7 @@ const Index = () => {
           </div> : filteredCreators.length > 0 ? <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
             {filteredCreators.map(creator => {
           const displayHandle = creator.custom_url ? creator.custom_url.startsWith('@') ? creator.custom_url : `@${creator.custom_url}` : `@${creator.channel_name}`;
-          return <YouTuberCard key={creator.id} id={creator.id} name={creator.channel_name} channel={displayHandle} subscribers={formatNumber(creator.subscriber_count)} avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))} engagement={calculateEngagement(creator)} skinTone="Light" style={["Natural"]} brands={[]} thumbnail={creator.thumbnail_url} channelUrl={`https://youtube.com/channel/${creator.channel_id}`} isVisible={creator.is_visible} onVisibilityChange={fetchCreators} variant={viewMode === 'grid' ? 'vertical' : 'horizontal'} />;
+          return <YouTuberCard key={creator.id} id={creator.id} name={creator.channel_name} channel={displayHandle} customUrl={creator.custom_url} subscribers={formatNumber(creator.subscriber_count)} avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))} engagement={calculateEngagement(creator)} skinTone="Light" style={["Natural"]} brands={[]} thumbnail={creator.thumbnail_url} channelUrl={`https://youtube.com/channel/${creator.channel_id}`} isVisible={creator.is_visible} onVisibilityChange={fetchCreators} variant={viewMode === 'grid' ? 'vertical' : 'horizontal'} />;
         })}
           </div> : <div className="text-center py-20">
             <p className="text-muted-foreground text-lg">

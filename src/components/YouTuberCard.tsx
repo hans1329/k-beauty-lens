@@ -13,6 +13,7 @@ interface YouTuberCardProps {
   id?: string;
   name: string;
   channel: string;
+  customUrl?: string;
   subscribers: string;
   avgViews: string;
   engagement: number;
@@ -30,6 +31,7 @@ const YouTuberCard = ({
   id,
   name,
   channel,
+  customUrl,
   subscribers,
   avgViews,
   engagement,
@@ -42,7 +44,7 @@ const YouTuberCard = ({
   onVisibilityChange,
   variant = 'vertical',
 }: YouTuberCardProps) => {
-  const creatorId = id || channel.replace('@', '');
+  const creatorUrl = customUrl?.replace('@', '') || id || channel.replace('@', '');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   
@@ -134,7 +136,7 @@ const YouTuberCard = ({
                     <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <Link to={`/creator/${creatorId}`}>
+                    <Link to={`/creator/${creatorUrl}`}>
                       <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
                         {name}
                       </h3>
@@ -184,7 +186,7 @@ const YouTuberCard = ({
 
               {/* Right section - Actions */}
               <div className="flex flex-col gap-3 sm:items-end">
-                <Link to={`/creator/${creatorId}`}>
+                <Link to={`/creator/${creatorUrl}`}>
                   <Button
                     variant="default"
                     size="sm"
@@ -263,7 +265,7 @@ const YouTuberCard = ({
             <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <Link to={`/creator/${creatorId}`}>
+            <Link to={`/creator/${creatorUrl}`}>
               <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
                 {name}
               </h3>
@@ -319,7 +321,7 @@ const YouTuberCard = ({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <Link to={`/creator/${creatorId}`} className="flex-1">
+          <Link to={`/creator/${creatorUrl}`} className="flex-1">
             <Button
               variant="default"
               size="sm"

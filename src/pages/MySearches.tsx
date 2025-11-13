@@ -229,6 +229,7 @@ const MySearches = () => {
                     id={creator.id}
                     name={creator.channel_name}
                     channel={displayHandle}
+                    customUrl={creator.custom_url}
                     subscribers={formatNumber(creator.subscriber_count)}
                     avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))}
                     engagement={calculateEngagement()}

@@ -268,11 +268,12 @@ const CreatorDetail = () => {
     try {
       setLoading(true);
 
-      // Load creator info
+      // Load creator info (using custom_url from URL)
+      const customUrl = id.startsWith('@') ? id : `@${id}`;
       const { data: creatorData, error: creatorError } = await supabase
         .from('creators')
         .select('*')
-        .eq('channel_id', id)
+        .eq('custom_url', customUrl)
         .single();
 
       if (creatorError) throw creatorError;
