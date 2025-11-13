@@ -77,6 +77,7 @@ export default {
       boxShadow: {
         glow: "var(--shadow-glow)",
         card: "var(--shadow-card)",
+        elegant: "0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)",
       },
       borderRadius: {
         lg: "var(--radius)",
