@@ -134,11 +134,30 @@ serve(async (req) => {
 
     console.log('Creator synced:', creator.channel_name);
 
+    // Check for the most recent video to enable incremental sync
+    const { data: latestVideo } = await supabase
+      .from('videos')
+      .select('published_at')
+      .eq('creator_id', creator.id)
+      .order('published_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     // Fetch videos from the channel
     const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
-    const videosResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=50&key=${YOUTUBE_API_KEY}`
-    );
+    
+    // Build API URL with publishedAfter parameter for incremental sync
+    let videosApiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=50&key=${YOUTUBE_API_KEY}`;
+    
+    if (latestVideo?.published_at) {
+      const publishedAfter = new Date(latestVideo.published_at).toISOString();
+      videosApiUrl += `&publishedAfter=${publishedAfter}`;
+      console.log(`Incremental sync: fetching videos published after ${publishedAfter}`);
+    } else {
+      console.log('First sync: fetching latest 50 videos');
+    }
+    
+    const videosResponse = await fetch(videosApiUrl);
 
     if (!videosResponse.ok) {
       console.error(`Failed to fetch videos: ${videosResponse.status}`);
