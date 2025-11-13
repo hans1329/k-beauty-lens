@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift } from "lucide-react";
+import { Menu, X, LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -234,7 +234,7 @@ const Navigation = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/my-searches" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
+                      <Search className="mr-2 h-4 w-4" />
                       <span>My Searches</span>
                     </Link>
                   </DropdownMenuItem>
@@ -262,6 +262,7 @@ const Navigation = () => {
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
