@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Video, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Users, Video, BarChart3, UserCog } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 import {
@@ -18,6 +18,7 @@ const menuItems = [
   { title: "Creators", url: "/admin/creators", icon: Users },
   { title: "Videos", url: "/admin/videos", icon: Video },
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+  { title: "Users", url: "/admin/users", icon: UserCog },
 ];
 
 export function AdminSidebar() {
