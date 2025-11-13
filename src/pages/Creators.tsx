@@ -60,6 +60,7 @@ const Creators = () => {
   const [analyzingCreatorId, setAnalyzingCreatorId] = useState<string | null>(null);
   const [isAnalyzingAll, setIsAnalyzingAll] = useState(false);
   const [abortAnalysis, setAbortAnalysis] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState({ current: 0, total: 0 });
   const itemsPerPage = 20;
 
   const handleSync = async (channelIdToSync?: string) => {
@@ -305,10 +306,13 @@ const Creators = () => {
 
     setIsAnalyzingAll(true);
     setAbortAnalysis(false);
+    setAnalysisProgress({ current: 0, total: creators.length });
     let successCount = 0;
     let failCount = 0;
 
-    for (const creator of creators) {
+    for (let i = 0; i < creators.length; i++) {
+      const creator = creators[i];
+      setAnalysisProgress({ current: i + 1, total: creators.length });
       // Check if user requested to stop
       if (abortAnalysis) {
         toast.error(`Analysis stopped. Completed ${successCount}/${creators.length} creators`);
@@ -329,6 +333,7 @@ const Creators = () => {
 
     setIsAnalyzingAll(false);
     setAbortAnalysis(false);
+    setAnalysisProgress({ current: 0, total: 0 });
     
     if (!abortAnalysis) {
       if (failCount === 0) {
@@ -400,7 +405,16 @@ const Creators = () => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>All Creators ({filteredCreators.length})</CardTitle>
-                <CardDescription>Browse and manage synced creators</CardDescription>
+                <CardDescription>
+                  {isAnalyzingAll ? (
+                    <span className="flex items-center gap-2 text-primary">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Analyzing {analysisProgress.current} of {analysisProgress.total} creators...
+                    </span>
+                  ) : (
+                    'Browse and manage synced creators'
+                  )}
+                </CardDescription>
               </div>
               <div className="flex items-center gap-2">
                 <Button
