@@ -162,7 +162,7 @@ const Auth = () => {
 
               {/* Sign In Tab */}
               <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
+                <form onSubmit={handleSignIn} className="space-y-4" autoComplete="on">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
                     <Input
@@ -181,6 +181,7 @@ const Auth = () => {
                       name="password"
                       type="password"
                       placeholder="••••••••"
+                      autoComplete="current-password"
                       required
                       disabled={isLoading}
                     />
@@ -228,7 +229,7 @@ const Auth = () => {
 
               {/* Sign Up Tab */}
               <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                <form onSubmit={handleSignUp} className="space-y-4" autoComplete="off">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input
@@ -258,6 +259,7 @@ const Auth = () => {
                       name="password"
                       type="password"
                       placeholder="••••••••"
+                      autoComplete="new-password"
                       minLength={6}
                       required
                       disabled={isLoading}
