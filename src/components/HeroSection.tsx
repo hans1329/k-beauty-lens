@@ -64,11 +64,15 @@ const HeroSection = () => {
           <CardContent className="pt-3 pb-3 px-2 md:px-6">
             <div className="relative">
               <Input 
+                type="text"
+                name="youtube-channel"
                 placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"}
                 value={channelId} 
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading} 
-                autoComplete="off" 
+                autoComplete="off"
+                data-lpignore="true"
+                data-form-type="other"
                 className="w-full bg-background/60 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14" 
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
