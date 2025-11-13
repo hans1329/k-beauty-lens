@@ -61,7 +61,7 @@ const HeroSection = () => {
         </div>
 
         <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-0.5 md:mx-0">
-          <CardContent className="pt-3 pb-3 px-2 md:px-6">
+          <CardContent className="p-0">
             <div className="relative">
               <Input 
                 type="text"
@@ -73,7 +73,7 @@ const HeroSection = () => {
                 autoComplete="off"
                 data-lpignore="true"
                 data-form-type="other"
-                className="w-full bg-background/60 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14" 
+                className="w-full bg-background/30 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0" 
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
                     handleSync();
