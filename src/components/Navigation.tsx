@@ -85,19 +85,20 @@ const Navigation = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
+    // Personal daily energy limit is always 13
+    setEnergyLimit(13);
+
     // Load daily energy usage
     const { data: quotaData } = await supabase
       .from('api_quota_usage' as any)
-      .select('quota_used, quota_limit')
+      .select('quota_used')
       .eq('date', new Date().toISOString().split('T')[0])
       .maybeSingle();
     
     if (quotaData) {
       setEnergyUsed((quotaData as any).quota_used);
-      setEnergyLimit((quotaData as any).quota_limit);
     } else {
       setEnergyUsed(0);
-      setEnergyLimit(13);
     }
 
     // Load purchased energy
