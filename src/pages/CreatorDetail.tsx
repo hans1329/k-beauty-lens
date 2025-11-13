@@ -272,7 +272,7 @@ const CreatorDetail = () => {
       const { data: creatorData, error: creatorError } = await supabase
         .from('creators')
         .select('*')
-        .eq('id', id)
+        .eq('channel_id', id)
         .single();
 
       if (creatorError) throw creatorError;
