@@ -225,8 +225,10 @@ const Creators = () => {
     }
   };
 
-  const handleAnalyzeCreator = async (creatorId: string, creatorName: string) => {
-    setAnalyzingCreatorId(creatorId);
+  const handleAnalyzeCreator = async (creatorId: string, creatorName: string, skipStateManagement = false) => {
+    if (!skipStateManagement) {
+      setAnalyzingCreatorId(creatorId);
+    }
     try {
       // Get creator's videos and comments
       const { data: videos, error: videosError } = await supabase
@@ -285,7 +287,9 @@ const Creators = () => {
       console.error('Error analyzing creator:', error);
       toast.error('Failed to analyze creator');
     } finally {
-      setAnalyzingCreatorId(null);
+      if (!skipStateManagement) {
+        setAnalyzingCreatorId(null);
+      }
     }
   };
 
@@ -311,9 +315,9 @@ const Creators = () => {
         break;
       }
 
+      setAnalyzingCreatorId(creator.id);
       try {
-        setAnalyzingCreatorId(creator.id);
-        await handleAnalyzeCreator(creator.id, creator.channel_name);
+        await handleAnalyzeCreator(creator.id, creator.channel_name, true);
         successCount++;
       } catch (error) {
         console.error(`Failed to analyze ${creator.channel_name}:`, error);
