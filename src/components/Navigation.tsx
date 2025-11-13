@@ -87,7 +87,6 @@ const Navigation = () => {
 
   const baseNavItems = [
     { label: "Discover", href: "/" },
-    { label: "My Searches", href: "/my-searches" },
     { label: "Analytics", href: "/analytics" },
     { label: "Pricing", href: "/pricing" },
     { label: "About", href: "/about" },
@@ -155,6 +154,12 @@ const Navigation = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-searches" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>My Searches</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/settings" className="cursor-pointer">
                       <SettingsIcon className="mr-2 h-4 w-4" />
@@ -235,6 +240,17 @@ const Navigation = () => {
                           </p>
                         </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start gap-2"
+                        asChild
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Link to="/my-searches">
+                          <User className="h-4 w-4" />
+                          My Searches
+                        </Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         className="w-full justify-start gap-2"
