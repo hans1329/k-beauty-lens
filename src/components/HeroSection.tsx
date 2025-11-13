@@ -69,7 +69,7 @@ const HeroSection = () => {
       
       // Show reward notification if given
       if (result?.reward_given) {
-        const { data: rewardSetting } = await supabase
+        const { data: rewardSetting } = await (supabase as any)
           .from('reward_settings')
           .select('setting_value')
           .eq('setting_key', 'daily_completion_reward')

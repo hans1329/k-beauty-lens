@@ -20,7 +20,7 @@ const AdminRewards = () => {
   const loadRewardSettings = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('reward_settings')
         .select('setting_value')
         .eq('setting_key', 'daily_completion_reward')
@@ -46,7 +46,7 @@ const AdminRewards = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('reward_settings')
         .update({ setting_value: rewardAmount })
         .eq('setting_key', 'daily_completion_reward');

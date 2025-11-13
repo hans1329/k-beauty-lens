@@ -41,7 +41,7 @@ const Rewards = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('energy_transactions')
         .select('*')
         .eq('user_id', session.user.id)
@@ -52,11 +52,11 @@ const Rewards = () => {
       setTransactions(data || []);
 
       // Calculate totals
-      const earned = data?.filter(t => ['reward', 'purchase', 'daily_reset'].includes(t.transaction_type))
-        .reduce((sum, t) => sum + t.amount, 0) || 0;
+      const earned = data?.filter((t: any) => ['reward', 'purchase', 'daily_reset'].includes(t.transaction_type))
+        .reduce((sum: number, t: any) => sum + t.amount, 0) || 0;
       
-      const used = data?.filter(t => t.transaction_type === 'used')
-        .reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0;
+      const used = data?.filter((t: any) => t.transaction_type === 'used')
+        .reduce((sum: number, t: any) => sum + Math.abs(t.amount), 0) || 0;
 
       setTotalEarned(earned);
       setTotalUsed(used);
