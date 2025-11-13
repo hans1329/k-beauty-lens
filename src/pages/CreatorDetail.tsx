@@ -312,14 +312,14 @@ const CreatorDetail = () => {
             variant="ghost" 
             size="icon"
             onClick={() => navigate(-1)}
-            className="rounded-full"
+            className="rounded-full shadow-elegant"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Button
             variant="outline"
             onClick={() => setIsEnglish(!isEnglish)}
-            className="rounded-full"
+            className="rounded-full shadow-elegant"
           >
             {isEnglish ? 'KOR' : 'ENG'}
           </Button>
