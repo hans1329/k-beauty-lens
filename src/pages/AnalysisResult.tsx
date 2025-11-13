@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import Navigation from "@/components/Navigation";
 
 interface ChannelData {
   channel_id: string;
@@ -47,20 +48,47 @@ const AnalysisResult = () => {
     try {
       setLoading(true);
 
-      // Temporary mock data until database tables are set up
-      setChannelData({
-        channel_id: channelId || "",
-        channel_name: "Sample Channel",
-        channel_handle: "@samplechannel",
-        subscriber_count: 100000,
-        total_views: 1000000,
-        video_count: 50,
-        profile_image_url: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
-      });
+      // Fetch channel data from creators table
+      const { data: creator, error: creatorError } = await supabase
+        .from('creators')
+        .select('*')
+        .or(`channel_id.eq.${channelId},custom_url.eq.${channelId}`)
+        .maybeSingle();
 
-      setVideos([]);
+      if (creatorError) throw creatorError;
+
+      if (creator) {
+        setChannelData({
+          channel_id: creator.channel_id,
+          channel_name: creator.channel_name,
+          channel_handle: creator.custom_url || '',
+          subscriber_count: creator.subscriber_count || 0,
+          total_views: creator.total_views || 0,
+          video_count: creator.video_count || 0,
+          profile_image_url: creator.thumbnail_url || ''
+        });
+
+        // Fetch videos for this creator
+        const { data: videosData, error: videosError } = await supabase
+          .from('videos')
+          .select('*')
+          .eq('creator_id', creator.id)
+          .order('published_at', { ascending: false })
+          .limit(10);
+
+        if (videosError) throw videosError;
+
+        setVideos(videosData?.map(v => ({
+          video_id: v.video_id,
+          title: v.title,
+          published_at: v.published_at,
+          view_count: v.view_count || 0,
+          like_count: v.like_count || 0,
+          thumbnail_url: v.thumbnail_url || ''
+        })) || []);
+      }
       
-      toast.success("Analysis completed successfully!");
+      toast.success("Analysis loaded successfully!");
     } catch (error) {
       console.error("Error loading analysis data:", error);
       toast.error("Failed to load analysis results");
@@ -70,9 +98,10 @@ const AnalysisResult = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto max-w-6xl px-4 py-8">
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="container mx-auto max-w-6xl px-4 py-8 mt-16">
           <Skeleton className="h-8 w-48 mb-6" />
           <Skeleton className="h-64 w-full mb-8" />
           <Skeleton className="h-96 w-full" />
@@ -83,12 +112,15 @@ const AnalysisResult = () => {
 
   if (!channelData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">No data found</h2>
-          <Button asChild className="rounded-full">
-            <Link to="/">Go back home</Link>
-          </Button>
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[calc(100vh-80px)] mt-16">
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-bold">No data found</h2>
+            <Button asChild className="rounded-full">
+              <Link to="/">Go back home</Link>
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -96,7 +128,8 @@ const AnalysisResult = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-6xl px-4 py-8">
+      <Navigation />
+      <div className="container mx-auto max-w-6xl px-4 py-8 mt-16">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
