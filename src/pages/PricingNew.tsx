@@ -63,7 +63,7 @@ const PricingNew = () => {
 
       // Add purchased energy to user profile
       const { error: updateError } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .update({ 
           purchased_energy: currentEnergy + energy
         })

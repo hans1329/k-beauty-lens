@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Progress } from "@/components/ui/progress";
 import { UserAvatar } from "@/components/UserAvatar";
 import logoImage from "@/assets/logo_linkk.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -126,7 +125,7 @@ const Navigation = () => {
   const baseNavItems = [
     { label: "Discover", href: "/" },
     { label: "Analytics", href: "/analytics" },
-    { label: "Pricing", href: "/pricing" },
+    { label: "Energy", href: "/pricing" },
     { label: "About", href: "/about" },
   ];
 
@@ -192,24 +191,31 @@ const Navigation = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <div className="px-2 py-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Daily Energy</span>
-                      </div>
-                      <span className="text-sm font-bold">
-                        {energyLimit - energyUsed}/{energyLimit}
-                      </span>
+                  <div className="mx-1 my-1 p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Zap className="w-4 h-4 text-yellow-500" />
+                      <span className="text-xs font-medium text-muted-foreground">Energy</span>
                     </div>
-                    <Progress value={((energyLimit - energyUsed) / energyLimit) * 100} className="h-2" />
+                    <div className="relative h-6 bg-muted-foreground/30 rounded-full overflow-hidden">
+                      <div
+                        className="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 transition-all duration-500 ease-out"
+                        style={{
+                          width: `${((energyLimit - energyUsed) / energyLimit) * 100}%`,
+                        }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-end pr-2">
+                        <span className="text-xs font-semibold text-white drop-shadow-md">
+                          {energyLimit - energyUsed}
+                        </span>
+                      </div>
+                    </div>
                     <div className="flex items-center justify-between mt-2">
                       <p className="text-xs text-muted-foreground">
                         Resets at midnight
                       </p>
                       {purchasedEnergy > 0 && (
                         <p className="text-xs font-medium text-primary">
-                          +{purchasedEnergy} purchased
+                          +{purchasedEnergy} bonus
                         </p>
                       )}
                     </div>
