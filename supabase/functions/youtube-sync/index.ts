@@ -132,11 +132,20 @@ serve(async (req) => {
     );
 
     if (!videosResponse.ok) {
-      throw new Error(`Failed to fetch videos: ${videosResponse.status}`);
+      console.error(`Failed to fetch videos: ${videosResponse.status}`);
+      // If videos fetch fails, still return the creator data
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Channel synced successfully, but videos could not be fetched',
+          creator 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const videosData = await videosResponse.json();
-    const videoIds = videosData.items.map((item: any) => item.contentDetails.videoId);
+    const videoIds = videosData.items?.map((item: any) => item.contentDetails.videoId) || [];
 
     if (videoIds.length === 0) {
       return new Response(
@@ -155,7 +164,15 @@ serve(async (req) => {
     );
 
     if (!videoDetailsResponse.ok) {
-      throw new Error(`Failed to fetch video details: ${videoDetailsResponse.status}`);
+      console.error(`Failed to fetch video details: ${videoDetailsResponse.status}`);
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Channel synced successfully, but video details could not be fetched',
+          creator 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const videoDetailsData = await videoDetailsResponse.json();
