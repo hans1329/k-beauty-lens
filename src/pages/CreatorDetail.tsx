@@ -650,7 +650,7 @@ const CreatorDetail = () => {
                 Terms
               </a>
               <a 
-                href="/contact" 
+                href="mailto:manager@fantagram.ai" 
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 Contact

@@ -191,16 +191,35 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border/50 mt-20">
         <div className="container mx-auto max-w-7xl px-6 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-center md:text-left">
-              <div className="text-xl font-bold gradient-text">Linkkbeauty</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Connecting brands with K-Beauty creators
+          <div className="space-y-6">
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <a 
+                href="/privacy" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Privacy
+              </a>
+              <a 
+                href="/terms" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Terms
+              </a>
+              <a 
+                href="mailto:manager@fantagram.ai" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contact
+              </a>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Fantagram Inc. © 2025. All rights reserved.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                131 Continental Dr. Suite 305, City of Newark, DE 19713 U.S.A.
               </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © 2024 Linkkbeauty. All rights reserved.
-            </p>
           </div>
         </div>
       </footer>
