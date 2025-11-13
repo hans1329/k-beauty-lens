@@ -55,6 +55,53 @@ export type Database = {
           },
         ]
       }
+      comments: {
+        Row: {
+          author_name: string | null
+          comment_id: string
+          created_at: string
+          id: string
+          like_count: number | null
+          published_at: string
+          reply_count: number | null
+          text_content: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          comment_id: string
+          created_at?: string
+          id?: string
+          like_count?: number | null
+          published_at: string
+          reply_count?: number | null
+          text_content: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          author_name?: string | null
+          comment_id?: string
+          created_at?: string
+          id?: string
+          like_count?: number | null
+          published_at?: string
+          reply_count?: number | null
+          text_content?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creators: {
         Row: {
           channel_id: string
@@ -105,6 +152,53 @@ export type Database = {
           video_count?: number | null
         }
         Relationships: []
+      }
+      thumbnail_analysis: {
+        Row: {
+          analyzed_at: string | null
+          brightness: number | null
+          color_temp: number | null
+          contrast: number | null
+          created_at: string
+          dominant_colors: Json | null
+          id: string
+          style_tags: Json | null
+          thumbnail_url: string
+          video_id: string
+        }
+        Insert: {
+          analyzed_at?: string | null
+          brightness?: number | null
+          color_temp?: number | null
+          contrast?: number | null
+          created_at?: string
+          dominant_colors?: Json | null
+          id?: string
+          style_tags?: Json | null
+          thumbnail_url: string
+          video_id: string
+        }
+        Update: {
+          analyzed_at?: string | null
+          brightness?: number | null
+          color_temp?: number | null
+          contrast?: number | null
+          created_at?: string
+          dominant_colors?: Json | null
+          id?: string
+          style_tags?: Json | null
+          thumbnail_url?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thumbnail_analysis_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: true
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_keywords: {
         Row: {

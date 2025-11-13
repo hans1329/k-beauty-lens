@@ -191,12 +191,70 @@ serve(async (req) => {
 
     console.log(`Synced ${videos.length} videos for ${creator.channel_name}`);
 
+    // Sync comments for each video (limit to 10 top comments per video)
+    let totalComments = 0;
+    for (const video of videos) {
+      try {
+        const commentsResponse = await fetch(
+          `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${video.video_id}&order=relevance&maxResults=10&key=${YOUTUBE_API_KEY}`
+        );
+
+        if (commentsResponse.ok) {
+          const commentsData = await commentsResponse.json();
+          
+          if (commentsData.items && commentsData.items.length > 0) {
+            const commentInserts = commentsData.items.map((item: any) => {
+              const comment = item.snippet.topLevelComment.snippet;
+              return {
+                video_id: video.id,
+                comment_id: item.snippet.topLevelComment.id,
+                author_name: comment.authorDisplayName,
+                text_content: comment.textDisplay,
+                like_count: parseInt(comment.likeCount || '0'),
+                reply_count: parseInt(item.snippet.totalReplyCount || '0'),
+                published_at: comment.publishedAt,
+              };
+            });
+
+            const { error: commentsError } = await supabase
+              .from('comments')
+              .upsert(commentInserts, { onConflict: 'comment_id' });
+
+            if (!commentsError) {
+              totalComments += commentInserts.length;
+            }
+          }
+        }
+      } catch (commentError) {
+        console.log(`Could not fetch comments for video ${video.video_id}:`, commentError);
+        // Continue even if comments fail (might be disabled)
+      }
+
+      // Store thumbnail analysis data
+      if (video.thumbnail_url) {
+        try {
+          await supabase
+            .from('thumbnail_analysis')
+            .upsert({
+              video_id: video.id,
+              thumbnail_url: video.thumbnail_url,
+              analyzed_at: new Date().toISOString(),
+            }, { onConflict: 'video_id' });
+        } catch (thumbnailError) {
+          console.log(`Could not store thumbnail analysis for video ${video.video_id}:`, thumbnailError);
+        }
+      }
+    }
+
+    console.log(`Synced ${totalComments} comments across ${videos.length} videos`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         creator,
         videosCount: videos.length,
-        message: `Successfully synced ${videos.length} videos from ${creator.channel_name}`
+        commentsCount: totalComments,
+        message: `Successfully synced ${videos.length} videos and ${totalComments} comments from ${creator.channel_name}`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

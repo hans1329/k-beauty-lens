@@ -51,6 +51,18 @@ interface KeywordData {
   keyword_type: string;
 }
 
+interface CommentData {
+  text_content: string;
+  like_count: number;
+  author_name: string;
+  published_at: string;
+}
+
+interface TopQuestion {
+  question: string;
+  count: number;
+}
+
 const COLORS = ['#FF6B9D', '#C084FC', '#60A5FA', '#34D399', '#FBBF24', '#F87171'];
 
 const AnalyticsAdmin = () => {
@@ -60,6 +72,8 @@ const AnalyticsAdmin = () => {
   const [topVideos, setTopVideos] = useState<Video[]>([]);
   const [brandMentions, setBrandMentions] = useState<BrandMention[]>([]);
   const [keywords, setKeywords] = useState<KeywordData[]>([]);
+  const [topComments, setTopComments] = useState<CommentData[]>([]);
+  const [topQuestions, setTopQuestions] = useState<TopQuestion[]>([]);
   const [timeRange, setTimeRange] = useState("30");
 
   useEffect(() => {
@@ -171,6 +185,37 @@ const AnalyticsAdmin = () => {
           .slice(0, 20);
 
         setKeywords(keywordData);
+      }
+
+      // Comments analysis
+      const commentsRes = await supabase
+        .from('comments')
+        .select('text_content, like_count, author_name, published_at')
+        .gte('published_at', dateFilter.toISOString())
+        .order('like_count', { ascending: false })
+        .limit(50);
+
+      if (commentsRes.data) {
+        setTopComments(commentsRes.data);
+
+        // Extract questions (comments with '?')
+        const questions = commentsRes.data
+          .filter(c => c.text_content.includes('?'))
+          .map(c => c.text_content);
+
+        // Count similar questions (simple approach - exact match)
+        const questionMap = new Map<string, number>();
+        questions.forEach(q => {
+          const normalized = q.toLowerCase().trim();
+          questionMap.set(normalized, (questionMap.get(normalized) || 0) + 1);
+        });
+
+        const topQs = Array.from(questionMap.entries())
+          .map(([question, count]) => ({ question, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+
+        setTopQuestions(topQs);
       }
 
     } catch (error) {
@@ -395,6 +440,72 @@ const AnalyticsAdmin = () => {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Comments Analysis */}
+        {topComments.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Questions</CardTitle>
+                <CardDescription>Most frequently asked questions in comments</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topQuestions.length > 0 ? (
+                  <div className="space-y-3">
+                    {topQuestions.map((q, idx) => (
+                      <div key={idx} className="p-3 border rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm">{q.question}</p>
+                            {q.count > 1 && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Asked {q.count} times
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground py-4">
+                    No questions found in comments
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Comments</CardTitle>
+                <CardDescription>Most liked comments across all videos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {topComments.slice(0, 5).map((comment, idx) => (
+                    <div key={idx} className="p-3 border rounded-lg">
+                      <div className="flex items-start gap-2 mb-2">
+                        <div className="flex-shrink-0">
+                          <Heart className="h-4 w-4 text-red-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{comment.author_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatNumber(comment.like_count)} likes
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm line-clamp-3">{comment.text_content}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Video Performance Table */}
