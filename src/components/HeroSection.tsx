@@ -25,14 +25,12 @@ const HeroSection = () => {
 
     // Only allow @username format
     const atHandleRegex = /^@[\w-]+$/;
-    
     if (!atHandleRegex.test(targetChannelId)) {
       toast("Invalid format", {
         description: "Please use the @username format (e.g., @username)"
       });
       return;
     }
-
     const {
       data: {
         session
@@ -46,43 +44,38 @@ const HeroSection = () => {
 
     // Increment quota usage based on energy cost for search
     try {
-      const { data: energyCost } = await supabase
-        .from('energy_costs' as any)
-        .select('cost')
-        .eq('action_type', 'search')
-        .single();
-      
+      const {
+        data: energyCost
+      } = await supabase.from('energy_costs' as any).select('cost').eq('action_type', 'search').single();
       const cost = (energyCost as any)?.cost || 1;
-      const { data: quotaResult, error: quotaError } = await (supabase as any)
-        .rpc('increment_quota_usage', { quota_cost: cost });
-      
+      const {
+        data: quotaResult,
+        error: quotaError
+      } = await (supabase as any).rpc('increment_quota_usage', {
+        quota_cost: cost
+      });
       if (quotaError) throw quotaError;
-      
       const result = quotaResult?.[0];
-      
       if (result?.is_exceeded) {
         toast.error("Energy Depleted", {
           description: "Daily energy refreshes at midnight (KST). You can purchase additional energy to continue searching.",
-          duration: 5000,
+          duration: 5000
         });
         setIsLoading(false);
         return;
       }
-      
+
       // Show reward notification if given
       if (result?.reward_given) {
-        const { data: rewardSetting } = await (supabase as any)
-          .from('reward_settings')
-          .select('setting_value')
-          .eq('setting_key', 'daily_completion_reward')
-          .single();
-        
+        const {
+          data: rewardSetting
+        } = await (supabase as any).from('reward_settings').select('setting_value').eq('setting_key', 'daily_completion_reward').single();
         const rewardAmount = rewardSetting?.setting_value || 5;
         toast.success("Daily Quest Complete!", {
           description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`
         });
       }
-      
+
       // Show energy consumption notification
       const remaining = result?.quota_limit - result?.current_usage;
       const energyType = result?.used_purchased ? "Purchased Energy" : "Daily Energy";
@@ -96,17 +89,14 @@ const HeroSection = () => {
     // Check if creator already exists
     setIsLoading(true);
     try {
-      const { data: existingCreator } = await supabase
-        .from('creators')
-        .select('id, channel_name')
-        .eq('custom_url', targetChannelId)
-        .maybeSingle();
-
+      const {
+        data: existingCreator
+      } = await supabase.from('creators').select('id, channel_name').eq('custom_url', targetChannelId).maybeSingle();
       if (existingCreator) {
         toast("Creator already exists", {
           description: `${existingCreator.channel_name} is already in our database. Redirecting...`
         });
-        
+
         // Save search to database
         try {
           await supabase.from("user_searches").insert({
@@ -118,10 +108,9 @@ const HeroSection = () => {
         } catch (error) {
           console.error("Error saving search:", error);
         }
-
         setChannelId("");
         setIsLoading(false);
-        
+
         // Navigate to existing creator page
         setTimeout(() => {
           navigate(`/creator/${existingCreator.id}`);
@@ -181,11 +170,7 @@ const HeroSection = () => {
               handleSync();
             }
           }} className="relative">
-              <img 
-                src={logoRed} 
-                alt="Linkk Logo" 
-                className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 h-6 w-6 md:h-7 md:w-7 z-10"
-              />
+              <img src={logoRed} alt="Linkk Logo" className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 h-6 w-6 md:h-7 md:w-7 z-10" />
               <Input type="text" name="search-query" id="youtube-search" placeholder="" value={channelId} onChange={e => setChannelId(e.target.value)} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className={`w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg font-bold pl-12 pr-12 md:pl-16 md:pr-14 border-0 placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0 transition-colors caret-white ${isFocused ? 'text-white' : 'text-white/80'}`} />
               <button type="submit" disabled={isLoading || !channelId.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 disabled:opacity-50 transition-all" aria-label="Search">
                 {isLoading ? <Loader2 className={`h-6 w-6 md:h-7 md:w-7 animate-spin ${isFocused ? 'text-white' : 'text-pink-400'}`} /> : <Search className={`h-6 w-6 md:h-7 md:w-7 ${isFocused ? 'text-white' : 'text-pink-400'}`} />}
@@ -195,7 +180,7 @@ const HeroSection = () => {
         </Card>
         
         <p className="text-center text-white/60 text-sm mt-3">
-          @username
+          @username on YouTube  
         </p>
       </div>
 
