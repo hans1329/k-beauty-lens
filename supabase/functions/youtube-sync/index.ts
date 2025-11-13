@@ -92,8 +92,7 @@ serve(async (req) => {
 
     if (!channelData.items || channelData.items.length === 0) {
       console.error('No channel found in YouTube API response');
-      console.error('Possible causes: 1) Channel ID is incorrect, 2) Channel is terminated/restricted, 3) YouTube Data API v3 not enabled in Google Cloud Console');
-      throw new Error(`Channel not found for ID: ${channelId}. Please verify: 1) Channel ID is correct, 2) Channel exists and is public, 3) YouTube Data API v3 is enabled in your Google Cloud Console project`);
+      throw new Error(`CHANNEL_NOT_FOUND: No YouTube channel found with handle ${channelId}`);
     }
 
     const channel = channelData.items[0];

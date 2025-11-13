@@ -16,43 +16,18 @@ const HeroSection = () => {
   const handleSync = async () => {
     const targetChannelId = channelId.trim();
     if (!targetChannelId) {
-      toast.error("Please enter a valid YouTube channel ID");
+      toast("Enter a channel handle", {
+        description: "Please enter a YouTube channel handle (e.g., @username)"
+      });
       return;
     }
 
-    // Extract channel handle/ID from various YouTube URL formats
-    let extractedChannelId = targetChannelId;
+    // Only allow @username format
+    const atHandleRegex = /^@[\w-]+$/;
     
-    // Handle youtube.com/@username format
-    if (targetChannelId.includes('youtube.com/@')) {
-      const match = targetChannelId.match(/youtube\.com\/@([^/?]+)/);
-      if (match) {
-        extractedChannelId = '@' + match[1];
-      }
-    }
-    // Handle @username format
-    else if (targetChannelId.startsWith('@')) {
-      extractedChannelId = targetChannelId;
-    }
-    // Handle youtube.com/channel/CHANNEL_ID format
-    else if (targetChannelId.includes('youtube.com/channel/')) {
-      const match = targetChannelId.match(/youtube\.com\/channel\/([^/?]+)/);
-      if (match) {
-        extractedChannelId = match[1];
-      }
-    }
-    // Handle youtube.com/c/CustomName format
-    else if (targetChannelId.includes('youtube.com/c/')) {
-      const match = targetChannelId.match(/youtube\.com\/c\/([^/?]+)/);
-      if (match) {
-        extractedChannelId = match[1];
-      }
-    }
-
-    // Basic validation for channel ID format
-    if (!extractedChannelId || extractedChannelId.length < 2) {
-      toast("Invalid channel format", {
-        description: "Please enter a valid YouTube channel handle (e.g., @username) or channel URL"
+    if (!atHandleRegex.test(targetChannelId)) {
+      toast("Invalid format", {
+        description: "Please use the @username format (e.g., @username)"
       });
       return;
     }
@@ -72,14 +47,14 @@ const HeroSection = () => {
     try {
       await supabase.from("user_searches").insert({
         user_id: session.user.id,
-        channel_id: extractedChannelId,
-        channel_name: extractedChannelId,
+        channel_id: targetChannelId,
+        channel_name: targetChannelId,
         channel_thumbnail: null
       });
     } catch (error) {
       console.error("Error saving search:", error);
     }
-    setAnalyzingChannelId(extractedChannelId);
+    setAnalyzingChannelId(targetChannelId);
     setShowProgressModal(true);
     setChannelId("");
   };
@@ -125,8 +100,7 @@ const HeroSection = () => {
         </Card>
         
         <p className="text-center text-white/60 text-sm mt-3">
-          <span className="md:hidden">@username</span>
-          <span className="hidden md:inline">@username or https://youtube.com/@username</span>
+          @username
         </p>
       </div>
 

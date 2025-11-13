@@ -108,13 +108,13 @@ const AnalysisProgressModal = ({
         const errorMessage = err instanceof Error ? err.message : "Analysis failed";
         
         // User-friendly error messages
-        if (errorMessage.includes("not found") || errorMessage.includes("404")) {
+        if (errorMessage.includes("CHANNEL_NOT_FOUND")) {
           toast("Channel not found", {
-            description: "We couldn't find a YouTube channel with that handle. Please check and try again."
+            description: "We couldn't find this YouTube channel. Please check the handle and try again."
           });
         } else if (errorMessage.includes("invalid") || errorMessage.includes("Invalid")) {
           toast("Invalid channel", {
-            description: "The channel format appears to be invalid. Please use @username or a valid YouTube URL."
+            description: "The channel format appears to be invalid. Please use @username format."
           });
         } else {
           toast("Unable to analyze channel", {
