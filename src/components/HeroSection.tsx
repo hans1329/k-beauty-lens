@@ -73,7 +73,8 @@ const HeroSection = () => {
         <Card className="shadow-2xl border-white/20 backdrop-blur-sm bg-white/5 rounded-full">
           <CardContent className="p-0">
             <form 
-              role="search" 
+              role="search"
+              autoComplete="off"
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!isLoading && channelId.trim()) {
