@@ -158,10 +158,10 @@ const AnalysisProgressModal = ({
                 <span
                   className={`text-sm ${
                     step.status === "completed"
-                      ? "text-foreground"
+                      ? "text-white"
                       : step.status === "processing"
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground"
+                      ? "text-white font-medium"
+                      : "text-white/70"
                   }`}
                 >
                   {step.label}
