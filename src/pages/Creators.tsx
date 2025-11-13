@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Plus, RefreshCw, Trash2, Search } from "lucide-react";
+import { Loader2, Plus, RefreshCw, Trash2, Search, Sparkles } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
 import {
   Table,
@@ -56,6 +56,8 @@ const Creators = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [resyncingCreatorId, setResyncingCreatorId] = useState<string | null>(null);
   const [isSyncingAll, setIsSyncingAll] = useState(false);
+  const [analyzingCreatorId, setAnalyzingCreatorId] = useState<string | null>(null);
+  const [isAnalyzingAll, setIsAnalyzingAll] = useState(false);
   const itemsPerPage = 20;
 
   const handleSync = async (channelIdToSync?: string) => {
@@ -221,6 +223,104 @@ const Creators = () => {
     }
   };
 
+  const handleAnalyzeCreator = async (creatorId: string, creatorName: string) => {
+    setAnalyzingCreatorId(creatorId);
+    try {
+      // Get creator's videos and comments
+      const { data: videos, error: videosError } = await supabase
+        .from('videos')
+        .select('id, description, title')
+        .eq('creator_id', creatorId);
+
+      if (videosError) throw videosError;
+
+      if (!videos || videos.length === 0) {
+        toast.error('No videos found for this creator. Please sync first.');
+        return;
+      }
+
+      const { data: comments, error: commentsError } = await supabase
+        .from('comments')
+        .select('id, text_content')
+        .in('video_id', videos.map(v => v.id))
+        .limit(50);
+
+      if (commentsError) throw commentsError;
+
+      // Run sentiment analysis
+      if (comments && comments.length > 0) {
+        const sentimentResponse = await supabase.functions.invoke('analyze-sentiment', {
+          body: { comments }
+        });
+
+        if (sentimentResponse.error) {
+          console.error('Sentiment analysis error:', sentimentResponse.error);
+        } else {
+          toast.success(`Sentiment analysis complete for ${creatorName}`);
+        }
+      }
+
+      // Run brand extraction for first 10 videos
+      let brandCount = 0;
+      for (const video of videos.slice(0, 10)) {
+        if (video.description) {
+          const extractResponse = await supabase.functions.invoke('extract-brands', {
+            body: { 
+              text: video.description,
+              videoId: video.id
+            }
+          });
+
+          if (!extractResponse.error) {
+            brandCount++;
+          }
+        }
+      }
+
+      toast.success(`Analysis complete: ${comments?.length || 0} comments, ${brandCount} videos analyzed`);
+      loadCreators();
+    } catch (error) {
+      console.error('Error analyzing creator:', error);
+      toast.error('Failed to analyze creator');
+    } finally {
+      setAnalyzingCreatorId(null);
+    }
+  };
+
+  const handleAnalyzeAll = async () => {
+    if (creators.length === 0) {
+      toast.error('No creators to analyze');
+      return;
+    }
+
+    if (!confirm(`Analyze all ${creators.length} creators? This will run sentiment and brand analysis on existing data.`)) {
+      return;
+    }
+
+    setIsAnalyzingAll(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const creator of creators) {
+      try {
+        await handleAnalyzeCreator(creator.id, creator.channel_name);
+        successCount++;
+        toast.success(`Analyzed ${successCount}/${creators.length}: ${creator.channel_name}`);
+      } catch (error) {
+        console.error(`Failed to analyze ${creator.channel_name}:`, error);
+        failCount++;
+      }
+    }
+
+    setIsAnalyzingAll(false);
+    
+    if (failCount === 0) {
+      toast.success(`All ${successCount} creators analyzed successfully!`);
+    } else {
+      toast.error(`Analyzed ${successCount} creators, ${failCount} failed`);
+    }
+  };
+
   const paginatedCreators = filteredCreators.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -281,15 +381,30 @@ const Creators = () => {
               </div>
               <Button
                 onClick={handleSyncAll}
-                disabled={isSyncingAll}
+                disabled={isSyncingAll || isAnalyzingAll}
                 size="sm"
                 variant="outline"
                 className="rounded-full"
+                title="Re-sync all creators from YouTube"
               >
                 {isSyncingAll ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                onClick={handleAnalyzeAll}
+                disabled={isAnalyzingAll || isSyncingAll}
+                size="sm"
+                variant="outline"
+                className="rounded-full"
+                title="Analyze all creators (sentiment + brands)"
+              >
+                {isAnalyzingAll ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
                 )}
               </Button>
             </div>
@@ -378,6 +493,20 @@ const Creators = () => {
                                   <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
                                   <RefreshCw className="h-4 w-4" />
+                                )}
+                              </Button>
+                              <Button
+                                onClick={() => handleAnalyzeCreator(creator.id, creator.channel_name)}
+                                disabled={analyzingCreatorId === creator.id || isSyncingAll || isAnalyzingAll}
+                                size="sm"
+                                variant="ghost"
+                                className="rounded-full hover:bg-secondary/50 hover:text-secondary-foreground"
+                                title="Analyze sentiment + brands"
+                              >
+                                {analyzingCreatorId === creator.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Sparkles className="h-4 w-4" />
                                 )}
                               </Button>
                               <Button
