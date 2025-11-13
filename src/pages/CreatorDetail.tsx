@@ -498,7 +498,7 @@ const CreatorDetail = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navigation />
 
-      <div className="container mx-auto max-w-7xl px-6 py-6 space-y-6">
+      <div className="container mx-auto max-w-7xl px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6">
         {/* Back Button and Language Toggle */}
         <div className="flex items-center justify-between">
           <Button 
@@ -524,8 +524,8 @@ const CreatorDetail = () => {
         </div>
 
         {/* Profile Header */}
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-primary/20 shadow-elegant">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
+          <Avatar className="h-20 w-20 md:h-32 md:w-32 border-4 border-primary/20 shadow-elegant">
             <AvatarImage src={creator.thumbnail_url} alt={creator.channel_name} />
             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
           </Avatar>
@@ -533,8 +533,8 @@ const CreatorDetail = () => {
           <div className="flex-1 space-y-4">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold gradient-text">{creator.channel_name}</h1>
-                <p className="text-muted-foreground text-lg">
+                <h1 className="text-2xl md:text-4xl font-bold gradient-text">{creator.channel_name}</h1>
+                <p className="text-muted-foreground text-sm md:text-lg">
                   {creator.custom_url 
                     ? (creator.custom_url.startsWith('@') ? creator.custom_url : `@${creator.custom_url}`)
                     : `@${creator.channel_name}`}
@@ -547,9 +547,10 @@ const CreatorDetail = () => {
               </div>
               <div className="flex gap-2">
                 <a href={channelUrl} target="_blank" rel="noopener noreferrer">
-                  <Button className="rounded-full gap-2">
-                    <ExternalLink className="h-4 w-4" />
-                    {t.visitChannel}
+                  <Button className="rounded-full gap-2 text-xs md:text-sm">
+                    <ExternalLink className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">{t.visitChannel}</span>
+                    <span className="sm:hidden">Visit</span>
                   </Button>
                 </a>
                 {isAdmin && (
@@ -568,15 +569,15 @@ const CreatorDetail = () => {
                         )}
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="max-w-[calc(100%-2rem)] md:max-w-lg">
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Creator</AlertDialogTitle>
                         <AlertDialogDescription>
                           Are you sure you want to delete this creator? This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                        <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteCreator}>
                           Delete
                         </AlertDialogAction>
@@ -587,44 +588,44 @@ const CreatorDetail = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
+                <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-muted-foreground">
+                  <Users className="h-3 w-3 md:h-4 md:w-4" />
                   {t.subscribers}
                 </div>
-                <div className="text-2xl font-bold">{formatNumber(creator.subscriber_count)}</div>
+                <div className="text-lg md:text-2xl font-bold">{formatNumber(creator.subscriber_count)}</div>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Eye className="h-4 w-4" />
+                <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-muted-foreground">
+                  <Eye className="h-3 w-3 md:h-4 md:w-4" />
                   {t.totalViews}
                 </div>
-                <div className="text-2xl font-bold">{formatNumber(creator.total_views)}</div>
+                <div className="text-lg md:text-2xl font-bold">{formatNumber(creator.total_views)}</div>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <TrendingUp className="h-4 w-4" />
+                <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-muted-foreground">
+                  <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
                   {t.avgViews}
                 </div>
-                <div className="text-2xl font-bold">{formatNumber(avgViews)}</div>
+                <div className="text-lg md:text-2xl font-bold">{formatNumber(avgViews)}</div>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <VideoIcon className="h-4 w-4" />
+                <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-muted-foreground">
+                  <VideoIcon className="h-3 w-3 md:h-4 md:w-4" />
                   {t.videos}
                 </div>
-                <div className="text-2xl font-bold">{creator.video_count}</div>
+                <div className="text-lg md:text-2xl font-bold">{creator.video_count}</div>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 text-xs md:text-sm">
               {creator.country && (
-                <Badge variant="secondary" className="rounded-full">
+                <Badge variant="secondary" className="rounded-full text-xs">
                   {creator.country}
                 </Badge>
               )}
-              <Badge variant="outline" className="rounded-full gap-1">
+              <Badge variant="outline" className="rounded-full gap-1 text-xs">
                 <Calendar className="h-3 w-3" />
                 {t.joined} {formatDate(creator.published_at)}
               </Badge>
@@ -648,27 +649,27 @@ const CreatorDetail = () => {
           <TabsContent value="videos" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{t.recentVideos}</CardTitle>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">{t.recentVideos}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{videos.length}</div>
+                  <div className="text-xl md:text-3xl font-bold">{videos.length}</div>
                 </CardContent>
               </Card>
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{t.totalLikes}</CardTitle>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">{t.totalLikes}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{formatNumber(totalLikes)}</div>
+                  <div className="text-xl md:text-3xl font-bold">{formatNumber(totalLikes)}</div>
                 </CardContent>
               </Card>
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{t.totalComments}</CardTitle>
+                <CardHeader className="pb-2 md:pb-3">
+                  <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">{t.totalComments}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{formatNumber(totalComments)}</div>
+                  <div className="text-xl md:text-3xl font-bold">{formatNumber(totalComments)}</div>
                 </CardContent>
               </Card>
             </div>
@@ -679,17 +680,17 @@ const CreatorDetail = () => {
                 <CardDescription>{t.latestVideos.replace('{count}', videos.length.toString())}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {displayVideos.slice(0, visibleVideosCount).map((video) => (
-                    <div key={video.id} className="flex gap-4 p-4 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors">
+                    <div key={video.id} className="flex gap-2 md:gap-4 p-3 md:p-4 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors">
                       <img 
                         src={video.thumbnail_url} 
                         alt={video.title}
-                        className="w-40 h-24 object-cover rounded-lg flex-shrink-0"
+                        className="w-24 h-16 md:w-40 md:h-24 object-cover rounded-lg flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold mb-2 line-clamp-2">{video.title}</h3>
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        <h3 className="font-semibold mb-1 md:mb-2 line-clamp-2 text-sm md:text-base">{video.title}</h3>
+                        <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Eye className="h-3 w-3" />
                             {formatNumber(video.view_count)}
@@ -712,7 +713,7 @@ const CreatorDetail = () => {
                         href={`https://youtube.com/watch?v=${video.video_id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-shrink-0"
+                        className="flex-shrink-0 hidden md:block"
                       >
                         <Button variant="ghost" size="icon" className="rounded-full">
                           <ExternalLink className="h-4 w-4" />
@@ -737,7 +738,7 @@ const CreatorDetail = () => {
           </TabsContent>
 
           {/* Brands Tab */}
-          <TabsContent value="brands" className="space-y-6">
+          <TabsContent value="brands" className="space-y-4 md:space-y-6">
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
                 <CardTitle>{t.topBrandMentions}</CardTitle>
@@ -748,23 +749,23 @@ const CreatorDetail = () => {
                   <p className="text-center text-muted-foreground py-8">No brand data available</p>
                 ) : (
                   <>
-                    <div className="space-y-4 mb-6">
+                    <div className="space-y-3 md:space-y-4 mb-6">
                       {topBrands.map((brand, index) => (
-                        <div key={brand.name} className="flex items-center gap-4">
-                          <div className="text-2xl font-bold text-muted-foreground w-8">
+                        <div key={brand.name} className="flex items-center gap-2 md:gap-4">
+                          <div className="text-xl md:text-2xl font-bold text-muted-foreground w-6 md:w-8">
                             {index + 1}
                           </div>
                           <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="font-semibold">{brand.name}</span>
+                            <div className="flex items-center justify-between mb-1 md:mb-2">
+                              <span className="font-semibold text-sm md:text-base">{brand.name}</span>
                               <div className="flex items-center gap-2">
                                 <Badge 
                                   variant={brand.sentiment === 'positive' ? 'default' : brand.sentiment === 'negative' ? 'destructive' : 'secondary'}
-                                  className="rounded-full"
+                                  className="rounded-full text-xs"
                                 >
                                   {brand.sentiment}
                                 </Badge>
-                                <span className="text-sm font-semibold">{brand.count} {t.mentions}</span>
+                                <span className="text-xs md:text-sm font-semibold">{brand.count} {t.mentions}</span>
                               </div>
                             </div>
                           </div>
@@ -772,7 +773,7 @@ const CreatorDetail = () => {
                       ))}
                     </div>
 
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={250} className="md:h-[300px]">
                       <BarChart data={topBrands.slice(0, 10)}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis 
@@ -780,7 +781,8 @@ const CreatorDetail = () => {
                           stroke="hsl(var(--muted-foreground))"
                           angle={-45}
                           textAnchor="end"
-                          height={100}
+                          height={80}
+                          className="text-xs md:text-sm"
                         />
                         <YAxis stroke="hsl(var(--muted-foreground))" />
                         <Tooltip
@@ -804,22 +806,22 @@ const CreatorDetail = () => {
                 <CardDescription>{t.howBrandsMentioned}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {displayBrands.slice(0, 10).map((mention, index) => (
-                    <div key={index} className="p-4 rounded-lg border border-border/50 bg-accent/20">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold">{mention.brand_name}</h4>
-                        <Badge variant="outline" className="rounded-full">
+                    <div key={index} className="p-3 md:p-4 rounded-lg border border-border/50 bg-accent/20">
+                      <div className="flex items-start justify-between mb-2 gap-2">
+                        <h4 className="font-semibold text-sm md:text-base">{mention.brand_name}</h4>
+                        <Badge variant="outline" className="rounded-full text-xs flex-shrink-0">
                           {mention.sentiment}
                         </Badge>
                       </div>
                       {mention.product_name && (
-                        <p className="text-sm text-muted-foreground mb-2">
+                        <p className="text-xs md:text-sm text-muted-foreground mb-2">
                           {t.product}: {mention.product_name}
                         </p>
                       )}
                       {mention.context && (
-                        <p className="text-sm line-clamp-3">{mention.context}</p>
+                        <p className="text-xs md:text-sm line-clamp-3">{mention.context}</p>
                       )}
                     </div>
                   ))}
@@ -829,7 +831,7 @@ const CreatorDetail = () => {
           </TabsContent>
 
           {/* Keywords Tab */}
-          <TabsContent value="keywords" className="space-y-6">
+          <TabsContent value="keywords" className="space-y-4 md:space-y-6">
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
                 <CardTitle>{t.topKeywords}</CardTitle>
@@ -844,7 +846,7 @@ const CreatorDetail = () => {
                       <Badge 
                         key={index} 
                         variant="outline" 
-                        className="rounded-full text-sm py-2 px-4"
+                        className="rounded-full text-xs md:text-sm py-1 md:py-2 px-2 md:px-4"
                       >
                         {kw.keyword} ({kw.count})
                       </Badge>
@@ -861,7 +863,7 @@ const CreatorDetail = () => {
                   <CardDescription>Frequency of top keywords</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
+                  <ResponsiveContainer width="100%" height={300} className="md:h-[400px]">
                     <BarChart data={topKeywords.slice(0, 15)} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
@@ -887,7 +889,7 @@ const CreatorDetail = () => {
           </TabsContent>
 
           {/* Sentiment Tab */}
-          <TabsContent value="sentiment" className="space-y-6">
+          <TabsContent value="sentiment" className="space-y-4 md:space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader>
@@ -898,7 +900,7 @@ const CreatorDetail = () => {
                   {sentimentData.every(s => s.value === 0) ? (
                     <p className="text-center text-muted-foreground py-8">{t.noSentimentData}</p>
                   ) : (
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={250} className="md:h-[300px]">
                       <PieChart>
                         <Pie
                           data={sentimentData}
@@ -927,12 +929,12 @@ const CreatorDetail = () => {
                   <CardTitle>{t.sentimentStats}</CardTitle>
                   <CardDescription>{t.sentimentBreakdown}</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 md:space-y-6">
                   {sentimentData.map((sentiment) => (
                     <div key={sentiment.name} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold">{sentiment.name}</span>
-                        <span className="text-2xl font-bold">{sentiment.value}</span>
+                        <span className="font-semibold text-sm md:text-base">{sentiment.name}</span>
+                        <span className="text-xl md:text-2xl font-bold">{sentiment.value}</span>
                       </div>
                       <div className="h-2 bg-secondary rounded-full overflow-hidden">
                         <div 
