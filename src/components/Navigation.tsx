@@ -179,7 +179,7 @@ const Navigation = () => {
                     />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-72">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
@@ -198,9 +198,10 @@ const Navigation = () => {
                     </div>
                     <div className="relative h-6 bg-muted-foreground/30 rounded-full overflow-hidden">
                       <div
-                        className="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 transition-all duration-500 ease-out"
+                        className="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 transition-all duration-500 ease-out animate-gradient-flow"
                         style={{
                           width: `${((energyLimit - energyUsed) / energyLimit) * 100}%`,
+                          backgroundSize: "200% 200%",
                         }}
                       />
                       <div className="absolute inset-0 flex items-center justify-end pr-2">
@@ -221,6 +222,12 @@ const Navigation = () => {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Discover</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/my-searches" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
