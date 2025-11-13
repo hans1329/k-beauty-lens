@@ -17,6 +17,7 @@ interface Creator {
   video_count: number;
   description: string;
   thumbnail_url: string;
+  custom_url: string;
 }
 
 const Index = () => {
@@ -155,22 +156,28 @@ const Index = () => {
           </div>
         ) : creators.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {creators.map((creator) => (
-              <YouTuberCard
-                key={creator.id}
-                id={creator.channel_id}
-                name={creator.channel_name}
-                channel={`@${creator.channel_id}`}
-                subscribers={formatNumber(creator.subscriber_count)}
-                avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))}
-                engagement={calculateEngagement(creator)}
-                skinTone="Light"
-                style={["Natural"]}
-                brands={[]}
-                thumbnail={creator.thumbnail_url}
-                channelUrl={`https://youtube.com/channel/${creator.channel_id}`}
-              />
-            ))}
+            {creators.map((creator) => {
+              const displayHandle = creator.custom_url 
+                ? (creator.custom_url.startsWith('@') ? creator.custom_url : `@${creator.custom_url}`)
+                : `@${creator.channel_name}`;
+              
+              return (
+                <YouTuberCard
+                  key={creator.id}
+                  id={creator.channel_id}
+                  name={creator.channel_name}
+                  channel={displayHandle}
+                  subscribers={formatNumber(creator.subscriber_count)}
+                  avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))}
+                  engagement={calculateEngagement(creator)}
+                  skinTone="Light"
+                  style={["Natural"]}
+                  brands={[]}
+                  thumbnail={creator.thumbnail_url}
+                  channelUrl={`https://youtube.com/channel/${creator.channel_id}`}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-20">
