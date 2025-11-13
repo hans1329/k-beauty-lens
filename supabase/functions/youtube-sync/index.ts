@@ -22,6 +22,38 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Check quota before proceeding
+    const { data: quotaData } = await supabase
+      .from('api_quota_usage')
+      .select('quota_used, quota_limit')
+      .eq('date', new Date().toISOString().split('T')[0])
+      .maybeSingle();
+
+    const currentQuota = quotaData?.quota_used || 0;
+    const quotaLimit = quotaData?.quota_limit || 3000;
+
+    console.log(`Current quota usage: ${currentQuota}/${quotaLimit}`);
+
+    // Estimate cost for this operation (channel info + 50 videos + comments)
+    const estimatedCost = 1 + 50 + 50; // rough estimate
+
+    if (currentQuota + estimatedCost > quotaLimit) {
+      console.log('Quota exceeded');
+      return new Response(
+        JSON.stringify({
+          error: 'QUOTA_EXCEEDED',
+          message: 'Daily API quota exceeded. Please try again tomorrow.',
+          currentQuota,
+          quotaLimit,
+          resetTime: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
+        }),
+        { 
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     const { channelId, action } = await req.json();
 
     if (!channelId) {
@@ -351,13 +383,19 @@ serve(async (req) => {
 
     console.log(`Sync complete: ${videos.length} videos, ${totalComments} comments analyzed`);
 
+    // Update quota usage
+    const quotaCost = 1 + videos.length + Math.ceil(totalComments / 10); // 1 for channel, 1 per video, 1 per 10 comments
+    await supabase.rpc('increment_quota_usage', { quota_cost: quotaCost });
+    console.log(`Quota cost for this sync: ${quotaCost} units`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         creator,
         videosCount: videos.length,
         commentsCount: totalComments,
-        message: `Successfully synced ${videos.length} videos and ${totalComments} comments from ${creator.channel_name}`
+        message: `Successfully synced ${videos.length} videos and ${totalComments} comments from ${creator.channel_name}`,
+        quotaUsed: quotaCost
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

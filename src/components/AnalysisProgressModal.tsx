@@ -40,6 +40,29 @@ const AnalysisProgressModal = ({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [quotaUsage, setQuotaUsage] = useState<{ current: number; limit: number } | null>(null);
+
+  // Fetch current quota usage
+  useEffect(() => {
+    const fetchQuota = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabase
+        .from('api_quota_usage')
+        .select('quota_used, quota_limit')
+        .eq('date', today)
+        .maybeSingle();
+      
+      if (data) {
+        setQuotaUsage({ current: data.quota_used, limit: data.quota_limit });
+      } else {
+        setQuotaUsage({ current: 0, limit: 3000 });
+      }
+    };
+
+    if (open) {
+      fetchQuota();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open || !channelId) return;
@@ -66,9 +89,28 @@ const AnalysisProgressModal = ({
           throw error;
         }
         
+        // Check if response indicates quota exceeded
+        if (data && data.error === 'QUOTA_EXCEEDED') {
+          throw { error: 'QUOTA_EXCEEDED', ...data };
+        }
+        
         // Check if response indicates channel not found
         if (data && data.error === 'CHANNEL_NOT_FOUND') {
           throw new Error('CHANNEL_NOT_FOUND');
+        }
+
+        // Update quota display
+        if (data?.quotaUsed) {
+          const today = new Date().toISOString().split('T')[0];
+          const { data: quotaData } = await supabase
+            .from('api_quota_usage')
+            .select('quota_used, quota_limit')
+            .eq('date', today)
+            .maybeSingle();
+          
+          if (quotaData) {
+            setQuotaUsage({ current: quotaData.quota_used, limit: quotaData.quota_limit });
+          }
         }
 
         // Update user_searches with actual channel data
@@ -116,10 +158,21 @@ const AnalysisProgressModal = ({
         let errorMessage = "Analysis failed";
         
         // Check if error has specific type
-        if (err && typeof err === 'object' && 'message' in err) {
+        if (err && typeof err === 'object') {
           const errorData = err as any;
           
-          if (errorData.error === 'CHANNEL_NOT_FOUND') {
+          if (errorData.error === 'QUOTA_EXCEEDED') {
+            errorMessage = "Daily API quota exceeded. Please try again tomorrow.";
+            toast.error(errorMessage, {
+              description: `Current usage: ${errorData.currentQuota || 'N/A'}/${errorData.quotaLimit || '3,000'}`
+            });
+            setError(errorMessage);
+            setSteps(prev => prev.map(step => ({
+              ...step,
+              status: step.status === "processing" ? "error" : step.status
+            })));
+            return;
+          } else if (errorData.error === 'CHANNEL_NOT_FOUND') {
             errorMessage = 'Channel not found';
           } else if (errorData.message) {
             errorMessage = errorData.message;
@@ -170,7 +223,14 @@ const AnalysisProgressModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-background/10 backdrop-blur-3xl border-white/5" hideClose>
         <DialogHeader>
-          <DialogTitle className="text-white">Analyzing YouTube Channel</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-white">Analyzing YouTube Channel</DialogTitle>
+            {quotaUsage && (
+              <span className="text-sm text-white/70 font-mono">
+                {quotaUsage.current}/{quotaUsage.limit}
+              </span>
+            )}
+          </div>
           <DialogDescription className="text-white/80">
             Please wait while we analyze the channel data
           </DialogDescription>
