@@ -22,6 +22,7 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState({
     id: "",
@@ -261,6 +262,9 @@ const Settings = () => {
                       setProfile({ ...profile, full_name: e.target.value })
                     }
                     placeholder="Enter your full name"
+                    readOnly={isReadOnly}
+                    onFocus={() => setIsReadOnly(false)}
+                    autoComplete="off"
                   />
                 </div>
 
