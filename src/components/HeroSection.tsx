@@ -15,7 +15,7 @@ const HeroSection = () => {
         <div className="text-center space-y-6">
           
           
-          <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl">
+          <h1 className="text-5xl font-bold tracking-tight text-white md:text-5xl">
             Connect with
             <br />
             <span className="text-white drop-shadow-lg">K-Beauty Creators</span>
