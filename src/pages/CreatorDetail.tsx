@@ -269,14 +269,22 @@ const CreatorDetail = () => {
     try {
       setLoading(true);
 
-      // Load creator info (case-insensitive search, but display exact match from DB)
-      const customUrl = id.startsWith('@') ? id : `@${id}`;
+      // Load creator info - check if id is UUID or custom_url
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUUID = uuidRegex.test(id);
       
-      const { data: creatorData, error: creatorError } = await supabase
-        .from('creators')
-        .select('*')
-        .ilike('custom_url', customUrl)
-        .maybeSingle();
+      let query = supabase.from('creators').select('*');
+      
+      if (isUUID) {
+        // Search by ID if it's a UUID
+        query = query.eq('id', id);
+      } else {
+        // Search by custom_url (case-insensitive)
+        const customUrl = id.startsWith('@') ? id : `@${id}`;
+        query = query.ilike('custom_url', customUrl);
+      }
+      
+      const { data: creatorData, error: creatorError } = await query.maybeSingle();
 
       if (creatorError) throw creatorError;
       if (!creatorData) {
