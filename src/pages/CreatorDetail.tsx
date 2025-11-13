@@ -23,6 +23,75 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const translations = {
+  en: {
+    visitChannel: "Visit Channel",
+    subscribers: "Subscribers",
+    totalViews: "Total Views",
+    avgViews: "Avg Views",
+    videos: "Videos",
+    joined: "Joined",
+    lastSynced: "Last synced",
+    videosTab: "Videos",
+    brandsTab: "Brands",
+    keywordsTab: "Keywords",
+    sentimentTab: "Sentiment",
+    recentVideos: "Recent Videos",
+    totalLikes: "Total Likes",
+    totalComments: "Total Comments",
+    latestVideos: "Latest {count} videos from this creator",
+    topBrandMentions: "Top Brand Mentions",
+    frequentBrands: "Most frequently mentioned brands across videos",
+    mentions: "mentions",
+    brandContextExamples: "Brand Context Examples",
+    howBrandsMentioned: "How brands are mentioned in videos",
+    product: "Product",
+    topKeywords: "Top Keywords",
+    commonKeywords: "Most common keywords across videos",
+    noKeywordData: "No keyword data available",
+    brandSentimentDist: "Brand Sentiment Distribution",
+    overallSentiment: "Overall sentiment in brand mentions",
+    noSentimentData: "No sentiment data available",
+    sentimentStats: "Sentiment Statistics",
+    sentimentBreakdown: "Breakdown of brand sentiment",
+    ofAllMentions: "of all mentions",
+    creatorNotFound: "Creator not found"
+  },
+  ko: {
+    visitChannel: "채널 방문",
+    subscribers: "구독자",
+    totalViews: "총 조회수",
+    avgViews: "평균 조회수",
+    videos: "영상",
+    joined: "가입일",
+    lastSynced: "마지막 동기화",
+    videosTab: "영상",
+    brandsTab: "브랜드",
+    keywordsTab: "키워드",
+    sentimentTab: "감정 분석",
+    recentVideos: "최근 영상",
+    totalLikes: "총 좋아요",
+    totalComments: "총 댓글",
+    latestVideos: "이 크리에이터의 최근 {count}개 영상",
+    topBrandMentions: "주요 브랜드 언급",
+    frequentBrands: "영상에서 가장 자주 언급된 브랜드",
+    mentions: "회 언급",
+    brandContextExamples: "브랜드 맥락 예시",
+    howBrandsMentioned: "영상에서 브랜드가 언급된 방식",
+    product: "제품",
+    topKeywords: "주요 키워드",
+    commonKeywords: "영상에서 가장 많이 사용된 키워드",
+    noKeywordData: "키워드 데이터가 없습니다",
+    brandSentimentDist: "브랜드 감정 분포",
+    overallSentiment: "브랜드 언급의 전반적인 감정",
+    noSentimentData: "감정 데이터가 없습니다",
+    sentimentStats: "감정 통계",
+    sentimentBreakdown: "브랜드 감정 분석",
+    ofAllMentions: "전체 언급 중",
+    creatorNotFound: "크리에이터를 찾을 수 없습니다"
+  }
+};
+
 interface Creator {
   id: string;
   channel_id: string;
@@ -73,6 +142,9 @@ const CreatorDetail = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [brandMentions, setBrandMentions] = useState<BrandMention[]>([]);
   const [keywords, setKeywords] = useState<VideoKeyword[]>([]);
+  const [isEnglish, setIsEnglish] = useState(false);
+
+  const t = isEnglish ? translations.en : translations.ko;
 
   useEffect(() => {
     if (id) {
@@ -150,7 +222,7 @@ const CreatorDetail = () => {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         <Navigation />
         <div className="container mx-auto max-w-7xl px-6 py-6">
-          <p className="text-center text-muted-foreground">Creator not found</p>
+          <p className="text-center text-muted-foreground">{t.creatorNotFound}</p>
         </div>
       </div>
     );
@@ -234,15 +306,24 @@ const CreatorDetail = () => {
       <Navigation />
 
       <div className="container mx-auto max-w-7xl px-6 py-6 space-y-6">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="rounded-full"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+        {/* Back Button and Language Toggle */}
+        <div className="flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="rounded-full"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsEnglish(!isEnglish)}
+            className="rounded-full"
+          >
+            {isEnglish ? 'KOR' : 'ENG'}
+          </Button>
+        </div>
 
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -269,7 +350,7 @@ const CreatorDetail = () => {
               <a href={channelUrl} target="_blank" rel="noopener noreferrer">
                 <Button className="rounded-full gap-2">
                   <ExternalLink className="h-4 w-4" />
-                  Visit Channel
+                  {t.visitChannel}
                 </Button>
               </a>
             </div>
@@ -278,28 +359,28 @@ const CreatorDetail = () => {
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users className="h-4 w-4" />
-                  Subscribers
+                  {t.subscribers}
                 </div>
                 <div className="text-2xl font-bold">{formatNumber(creator.subscriber_count)}</div>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Eye className="h-4 w-4" />
-                  Total Views
+                  {t.totalViews}
                 </div>
                 <div className="text-2xl font-bold">{formatNumber(creator.total_views)}</div>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
-                  Avg Views
+                  {t.avgViews}
                 </div>
                 <div className="text-2xl font-bold">{formatNumber(avgViews)}</div>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <VideoIcon className="h-4 w-4" />
-                  Videos
+                  {t.videos}
                 </div>
                 <div className="text-2xl font-bold">{creator.video_count}</div>
               </div>
@@ -313,10 +394,10 @@ const CreatorDetail = () => {
               )}
               <Badge variant="outline" className="rounded-full gap-1">
                 <Calendar className="h-3 w-3" />
-                Joined {formatDate(creator.published_at)}
+                {t.joined} {formatDate(creator.published_at)}
               </Badge>
               <Badge variant="outline" className="rounded-full">
-                Last synced: {formatDate(creator.last_synced_at)}
+                {t.lastSynced}: {formatDate(creator.last_synced_at)}
               </Badge>
             </div>
           </div>
@@ -325,10 +406,10 @@ const CreatorDetail = () => {
         {/* Analytics Tabs */}
         <Tabs defaultValue="videos" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 rounded-full">
-            <TabsTrigger value="videos" className="rounded-full">Videos</TabsTrigger>
-            <TabsTrigger value="brands" className="rounded-full">Brands</TabsTrigger>
-            <TabsTrigger value="keywords" className="rounded-full">Keywords</TabsTrigger>
-            <TabsTrigger value="sentiment" className="rounded-full">Sentiment</TabsTrigger>
+            <TabsTrigger value="videos" className="rounded-full">{t.videosTab}</TabsTrigger>
+            <TabsTrigger value="brands" className="rounded-full">{t.brandsTab}</TabsTrigger>
+            <TabsTrigger value="keywords" className="rounded-full">{t.keywordsTab}</TabsTrigger>
+            <TabsTrigger value="sentiment" className="rounded-full">{t.sentimentTab}</TabsTrigger>
           </TabsList>
 
           {/* Videos Tab */}
@@ -336,7 +417,7 @@ const CreatorDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Recent Videos</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t.recentVideos}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{videos.length}</div>
@@ -344,7 +425,7 @@ const CreatorDetail = () => {
               </Card>
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Likes</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t.totalLikes}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{formatNumber(totalLikes)}</div>
@@ -352,7 +433,7 @@ const CreatorDetail = () => {
               </Card>
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Comments</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t.totalComments}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{formatNumber(totalComments)}</div>
@@ -362,8 +443,8 @@ const CreatorDetail = () => {
 
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
-                <CardTitle>Recent Videos</CardTitle>
-                <CardDescription>Latest {videos.length} videos from this creator</CardDescription>
+                <CardTitle>{t.recentVideos}</CardTitle>
+                <CardDescription>{t.latestVideos.replace('{count}', videos.length.toString())}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -416,8 +497,8 @@ const CreatorDetail = () => {
           <TabsContent value="brands" className="space-y-6">
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
-                <CardTitle>Top Brand Mentions</CardTitle>
-                <CardDescription>Most frequently mentioned brands across videos</CardDescription>
+                <CardTitle>{t.topBrandMentions}</CardTitle>
+                <CardDescription>{t.frequentBrands}</CardDescription>
               </CardHeader>
               <CardContent>
                 {topBrands.length === 0 ? (
@@ -440,7 +521,7 @@ const CreatorDetail = () => {
                                 >
                                   {brand.sentiment}
                                 </Badge>
-                                <span className="text-sm font-semibold">{brand.count} mentions</span>
+                                <span className="text-sm font-semibold">{brand.count} {t.mentions}</span>
                               </div>
                             </div>
                           </div>
@@ -476,8 +557,8 @@ const CreatorDetail = () => {
 
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
-                <CardTitle>Brand Context Examples</CardTitle>
-                <CardDescription>How brands are mentioned in videos</CardDescription>
+                <CardTitle>{t.brandContextExamples}</CardTitle>
+                <CardDescription>{t.howBrandsMentioned}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -491,7 +572,7 @@ const CreatorDetail = () => {
                       </div>
                       {mention.product_name && (
                         <p className="text-sm text-muted-foreground mb-2">
-                          Product: {mention.product_name}
+                          {t.product}: {mention.product_name}
                         </p>
                       )}
                       {mention.context && (
@@ -508,12 +589,12 @@ const CreatorDetail = () => {
           <TabsContent value="keywords" className="space-y-6">
             <Card className="border-border/50 backdrop-blur-sm bg-card/80">
               <CardHeader>
-                <CardTitle>Top Keywords</CardTitle>
-                <CardDescription>Most common keywords across videos</CardDescription>
+                <CardTitle>{t.topKeywords}</CardTitle>
+                <CardDescription>{t.commonKeywords}</CardDescription>
               </CardHeader>
               <CardContent>
                 {topKeywords.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No keyword data available</p>
+                  <p className="text-center text-muted-foreground py-8">{t.noKeywordData}</p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {topKeywords.map((kw, index) => (
@@ -567,12 +648,12 @@ const CreatorDetail = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader>
-                  <CardTitle>Brand Sentiment Distribution</CardTitle>
-                  <CardDescription>Overall sentiment in brand mentions</CardDescription>
+                  <CardTitle>{t.brandSentimentDist}</CardTitle>
+                  <CardDescription>{t.overallSentiment}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {sentimentData.every(s => s.value === 0) ? (
-                    <p className="text-center text-muted-foreground py-8">No sentiment data available</p>
+                    <p className="text-center text-muted-foreground py-8">{t.noSentimentData}</p>
                   ) : (
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
@@ -600,8 +681,8 @@ const CreatorDetail = () => {
 
               <Card className="border-border/50 backdrop-blur-sm bg-card/80">
                 <CardHeader>
-                  <CardTitle>Sentiment Statistics</CardTitle>
-                  <CardDescription>Breakdown of brand sentiment</CardDescription>
+                  <CardTitle>{t.sentimentStats}</CardTitle>
+                  <CardDescription>{t.sentimentBreakdown}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {sentimentData.map((sentiment) => (
@@ -623,7 +704,7 @@ const CreatorDetail = () => {
                         {brandMentions.length > 0 
                           ? `${((sentiment.value / brandMentions.length) * 100).toFixed(1)}%` 
                           : '0%'
-                        } of all brand mentions
+                        } {t.ofAllMentions}
                       </p>
                     </div>
                   ))}
