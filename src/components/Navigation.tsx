@@ -134,7 +134,7 @@ const Navigation = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full p-0">
+                  <Button variant="ghost" size="icon" className="rounded-full p-0 shadow-elegant">
                     <UserAvatar
                       avatarUrl={avatarUrl}
                       email={user.email}
