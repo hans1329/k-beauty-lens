@@ -1,1 +1,7 @@
 project_id = "aeyyzppqymrqmezbbcaq"
+
+[functions.analyze-sentiment]
+verify_jwt = false
+
+[functions.extract-brands]
+verify_jwt = false

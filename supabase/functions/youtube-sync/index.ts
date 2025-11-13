@@ -248,6 +248,65 @@ serve(async (req) => {
 
     console.log(`Synced ${totalComments} comments across ${videos.length} videos`);
 
+    // Batch analyze sentiment for all comments
+    if (totalComments > 0) {
+      try {
+        const allComments = await supabase
+          .from('comments')
+          .select('id, text_content')
+          .in('video_id', videos.map(v => v.id))
+          .limit(50);
+
+        if (allComments.data && allComments.data.length > 0) {
+          console.log(`Analyzing sentiment for ${allComments.data.length} comments...`);
+          
+          const sentimentResponse = await fetch(`${SUPABASE_URL}/functions/v1/analyze-sentiment`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ comments: allComments.data })
+          });
+
+          if (sentimentResponse.ok) {
+            const sentimentData = await sentimentResponse.json();
+            console.log('Sentiment analysis complete:', sentimentData.analysis);
+          }
+        }
+      } catch (sentimentError) {
+        console.log('Could not analyze sentiment:', sentimentError);
+      }
+    }
+
+    // Extract brands and keywords from video descriptions
+    for (const video of videos.slice(0, 10)) { // Analyze first 10 videos
+      if (video.description) {
+        try {
+          console.log(`Extracting brands from video: ${video.title}`);
+          
+          const extractResponse = await fetch(`${SUPABASE_URL}/functions/v1/extract-brands`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              text: video.description,
+              videoId: video.id
+            })
+          });
+
+          if (extractResponse.ok) {
+            const extractData = await extractResponse.json();
+            console.log(`Extracted ${extractData.extraction.brand_mentions?.length || 0} brand mentions`);
+          }
+        } catch (extractError) {
+          console.log(`Could not extract brands for video ${video.id}:`, extractError);
+        }
+      }
+    }
+
+    console.log(`Sync complete: ${videos.length} videos, ${totalComments} comments analyzed`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
