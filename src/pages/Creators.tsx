@@ -54,6 +54,7 @@ const Creators = () => {
   const [deletingCreatorId, setDeletingCreatorId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<string>("last_synced_at");
+  const [filterByUser, setFilterByUser] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [resyncingCreatorId, setResyncingCreatorId] = useState<string | null>(null);
   const [isSyncingAll, setIsSyncingAll] = useState(false);
@@ -106,10 +107,48 @@ const Creators = () => {
   const loadCreators = async () => {
     setIsLoadingCreators(true);
     try {
-      const { data, error } = await supabase
-        .from('creators')
-        .select('*')
-        .order('last_synced_at', { ascending: false });
+      let query = supabase.from('creators').select('*');
+
+      // Apply user filter
+      if (filterByUser === 'user-added') {
+        // Get channel_ids from user_searches where user is not admin
+        const { data: userSearches } = await supabase
+          .from('user_searches')
+          .select('channel_id, user_id');
+
+        if (userSearches && userSearches.length > 0) {
+          // Get admin user ids
+          const { data: adminRoles } = await supabase
+            .from('user_roles')
+            .select('user_id')
+            .eq('role', 'admin');
+
+          const adminUserIds = adminRoles?.map(r => r.user_id) || [];
+          
+          // Filter to only non-admin users' searches
+          const nonAdminChannelIds = userSearches
+            .filter(search => !adminUserIds.includes(search.user_id))
+            .map(search => search.channel_id);
+
+          if (nonAdminChannelIds.length > 0) {
+            query = query.in('channel_id', nonAdminChannelIds);
+          } else {
+            // No non-admin searches found
+            setCreators([]);
+            setFilteredCreators([]);
+            setIsLoadingCreators(false);
+            return;
+          }
+        } else {
+          // No user searches found
+          setCreators([]);
+          setFilteredCreators([]);
+          setIsLoadingCreators(false);
+          return;
+        }
+      }
+
+      const { data, error } = await query.order('last_synced_at', { ascending: false });
 
       if (error) throw error;
       setCreators(data || []);
@@ -124,7 +163,7 @@ const Creators = () => {
 
   useEffect(() => {
     loadCreators();
-  }, []);
+  }, [filterByUser]);
 
   useEffect(() => {
     let filtered = [...creators];
@@ -490,6 +529,15 @@ const Creators = () => {
                   className="pl-9"
                 />
               </div>
+              <Select value={filterByUser} onValueChange={setFilterByUser}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Creators</SelectItem>
+                  <SelectItem value="user-added">User Added</SelectItem>
+                </SelectContent>
+              </Select>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Sort by" />
