@@ -158,6 +158,7 @@ const Index = () => {
             {creators.map((creator) => (
               <YouTuberCard
                 key={creator.id}
+                id={creator.channel_id}
                 name={creator.channel_name}
                 channel={`@${creator.channel_id}`}
                 subscribers={formatNumber(creator.subscriber_count)}
