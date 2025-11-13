@@ -214,55 +214,52 @@ const Navigation = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs text-muted-foreground">
-                        Resets at midnight
-                      </p>
-                      {purchasedEnergy > 0 && (
+                    {purchasedEnergy > 0 && (
+                      <div className="flex items-center justify-end mt-2">
                         <p className="text-xs font-medium text-primary">
                           +{purchasedEnergy} bonus
                         </p>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuSeparator className="my-2" />
+                  <DropdownMenuItem asChild className="py-2.5">
                     <Link to="/" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>Discover</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="py-2.5">
                     <Link to="/my-searches" className="cursor-pointer">
                       <Search className="mr-2 h-4 w-4" />
                       <span>My Searches</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="py-2.5">
                     <Link to="/analytics" className="cursor-pointer">
                       <BarChart3 className="mr-2 h-4 w-4" />
                       <span>Analytics</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="py-2.5">
                     <Link to="/rewards" className="cursor-pointer">
                       <Gift className="mr-2 h-4 w-4" />
                       <span>Rewards</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="py-2.5">
                     <Link to="/pricing" className="cursor-pointer">
                       <Zap className="mr-2 h-4 w-4" />
                       <span>Energy</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="py-2.5">
                     <Link to="/settings" className="cursor-pointer">
                       <SettingsIcon className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="my-2" />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
