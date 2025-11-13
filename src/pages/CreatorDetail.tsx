@@ -153,7 +153,7 @@ const CreatorDetail = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [brandMentions, setBrandMentions] = useState<BrandMention[]>([]);
   const [keywords, setKeywords] = useState<VideoKeyword[]>([]);
-  const [isEnglish, setIsEnglish] = useState(false);
+  const [isEnglish, setIsEnglish] = useState(true);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translatedVideos, setTranslatedVideos] = useState<Video[]>([]);
   const [translatedBrands, setTranslatedBrands] = useState<BrandMention[]>([]);
