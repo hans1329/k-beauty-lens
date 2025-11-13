@@ -115,7 +115,7 @@ serve(async (req) => {
         custom_url: snippet.customUrl,
         published_at: snippet.publishedAt,
         last_synced_at: new Date().toISOString(),
-      })
+      }, { onConflict: 'channel_id' })
       .select()
       .single();
 
