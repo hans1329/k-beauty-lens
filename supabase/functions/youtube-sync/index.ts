@@ -32,9 +32,10 @@ serve(async (req) => {
 
     // Fetch channel information
     console.log(`Fetching channel data for: ${channelId}`);
-    const channelResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`
-    );
+    const apiUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${YOUTUBE_API_KEY}`;
+    console.log('API URL (key masked):', apiUrl.replace(YOUTUBE_API_KEY, 'MASKED'));
+    
+    const channelResponse = await fetch(apiUrl);
 
     console.log(`YouTube API response status: ${channelResponse.status}`);
 
@@ -47,9 +48,16 @@ serve(async (req) => {
     const channelData = await channelResponse.json();
     console.log(`Channel data received:`, JSON.stringify(channelData, null, 2));
 
+    // Check for API errors even with 200 status
+    if (channelData.error) {
+      console.error('YouTube API error in response:', channelData.error);
+      throw new Error(`YouTube API error: ${channelData.error.message || JSON.stringify(channelData.error)}`);
+    }
+
     if (!channelData.items || channelData.items.length === 0) {
       console.error('No channel found in YouTube API response');
-      throw new Error(`Channel not found for ID: ${channelId}. Please verify the channel ID is correct.`);
+      console.error('Possible causes: 1) Channel ID is incorrect, 2) Channel is terminated/restricted, 3) YouTube Data API v3 not enabled in Google Cloud Console');
+      throw new Error(`Channel not found for ID: ${channelId}. Please verify: 1) Channel ID is correct, 2) Channel exists and is public, 3) YouTube Data API v3 is enabled in your Google Cloud Console project`);
     }
 
     const channel = channelData.items[0];
