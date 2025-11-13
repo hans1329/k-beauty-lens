@@ -179,13 +179,29 @@ const CreatorDetail = () => {
 
     try {
       const { data: energyCost } = await supabase
-        .from('energy_costs')
+        .from('energy_costs' as any)
         .select('cost')
         .eq('action_type', 'visit_creator')
         .single();
       
-      const cost = energyCost?.cost || 1;
-      await (supabase as any).rpc('increment_quota_usage', { quota_cost: cost });
+      const cost = (energyCost as any)?.cost || 1;
+      const { data: quotaResult, error: quotaError } = await (supabase as any)
+        .rpc('increment_quota_usage', { quota_cost: cost });
+      
+      if (quotaError) throw quotaError;
+      
+      if (quotaResult?.[0]?.is_exceeded) {
+        toast.error("Daily Energy Exhausted", {
+          description: "All daily energy has been consumed. Resets at midnight."
+        });
+        return;
+      }
+      
+      // Show energy consumption notification
+      const remaining = quotaResult?.[0]?.quota_limit - quotaResult?.[0]?.current_usage;
+      toast.info(`${cost} Energy Consumed`, {
+        description: `${remaining} energy remaining today`
+      });
     } catch (error) {
       console.error("Error deducting visit energy:", error);
     }

@@ -83,14 +83,14 @@ const Navigation = () => {
 
   const loadEnergyUsage = async () => {
     const { data } = await supabase
-      .from('api_quota_usage')
+      .from('api_quota_usage' as any)
       .select('quota_used, quota_limit')
       .eq('date', new Date().toISOString().split('T')[0])
       .maybeSingle();
     
     if (data) {
-      setEnergyUsed(data.quota_used);
-      setEnergyLimit(data.quota_limit);
+      setEnergyUsed((data as any).quota_used);
+      setEnergyLimit((data as any).quota_limit);
     } else {
       setEnergyUsed(0);
       setEnergyLimit(13);

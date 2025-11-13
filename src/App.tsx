@@ -8,6 +8,7 @@ import CreatorDetail from "./pages/CreatorDetail";
 import Auth from "./pages/Auth";
 import Analytics from "./pages/Analytics";
 import Pricing from "./pages/Pricing";
+import PricingNew from "./pages/PricingNew";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
@@ -34,7 +35,7 @@ const App = () => (
           <Route path="/my-searches" element={<MySearches />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/pricing" element={<PricingNew />} />
           <Route path="/about" element={<About />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin" element={<Admin />} />
