@@ -57,12 +57,12 @@ const HeroSection = () => {
       animationDelay: "1s"
     }} />
       
-      <div className="container mx-auto max-w-2xl relative z-10 px-4 md:px-0">
+      <div className="container mx-auto max-w-xl relative z-10 px-4 md:px-0">
         <div className="text-center space-y-4 md:space-y-6 mb-6 md:mb-8">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
             Explore Analyzed
             <br />
-            <span className="text-white drop-shadow-lg">K-Beauty Insights</span>
+            <span className="text-white drop-shadow-lg">K-Beauty YouTube</span>
           </h1>
           
           <p className="text-white/90 max-w-2xl mx-auto drop-shadow text-base md:text-lg px-4">
