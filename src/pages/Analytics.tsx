@@ -15,7 +15,7 @@ const Analytics = () => {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
   
-  const handleCreatorClick = async (channelId: string) => {
+  const handleCreatorClick = async (customUrl: string) => {
     if (isNavigating) return;
     
     setIsNavigating(true);
@@ -60,7 +60,7 @@ const Analytics = () => {
         });
       }
 
-      navigate(`/creator/${channelId}`);
+      navigate(`/creator/${customUrl?.replace('@', '')}`);
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to navigate to creator page");
@@ -239,7 +239,7 @@ const Analytics = () => {
                             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
                           </Avatar>
                           <button 
-                            onClick={() => handleCreatorClick(creator.channel_id)}
+                            onClick={() => handleCreatorClick(creator.custom_url)}
                             className="font-medium hover:text-primary transition-colors text-left"
                             disabled={isNavigating}
                           >
@@ -294,7 +294,7 @@ const Analytics = () => {
                             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
                           </Avatar>
                           <button 
-                            onClick={() => handleCreatorClick(creator.channel_id)}
+                            onClick={() => handleCreatorClick(creator.custom_url)}
                             className="font-medium hover:text-primary transition-colors text-left"
                             disabled={isNavigating}
                           >
@@ -349,7 +349,7 @@ const Analytics = () => {
                             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
                           </Avatar>
                           <button 
-                            onClick={() => handleCreatorClick(creator.channel_id)}
+                            onClick={() => handleCreatorClick(creator.custom_url)}
                             className="font-medium hover:text-primary transition-colors text-left"
                             disabled={isNavigating}
                           >
