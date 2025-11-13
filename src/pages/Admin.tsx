@@ -1,26 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, RefreshCw } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const VERIFIED_CHANNELS = [
-  { name: "PONY Syndrome", id: "UCT-_4GqC-yLY1xtTHhwY0hA" },
-  { name: "Edward Avila", id: "UC1i-VQpB2dXZf-TsyF34SsQ" },
-  { name: "Joan Kim", id: "UCAo41QETLlwvJ-oqjmEPt8A" },
-  { name: "Soyoon", id: "UCBmS_9qUyjH33AzlzDU2cSg" },
-  { name: "씬님 (Ssin)", id: "UCDxH50RHI2dg7jJGZPc3wDQ" },
-  { name: "다영 (Dayoung)", id: "UCbwVqd3BLujU5WXqiF_oCJA" },
-  { name: "레오제이 (Leojay)", id: "UCGv6x0y3qkf0a8eouMAzVqw" },
+  { name: "PONY Syndrome", handle: "@ponysmakeup" },
+  { name: "Edward Avila", handle: "@edward_avila" },
+  { name: "Joan Kim", handle: "@joankeem" },
+  { name: "Soyoon", handle: "@soy00n" },
+  { name: "씬님 (Ssin)", handle: "@Hines382" },
+  { name: "다예 Daily Daye", handle: "@DailyDaye" },
+  { name: "레오제이 (Leojay)", handle: "@leojay_" },
 ];
+
+interface Creator {
+  id: string;
+  channel_id: string;
+  channel_name: string;
+  subscriber_count: number;
+  video_count: number;
+  thumbnail_url: string;
+  last_synced_at: string;
+}
 
 const Admin = () => {
   const [channelId, setChannelId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [syncingChannelId, setSyncingChannelId] = useState<string | null>(null);
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [isLoadingCreators, setIsLoadingCreators] = useState(false);
 
   const handleSync = async (channelIdToSync?: string) => {
     const targetChannelId = channelIdToSync || channelId.trim();
@@ -50,6 +62,9 @@ const Admin = () => {
       if (!channelIdToSync) {
         setChannelId("");
       }
+      
+      // Reload creators list
+      loadCreators();
     } catch (err) {
       console.error('Unexpected error:', err);
       toast.error('An unexpected error occurred');
@@ -58,6 +73,28 @@ const Admin = () => {
       setSyncingChannelId(null);
     }
   };
+
+  const loadCreators = async () => {
+    setIsLoadingCreators(true);
+    try {
+      const { data, error } = await supabase
+        .from('creators')
+        .select('*')
+        .order('last_synced_at', { ascending: false });
+
+      if (error) throw error;
+      setCreators(data || []);
+    } catch (error) {
+      console.error('Error loading creators:', error);
+      toast.error('Failed to load creators');
+    } finally {
+      setIsLoadingCreators(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCreators();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -124,23 +161,23 @@ const Admin = () => {
               <div className="grid gap-3">
                 {VERIFIED_CHANNELS.map((channel) => (
                   <div
-                    key={channel.id}
+                    key={channel.handle}
                     className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex-1">
                       <p className="font-medium">{channel.name}</p>
-                      <p className="text-xs text-muted-foreground">{channel.id}</p>
+                      <p className="text-xs text-muted-foreground">{channel.handle}</p>
                     </div>
                     <Button
                       onClick={(e) => {
                         e.preventDefault();
-                        handleSync(channel.id);
+                        handleSync(channel.handle);
                       }}
                       disabled={isLoading}
                       size="sm"
                       className="rounded-full"
                     >
-                      {syncingChannelId === channel.id ? (
+                      {syncingChannelId === channel.handle ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
                         </>
@@ -154,6 +191,67 @@ const Admin = () => {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Synced Creators</CardTitle>
+                <CardDescription>
+                  All YouTube creators currently in the database
+                </CardDescription>
+              </div>
+              <Button
+                onClick={loadCreators}
+                disabled={isLoadingCreators}
+                size="sm"
+                variant="outline"
+                className="rounded-full"
+              >
+                {isLoadingCreators ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {isLoadingCreators ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : creators.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No creators synced yet. Add your first channel above!
+                </p>
+              ) : (
+                <div className="grid gap-3">
+                  {creators.map((creator) => (
+                    <div
+                      key={creator.id}
+                      className="flex items-center gap-4 p-3 rounded-lg border bg-card"
+                    >
+                      {creator.thumbnail_url && (
+                        <img
+                          src={creator.thumbnail_url}
+                          alt={creator.channel_name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{creator.channel_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {creator.subscriber_count.toLocaleString()} subscribers • {creator.video_count} videos
+                        </p>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(creator.last_synced_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
