@@ -59,21 +59,21 @@ const MySearches = () => {
         return;
       }
 
-      // Fetch creator details for each search
-      const channelIds = searchesData.map(s => s.channel_id);
+      // Fetch creator details for each search - match by custom_url (case insensitive)
+      const channelIds = searchesData.map(s => s.channel_id.toLowerCase());
       const { data: creatorsData, error: creatorsError } = await supabase
         .from("creators")
         .select("*")
-        .in("custom_url", channelIds);
+        .filter('custom_url', 'in', `(${channelIds.join(',')})`);
 
       if (creatorsError) {
         console.error("Error fetching creators:", creatorsError);
       }
 
-      // Merge creator data with search history
+      // Merge creator data with search history - match by custom_url
       const enrichedSearches = searchesData.map(search => ({
         ...search,
-        creator: creatorsData?.find(c => c.channel_id === search.channel_id)
+        creator: creatorsData?.find(c => c.custom_url?.toLowerCase() === search.channel_id.toLowerCase())
       }));
 
       console.log("Loaded searches:", enrichedSearches);
