@@ -39,8 +39,9 @@ const Analytics = () => {
       }
 
       if (result?.is_exceeded) {
-        toast.error("All Energy Exhausted", {
-          description: "Both daily and purchased energy depleted. Daily energy resets at midnight."
+        toast.error("Energy Depleted", {
+          description: "Daily energy refreshes at midnight (KST). You can purchase additional energy to continue exploring.",
+          duration: 5000,
         });
         setIsNavigating(false);
         return;
