@@ -217,7 +217,7 @@ const Navigation = () => {
                     {purchasedEnergy > 0 && (
                       <div className="flex items-center justify-end mt-2">
                         <p className="text-xs font-medium text-primary">
-                          +{purchasedEnergy} energy
+                          +{purchasedEnergy} Energy
                         </p>
                       </div>
                     )}
