@@ -8,9 +8,65 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { useState } from "react";
 
 const Analytics = () => {
   const navigate = useNavigate();
+  const [isNavigating, setIsNavigating] = useState(false);
+  
+  const handleCreatorClick = async (channelId: string) => {
+    if (isNavigating) return;
+    
+    setIsNavigating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please log in to view creator details");
+        navigate("/auth");
+        return;
+      }
+
+      const { data: result, error: quotaError } = await (supabase as any).rpc('increment_quota_usage', {
+        quota_cost: 1
+      });
+
+      if (quotaError) {
+        console.error('Quota error:', quotaError);
+        toast.error("Failed to process energy");
+        setIsNavigating(false);
+        return;
+      }
+
+      if (result?.is_exceeded) {
+        toast.error("All Energy Exhausted", {
+          description: "Both daily and purchased energy depleted. Daily energy resets at midnight."
+        });
+        setIsNavigating(false);
+        return;
+      }
+
+      // Show reward notification if given
+      if (result?.reward_given) {
+        const { data: rewardSetting } = await (supabase as any)
+          .from('reward_settings')
+          .select('setting_value')
+          .eq('setting_key', 'daily_completion_reward')
+          .single();
+        
+        const rewardAmount = rewardSetting?.setting_value || 5;
+        toast.success("Daily Quest Complete!", {
+          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`
+        });
+      }
+
+      navigate(`/creator/${channelId}`);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Failed to navigate to creator page");
+      setIsNavigating(false);
+    }
+  };
   
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["analytics-stats"],
@@ -182,7 +238,13 @@ const Analytics = () => {
                             <AvatarImage src={creator.thumbnail_url} />
                             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{creator.channel_name}</span>
+                          <button 
+                            onClick={() => handleCreatorClick(creator.channel_id)}
+                            className="font-medium hover:text-primary transition-colors text-left"
+                            disabled={isNavigating}
+                          >
+                            {creator.channel_name}
+                          </button>
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-medium">
@@ -231,7 +293,13 @@ const Analytics = () => {
                             <AvatarImage src={creator.thumbnail_url} />
                             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{creator.channel_name}</span>
+                          <button 
+                            onClick={() => handleCreatorClick(creator.channel_id)}
+                            className="font-medium hover:text-primary transition-colors text-left"
+                            disabled={isNavigating}
+                          >
+                            {creator.channel_name}
+                          </button>
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-medium">
@@ -280,7 +348,13 @@ const Analytics = () => {
                             <AvatarImage src={creator.thumbnail_url} />
                             <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{creator.channel_name}</span>
+                          <button 
+                            onClick={() => handleCreatorClick(creator.channel_id)}
+                            className="font-medium hover:text-primary transition-colors text-left"
+                            disabled={isNavigating}
+                          >
+                            {creator.channel_name}
+                          </button>
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-medium">
