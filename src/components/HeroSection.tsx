@@ -46,24 +46,30 @@ const HeroSection = () => {
     // Increment quota usage based on energy cost for search
     try {
       const { data: energyCost } = await supabase
-        .from('energy_costs')
+        .from('energy_costs' as any)
         .select('cost')
         .eq('action_type', 'search')
         .single();
       
-      const cost = energyCost?.cost || 1;
+      const cost = (energyCost as any)?.cost || 1;
       const { data: quotaResult, error: quotaError } = await (supabase as any)
         .rpc('increment_quota_usage', { quota_cost: cost });
       
       if (quotaError) throw quotaError;
       
       if (quotaResult?.[0]?.is_exceeded) {
-        toast.error("Daily energy limit reached", {
-          description: "You've used all your daily energy. It will reset at midnight."
+        toast.error("Daily Energy Exhausted", {
+          description: "All daily energy has been consumed. Resets at midnight."
         });
         setIsLoading(false);
         return;
       }
+      
+      // Show energy consumption notification
+      const remaining = quotaResult?.[0]?.quota_limit - quotaResult?.[0]?.current_usage;
+      toast.success(`${cost} Energy Consumed`, {
+        description: `${remaining} energy remaining today`
+      });
     } catch (error) {
       console.error("Error updating quota:", error);
     }

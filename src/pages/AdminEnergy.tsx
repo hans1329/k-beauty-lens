@@ -53,12 +53,12 @@ const AdminEnergy = () => {
   const loadEnergyCosts = async () => {
     try {
       const { data, error } = await supabase
-        .from('energy_costs')
+        .from('energy_costs' as any)
         .select('*')
         .order('action_type');
 
       if (error) throw error;
-      setEnergyCosts(data || []);
+      setEnergyCosts((data as any) || []);
     } catch (error) {
       console.error("Error loading energy costs:", error);
       toast.error("Failed to load energy costs");
@@ -80,7 +80,7 @@ const AdminEnergy = () => {
     try {
       for (const item of energyCosts) {
         const { error } = await supabase
-          .from('energy_costs')
+          .from('energy_costs' as any)
           .update({ cost: item.cost })
           .eq('id', item.id);
 
