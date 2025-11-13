@@ -204,4 +204,14 @@ All colors MUST be HSL.
   [data-sonner-toaster][data-y-position="top"] {
     top: 25% !important;
   }
+
+  /* Energy bar gradient animation */
+  @keyframes gradient-flow {
+    0% {
+      background-position: 200% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 }
