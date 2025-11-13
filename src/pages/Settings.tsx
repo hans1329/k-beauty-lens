@@ -1,23 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { UserAvatar } from "@/components/UserAvatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState({
     id: "",
     email: "",
     full_name: "",
+    avatar_url: "",
+    user_type: "general_user" as "general_user" | "creator" | "brand",
   });
 
   useEffect(() => {
@@ -35,20 +46,90 @@ const Settings = () => {
 
       const { data: profileData, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name')
+        .select('id, email, full_name, avatar_url, user_type')
         .eq('id', session.user.id)
         .single();
 
       if (error) throw error;
 
       if (profileData) {
-        setProfile(profileData);
+        setProfile({
+          id: profileData.id,
+          email: profileData.email || "",
+          full_name: profileData.full_name || "",
+          avatar_url: profileData.avatar_url || "",
+          user_type: (profileData.user_type as "general_user" | "creator" | "brand") || "general_user",
+        });
       }
     } catch (error) {
       console.error('Error loading profile:', error);
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${session.user.id}/avatar.${fileExt}`;
+
+      // Delete old avatar if exists
+      if (profile.avatar_url) {
+        const oldPath = profile.avatar_url.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
+
+      // Upload new avatar
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', session.user.id);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile, avatar_url: data.publicUrl });
+      toast.success("Profile picture updated successfully");
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error("Failed to upload profile picture");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -66,7 +147,10 @@ const Settings = () => {
 
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: profile.full_name })
+        .update({ 
+          full_name: profile.full_name,
+          user_type: profile.user_type
+        })
         .eq('id', session.user.id);
 
       if (error) throw error;
@@ -113,15 +197,43 @@ const Settings = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="flex items-center gap-6">
-                  <Avatar className="h-20 w-20">
-                    <AvatarFallback className="text-2xl">
-                      {profile.email?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    avatarUrl={profile.avatar_url}
+                    email={profile.email}
+                    size="xl"
+                  />
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">
-                      Profile picture
+                    <p className="text-sm font-medium mb-2">Profile picture</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Upload a custom image or enjoy your random character
                     </p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="rounded-full"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload Image
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
 
@@ -150,6 +262,30 @@ const Settings = () => {
                     }
                     placeholder="Enter your full name"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="user_type">Account Type</Label>
+                  <Select
+                    value={profile.user_type}
+                    onValueChange={(value: "general_user" | "creator" | "brand") =>
+                      setProfile({ ...profile, user_type: value })
+                    }
+                  >
+                    <SelectTrigger id="user_type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general_user">General User</SelectItem>
+                      <SelectItem value="creator">Creator</SelectItem>
+                      <SelectItem value="brand">Brand</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {profile.user_type === "creator" && "Creator accounts require verification"}
+                    {profile.user_type === "brand" && "Brand accounts get special access to insights"}
+                    {profile.user_type === "general_user" && "Standard user account"}
+                  </p>
                 </div>
 
                 <div className="flex gap-3">

@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/UserAvatar";
 import logoImage from "@/assets/logo_linkk.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -22,6 +22,8 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const location = window.location.pathname;
 
   useEffect(() => {
     // Check current session
@@ -29,6 +31,7 @@ const Navigation = () => {
       setUser(session?.user ?? null);
       if (session?.user) {
         checkAdminStatus(session.user.id);
+        loadAvatar(session.user.id);
       }
     });
 
@@ -38,8 +41,10 @@ const Navigation = () => {
         setUser(session?.user ?? null);
         if (session?.user) {
           checkAdminStatus(session.user.id);
+          loadAvatar(session.user.id);
         } else {
           setIsAdmin(false);
+          setAvatarUrl("");
         }
       }
     );
@@ -56,6 +61,18 @@ const Navigation = () => {
       .single();
     
     setIsAdmin(!!data && !error);
+  };
+
+  const loadAvatar = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', userId)
+      .single();
+    
+    if (data?.avatar_url) {
+      setAvatarUrl(data.avatar_url);
+    }
   };
 
   const handleSignOut = async () => {
@@ -93,15 +110,23 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = location === item.href || 
+                (item.href !== '/' && location.startsWith(item.href));
+              return (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive 
+                      ? 'text-primary font-semibold' 
+                      : 'text-foreground/80 hover:text-foreground'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Desktop Actions */}
@@ -109,12 +134,12 @@ const Navigation = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        {user.email?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" size="icon" className="rounded-full p-0">
+                    <UserAvatar
+                      avatarUrl={avatarUrl}
+                      email={user.email}
+                      size="sm"
+                    />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -170,16 +195,24 @@ const Navigation = () => {
 
                 {/* Mobile Nav Items */}
                 <div className="flex flex-col gap-4">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.label}
-                      to={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="text-lg font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
+                  {navItems.map((item) => {
+                    const isActive = location === item.href || 
+                      (item.href !== '/' && location.startsWith(item.href));
+                    return (
+                      <Link
+                        key={item.label}
+                        to={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={`text-lg font-medium transition-colors py-2 ${
+                          isActive 
+                            ? 'text-primary font-semibold' 
+                            : 'text-foreground/80 hover:text-foreground'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
                 </div>
 
                 {/* Mobile Actions */}
@@ -187,11 +220,11 @@ const Navigation = () => {
                   {user ? (
                     <>
                       <div className="flex items-center gap-3 px-3 py-2">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback>
-                            {user.email?.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          avatarUrl={avatarUrl}
+                          email={user.email}
+                          size="md"
+                        />
                         <div className="flex flex-col">
                           <p className="text-sm font-medium">
                             {user.user_metadata?.full_name || "User"}

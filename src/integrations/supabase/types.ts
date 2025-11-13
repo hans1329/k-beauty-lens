@@ -161,6 +161,7 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string
+          user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
           avatar_url?: string | null
@@ -169,6 +170,7 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
         }
         Update: {
           avatar_url?: string | null
@@ -177,6 +179,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []
       }
@@ -366,6 +369,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      user_type: "general_user" | "creator" | "brand"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -494,6 +498,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      user_type: ["general_user", "creator", "brand"],
     },
   },
 } as const
