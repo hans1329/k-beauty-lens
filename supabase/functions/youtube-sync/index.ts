@@ -327,11 +327,37 @@ serve(async (req) => {
       }
     }
 
-    // Extract brands and keywords from video descriptions
-    for (const video of videos.slice(0, 10)) { // Analyze first 10 videos
-      if (video.description) {
-        try {
-          console.log(`Extracting brands from video: ${video.title}`);
+    // Extract brands and keywords from video content (title, description, comments)
+    for (const video of videos) { // Analyze all videos
+      try {
+        // Build text from available sources
+        let analysisText = '';
+        
+        // Always include title
+        if (video.title) {
+          analysisText += `Title: ${video.title}\n\n`;
+        }
+        
+        // Include description if available
+        if (video.description && video.description.trim().length > 0) {
+          analysisText += `Description: ${video.description}\n\n`;
+        }
+        
+        // Fetch and include comments for this video
+        const { data: videoComments } = await supabase
+          .from('comments')
+          .select('text_content')
+          .eq('video_id', video.id)
+          .order('like_count', { ascending: false })
+          .limit(20); // Top 20 comments
+        
+        if (videoComments && videoComments.length > 0) {
+          analysisText += `Top Comments:\n${videoComments.map(c => c.text_content).join('\n')}\n\n`;
+        }
+        
+        // Only proceed if we have some text to analyze
+        if (analysisText.trim().length > 0) {
+          console.log(`Extracting brands from video: ${video.title} (${analysisText.length} chars)`);
           
           const extractResponse = await fetch(`${SUPABASE_URL}/functions/v1/extract-brands`, {
             method: 'POST',
@@ -339,7 +365,7 @@ serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
-              text: video.description,
+              text: analysisText,
               videoId: video.id
             })
           });
@@ -348,9 +374,11 @@ serve(async (req) => {
             const extractData = await extractResponse.json();
             console.log(`Extracted ${extractData.extraction.brand_mentions?.length || 0} brand mentions`);
           }
-        } catch (extractError) {
-          console.log(`Could not extract brands for video ${video.id}:`, extractError);
+        } else {
+          console.log(`Skipping video ${video.title}: no content to analyze`);
         }
+      } catch (extractError) {
+        console.log(`Could not extract brands for video ${video.id}:`, extractError);
       }
     }
 
