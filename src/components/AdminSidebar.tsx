@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Video, BarChart3, UserCog } from "lucide-react";
+import { LayoutDashboard, Users, Video, BarChart3, UserCog, Home } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
+  { title: "Main Site", url: "/", icon: Home },
   { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Creators", url: "/admin/creators", icon: Users },
   { title: "Videos", url: "/admin/videos", icon: Video },

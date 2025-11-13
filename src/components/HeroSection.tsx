@@ -55,24 +55,24 @@ const HeroSection = () => {
       <div className="container mx-auto max-w-3xl relative z-10">
         <div className="text-center space-y-6 mb-8">
           <h1 className="text-5xl font-bold tracking-tight text-white md:text-5xl">
-            Discover
+            Explore Analyzed
             <br />
-            <span className="text-white drop-shadow-lg">K-Beauty Creators</span>
+            <span className="text-white drop-shadow-lg">K-Beauty Insights</span>
           </h1>
           
           <p className="text-white/90 max-w-2xl mx-auto drop-shadow text-lg">
-            Search and explore Korean beauty YouTubers. Add creators to get detailed analytics and insights.
+            View analyzed data and insights for Korean beauty YouTubers. Search for any creator to see their detailed analytics.
           </p>
         </div>
 
-        <Card className="shadow-2xl border-border/50 backdrop-blur">
+        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              Add YouTube Channel
+              Search Creator
             </CardTitle>
             <CardDescription>
-              Enter a YouTube channel ID, handle, or URL to discover creator data
+              Enter a YouTube channel to view analytics or add new creators to our database
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
