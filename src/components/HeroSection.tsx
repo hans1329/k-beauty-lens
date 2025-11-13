@@ -37,7 +37,7 @@ const HeroSection = () => {
       setIsLoading(false);
     }
   };
-  return <section className="relative overflow-hidden py-12 md:py-20 px-4 md:px-6">
+  return <section className="relative overflow-hidden py-12 md:py-20 px-0 md:px-6">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-instagram" />
       
@@ -47,7 +47,7 @@ const HeroSection = () => {
       animationDelay: "1s"
     }} />
       
-      <div className="container mx-auto max-w-3xl relative z-10">
+      <div className="container mx-auto max-w-3xl relative z-10 px-4 md:px-0">
         <div className="text-center space-y-4 md:space-y-6 mb-6 md:mb-8">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
             Explore Analyzed
@@ -60,7 +60,7 @@ const HeroSection = () => {
           </p>
         </div>
 
-        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-0.5 md:mx-0">
+        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full">
           <CardContent className="p-0">
             <form 
               role="search" 
