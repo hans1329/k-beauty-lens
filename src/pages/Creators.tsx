@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Plus, RefreshCw, Trash2, Search, Sparkles } from "lucide-react";
+import { Loader2, Plus, RefreshCw, Trash2, Search, Sparkles, X } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
 import {
   Table,
@@ -58,6 +58,7 @@ const Creators = () => {
   const [isSyncingAll, setIsSyncingAll] = useState(false);
   const [analyzingCreatorId, setAnalyzingCreatorId] = useState<string | null>(null);
   const [isAnalyzingAll, setIsAnalyzingAll] = useState(false);
+  const [abortAnalysis, setAbortAnalysis] = useState(false);
   const itemsPerPage = 20;
 
   const handleSync = async (channelIdToSync?: string) => {
@@ -298,29 +299,44 @@ const Creators = () => {
     }
 
     setIsAnalyzingAll(true);
+    setAbortAnalysis(false);
     let successCount = 0;
     let failCount = 0;
 
     for (const creator of creators) {
+      // Check if user requested to stop
+      if (abortAnalysis) {
+        toast.error(`Analysis stopped. Completed ${successCount}/${creators.length} creators`);
+        break;
+      }
+
       try {
-        setAnalyzingCreatorId(creator.id); // Show loading on current creator
+        setAnalyzingCreatorId(creator.id);
         await handleAnalyzeCreator(creator.id, creator.channel_name);
         successCount++;
       } catch (error) {
         console.error(`Failed to analyze ${creator.channel_name}:`, error);
         failCount++;
       } finally {
-        setAnalyzingCreatorId(null); // Clear loading after each creator
+        setAnalyzingCreatorId(null);
       }
     }
 
     setIsAnalyzingAll(false);
+    setAbortAnalysis(false);
     
-    if (failCount === 0) {
-      toast.success(`All ${successCount} creators analyzed successfully!`);
-    } else {
-      toast.error(`Analyzed ${successCount} creators, ${failCount} failed`);
+    if (!abortAnalysis) {
+      if (failCount === 0) {
+        toast.success(`All ${successCount} creators analyzed successfully!`);
+      } else {
+        toast.error(`Analyzed ${successCount} creators, ${failCount} failed`);
+      }
     }
+  };
+
+  const handleStopAnalysis = () => {
+    setAbortAnalysis(true);
+    toast.info('Stopping analysis after current creator...');
   };
 
   const paginatedCreators = filteredCreators.slice(
@@ -381,34 +397,48 @@ const Creators = () => {
                 <CardTitle>All Creators ({filteredCreators.length})</CardTitle>
                 <CardDescription>Browse and manage synced creators</CardDescription>
               </div>
-              <Button
-                onClick={handleSyncAll}
-                disabled={isSyncingAll || isAnalyzingAll}
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-                title="Re-sync all creators from YouTube"
-              >
-                {isSyncingAll ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-4 w-4" />
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleSyncAll}
+                  disabled={isSyncingAll || isAnalyzingAll}
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  title="Re-sync all creators from YouTube"
+                >
+                  {isSyncingAll ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={handleAnalyzeAll}
+                  disabled={isAnalyzingAll || isSyncingAll}
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  title="Analyze all creators (sentiment + brands)"
+                >
+                  {isAnalyzingAll ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                </Button>
+                {isAnalyzingAll && (
+                  <Button
+                    onClick={handleStopAnalysis}
+                    disabled={abortAnalysis}
+                    size="sm"
+                    variant="destructive"
+                    className="rounded-full"
+                    title="Stop analysis"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 )}
-              </Button>
-              <Button
-                onClick={handleAnalyzeAll}
-                disabled={isAnalyzingAll || isSyncingAll}
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-                title="Analyze all creators (sentiment + brands)"
-              >
-                {isAnalyzingAll ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Sparkles className="h-4 w-4" />
-                )}
-              </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
