@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, ExternalLink } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
+import YouTuberCard from "@/components/YouTuberCard";
 
 interface SearchHistory {
   id: string;
@@ -13,6 +14,18 @@ interface SearchHistory {
   channel_name: string;
   channel_thumbnail: string | null;
   searched_at: string;
+  creator?: {
+    id: string;
+    channel_id: string;
+    channel_name: string;
+    subscriber_count: number;
+    total_views: number;
+    video_count: number;
+    description: string;
+    thumbnail_url: string;
+    custom_url: string;
+    is_visible: boolean;
+  };
 }
 
 const MySearches = () => {
@@ -34,13 +47,29 @@ const MySearches = () => {
 
   const loadSearchHistory = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: searchesData, error: searchError } = await supabase
         .from("user_searches")
         .select("*")
         .order("searched_at", { ascending: false });
 
-      if (error) throw error;
-      setSearches(data || []);
+      if (searchError) throw searchError;
+
+      // Fetch creator details for each search
+      const channelIds = searchesData?.map(s => s.channel_id) || [];
+      const { data: creatorsData, error: creatorsError } = await supabase
+        .from("creators")
+        .select("*")
+        .in("channel_id", channelIds);
+
+      if (creatorsError) throw creatorsError;
+
+      // Merge creator data with search history
+      const enrichedSearches = searchesData?.map(search => ({
+        ...search,
+        creator: creatorsData?.find(c => c.channel_id === search.channel_id)
+      })) || [];
+
+      setSearches(enrichedSearches);
     } catch (error) {
       console.error("Error loading search history:", error);
       toast.error("Failed to load search history");
@@ -66,73 +95,123 @@ const MySearches = () => {
     }
   };
 
-  const viewAnalysis = (channelId: string) => {
-    navigate(`/analysis/${channelId}`);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto px-4 py-8 mt-16">
-        <h1 className="text-4xl font-bold mb-8 text-foreground">My Searches</h1>
+      <div className="container mx-auto max-w-7xl px-6 py-12 mt-16">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-foreground">My Searches</h1>
+          <p className="text-muted-foreground mt-2">
+            View your recently searched beauty creators
+          </p>
+        </div>
         
         {loading ? (
-          <div className="text-center text-muted-foreground">Loading...</div>
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
         ) : searches.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No search history yet.</p>
+              <p className="text-muted-foreground text-lg mb-4">No search history yet.</p>
               <Button
                 onClick={() => navigate("/")}
-                className="mt-4"
-                variant="outline"
+                className="rounded-full"
               >
                 Start Searching
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {searches.map((search) => (
-              <Card key={search.id} className="overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    {search.channel_thumbnail && (
-                      <img
-                        src={search.channel_thumbnail}
-                        alt={search.channel_name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground truncate">
-                        {search.channel_name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(search.searched_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <Button
-                      onClick={() => viewAnalysis(search.channel_id)}
-                      className="flex-1"
-                      size="sm"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View
-                    </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {searches.map((search) => {
+              const creator = search.creator;
+              if (!creator) {
+                return (
+                  <Card key={search.id} className="overflow-hidden">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        {search.channel_thumbnail && (
+                          <img
+                            src={search.channel_thumbnail}
+                            alt={search.channel_name}
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-foreground truncate">
+                            {search.channel_name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Searched on {new Date(search.searched_at).toLocaleDateString()}
+                          </p>
+                          <Button
+                            onClick={() => deleteSearch(search.id)}
+                            variant="outline"
+                            size="sm"
+                            className="mt-4 rounded-full"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              const displayHandle = creator.custom_url
+                ? creator.custom_url.startsWith('@')
+                  ? creator.custom_url
+                  : `@${creator.custom_url}`
+                : `@${creator.channel_name}`;
+
+              const formatNumber = (num: number): string => {
+                if (num >= 1000000) {
+                  return `${(num / 1000000).toFixed(1)}M`;
+                } else if (num >= 1000) {
+                  return `${(num / 1000).toFixed(1)}K`;
+                }
+                return num.toString();
+              };
+
+              const calculateEngagement = (): number => {
+                if (creator.subscriber_count === 0) return 0;
+                const avgViews = creator.total_views / (creator.video_count || 1);
+                const ratio = (avgViews / creator.subscriber_count) * 100;
+                return Math.min(Math.round(ratio), 100);
+              };
+
+              return (
+                <div key={search.id} className="relative">
+                  <div className="absolute top-2 right-2 z-10">
                     <Button
                       onClick={() => deleteSearch(search.id)}
                       variant="outline"
-                      size="sm"
+                      size="icon"
+                      className="rounded-full bg-background/80 hover:bg-background shadow-elegant"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <YouTuberCard
+                    id={creator.id}
+                    name={creator.channel_name}
+                    channel={displayHandle}
+                    subscribers={formatNumber(creator.subscriber_count)}
+                    avgViews={formatNumber(Math.floor(creator.total_views / (creator.video_count || 1)))}
+                    engagement={calculateEngagement()}
+                    skinTone="Light"
+                    style={["Natural"]}
+                    brands={[]}
+                    thumbnail={creator.thumbnail_url}
+                    channelUrl={`https://youtube.com/channel/${creator.channel_id}`}
+                    isVisible={creator.is_visible}
+                    variant="vertical"
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
