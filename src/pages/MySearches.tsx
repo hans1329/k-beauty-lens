@@ -64,7 +64,7 @@ const MySearches = () => {
       const { data: creatorsData, error: creatorsError } = await supabase
         .from("creators")
         .select("*")
-        .in("channel_id", channelIds);
+        .in("custom_url", channelIds);
 
       if (creatorsError) {
         console.error("Error fetching creators:", creatorsError);
