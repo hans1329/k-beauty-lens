@@ -11,7 +11,6 @@ const VERIFIED_CHANNELS = [
   { name: "PONY Syndrome", id: "UCxv8kXBd8qEq-oXXwXsR6Rw" },
   { name: "Edward Avila", id: "UC1i-VQpB2dXZf-TsyF34SsQ" },
   { name: "Joan Kim", id: "UCbCJZT4uDBjdoiGSwODZ_lQ" },
-  { name: "RISABAE", id: "UCNin3KUqjwIQjmjKcw1T-Vg" },
   { name: "Soyoon", id: "UCBmS_9qUyjH33AzlzDU2cSg" },
   { name: "씬님 (Ssin)", id: "UCDxH50RHI2dg7jJGZPc3wDQ" },
   { name: "다영 (Dayoung)", id: "UCbwVqd3BLujU5WXqiF_oCJA" },
