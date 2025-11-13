@@ -170,6 +170,7 @@ const Auth = () => {
                       name="email"
                       type="email"
                       placeholder="your@email.com"
+                      autoComplete="email"
                       required
                       disabled={isLoading}
                     />
@@ -237,6 +238,7 @@ const Auth = () => {
                       name="fullName"
                       type="text"
                       placeholder="John Doe"
+                      autoComplete="name"
                       required
                       disabled={isLoading}
                     />
@@ -248,6 +250,7 @@ const Auth = () => {
                       name="email"
                       type="email"
                       placeholder="your@email.com"
+                      autoComplete="email"
                       required
                       disabled={isLoading}
                     />
