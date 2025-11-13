@@ -59,17 +59,8 @@ const MySearches = () => {
         return;
       }
 
-      // Remove duplicates - keep only the latest search for each channel
-      const uniqueSearches = searchesData.reduce((acc, current) => {
-        const existing = acc.find(item => item.channel_id.toLowerCase() === current.channel_id.toLowerCase());
-        if (!existing) {
-          acc.push(current);
-        }
-        return acc;
-      }, [] as typeof searchesData);
-
       // Fetch creator details for each search - match by custom_url (case insensitive)
-      const channelIds = uniqueSearches.map(s => s.channel_id.toLowerCase());
+      const channelIds = searchesData.map(s => s.channel_id.toLowerCase());
       const { data: creatorsData, error: creatorsError } = await supabase
         .from("creators")
         .select("*")
@@ -80,7 +71,7 @@ const MySearches = () => {
       }
 
       // Merge creator data with search history - match by custom_url
-      const enrichedSearches = uniqueSearches.map(search => ({
+      const enrichedSearches = searchesData.map(search => ({
         ...search,
         creator: creatorsData?.find(c => c.custom_url?.toLowerCase() === search.channel_id.toLowerCase())
       }));
