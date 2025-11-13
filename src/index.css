@@ -32,9 +32,9 @@ All colors MUST be HSL.
     --muted: 280 10% 96%;
     --muted-foreground: 280 10% 45%;
 
-    /* Accent light gray */
-    --accent: 280 5% 94%;
-    --accent-foreground: 280 10% 20%;
+    /* Accent orange */
+    --accent: 25 90% 65%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
@@ -99,8 +99,8 @@ All colors MUST be HSL.
     --muted: 280 15% 20%;
     --muted-foreground: 280 10% 65%;
 
-    --accent: 280 10% 25%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 25 85% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 100%;
