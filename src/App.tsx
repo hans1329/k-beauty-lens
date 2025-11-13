@@ -17,6 +17,7 @@ import Videos from "./pages/Videos";
 import AnalyticsAdmin from "./pages/AnalyticsAdmin";
 import AdminUsers from "./pages/AdminUsers";
 import AnalysisResult from "./pages/AnalysisResult";
+import MySearches from "./pages/MySearches";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/creator/:id" element={<CreatorDetail />} />
           <Route path="/analysis/:channelId" element={<AnalysisResult />} />
+          <Route path="/my-searches" element={<MySearches />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/pricing" element={<Pricing />} />

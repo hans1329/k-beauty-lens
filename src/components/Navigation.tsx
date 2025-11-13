@@ -87,6 +87,7 @@ const Navigation = () => {
 
   const baseNavItems = [
     { label: "Discover", href: "/" },
+    { label: "My Searches", href: "/my-searches" },
     { label: "Analytics", href: "/analytics" },
     { label: "Pricing", href: "/pricing" },
     { label: "About", href: "/about" },

@@ -18,6 +18,25 @@ const HeroSection = () => {
       toast.error("Please enter a valid YouTube channel ID");
       return;
     }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Please sign in to search");
+      navigate("/auth");
+      return;
+    }
+
+    // Save search to database
+    try {
+      await supabase.from("user_searches").insert({
+        user_id: session.user.id,
+        channel_id: targetChannelId,
+        channel_name: targetChannelId,
+        channel_thumbnail: null
+      });
+    } catch (error) {
+      console.error("Error saving search:", error);
+    }
     
     setAnalyzingChannelId(targetChannelId);
     setShowProgressModal(true);

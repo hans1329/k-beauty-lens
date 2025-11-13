@@ -251,6 +251,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_searches: {
+        Row: {
+          channel_id: string
+          channel_name: string
+          channel_thumbnail: string | null
+          created_at: string
+          id: string
+          searched_at: string
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          channel_name: string
+          channel_thumbnail?: string | null
+          created_at?: string
+          id?: string
+          searched_at?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          channel_name?: string
+          channel_thumbnail?: string | null
+          created_at?: string
+          id?: string
+          searched_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       video_keywords: {
         Row: {
           confidence: number | null
