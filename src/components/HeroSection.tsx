@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -66,23 +66,14 @@ const HeroSection = () => {
         </div>
 
         <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Search Creator
-            </CardTitle>
-            <CardDescription>
-              Enter a YouTube channel to view analytics or add new creators to our database
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-6 space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
-                placeholder="UCxxxxxx or @username or https://youtube.com/@username"
+                placeholder="@username or https://youtube.com/@username"
                 value={channelId}
                 onChange={(e) => setChannelId(e.target.value)}
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 bg-background/60 backdrop-blur"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
                     handleSync();
@@ -98,12 +89,12 @@ const HeroSection = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Syncing...
+                    Loading...
                   </>
                 ) : (
                   <>
                     <Search className="mr-2 h-4 w-4" />
-                    Sync Channel
+                    View Data
                   </>
                 )}
               </Button>
