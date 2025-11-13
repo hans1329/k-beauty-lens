@@ -268,8 +268,9 @@ const CreatorDetail = () => {
     try {
       setLoading(true);
 
-      // Load creator info (using custom_url from URL)
-      const customUrl = id.startsWith('@') ? id : `@${id}`;
+      // Load creator info (using custom_url from URL, case-insensitive)
+      const normalizedUrl = id.toLowerCase();
+      const customUrl = normalizedUrl.startsWith('@') ? normalizedUrl : `@${normalizedUrl}`;
       const { data: creatorData, error: creatorError } = await supabase
         .from('creators')
         .select('*')
