@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import YouTuberCard from "@/components/YouTuberCard";
@@ -99,11 +99,21 @@ const MySearches = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto max-w-7xl px-6 py-12 mt-16">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground">My Searches</h1>
-          <p className="text-muted-foreground mt-2">
-            View your recently searched beauty creators
-          </p>
+        <div className="mb-8 flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="rounded-full"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-4xl font-bold text-foreground">My Searches</h1>
+            <p className="text-muted-foreground mt-2">
+              View your recently searched beauty creators
+            </p>
+          </div>
         </div>
         
         {loading ? (
