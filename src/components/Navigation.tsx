@@ -26,6 +26,7 @@ const Navigation = () => {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [energyUsed, setEnergyUsed] = useState(0);
   const [energyLimit, setEnergyLimit] = useState(13);
+  const [purchasedEnergy, setPurchasedEnergy] = useState(0);
   const location = window.location.pathname;
 
   useEffect(() => {
@@ -82,18 +83,33 @@ const Navigation = () => {
   };
 
   const loadEnergyUsage = async () => {
-    const { data } = await supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    // Load daily energy usage
+    const { data: quotaData } = await supabase
       .from('api_quota_usage' as any)
       .select('quota_used, quota_limit')
       .eq('date', new Date().toISOString().split('T')[0])
       .maybeSingle();
     
-    if (data) {
-      setEnergyUsed((data as any).quota_used);
-      setEnergyLimit((data as any).quota_limit);
+    if (quotaData) {
+      setEnergyUsed((quotaData as any).quota_used);
+      setEnergyLimit((quotaData as any).quota_limit);
     } else {
       setEnergyUsed(0);
       setEnergyLimit(13);
+    }
+
+    // Load purchased energy
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('purchased_energy')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (profileData) {
+      setPurchasedEnergy((profileData as any).purchased_energy || 0);
     }
   };
 
@@ -187,9 +203,16 @@ const Navigation = () => {
                       </span>
                     </div>
                     <Progress value={((energyLimit - energyUsed) / energyLimit) * 100} className="h-2" />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Resets at midnight
-                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-muted-foreground">
+                        Resets at midnight
+                      </p>
+                      {purchasedEnergy > 0 && (
+                        <p className="text-xs font-medium text-primary">
+                          +{purchasedEnergy} purchased
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>

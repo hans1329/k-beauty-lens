@@ -190,17 +190,20 @@ const CreatorDetail = () => {
       
       if (quotaError) throw quotaError;
       
-      if (quotaResult?.[0]?.is_exceeded) {
-        toast.error("Daily Energy Exhausted", {
-          description: "All daily energy has been consumed. Resets at midnight."
+      const result = quotaResult?.[0];
+      
+      if (result?.is_exceeded) {
+        toast.error("All Energy Exhausted", {
+          description: "Both daily and purchased energy depleted. Daily energy resets at midnight."
         });
         return;
       }
       
       // Show energy consumption notification
-      const remaining = quotaResult?.[0]?.quota_limit - quotaResult?.[0]?.current_usage;
-      toast.info(`${cost} Energy Consumed`, {
-        description: `${remaining} energy remaining today`
+      const remaining = result?.quota_limit - result?.current_usage;
+      const energyType = result?.used_purchased ? "Purchased Energy" : "Daily Energy";
+      toast.info(`${cost} ${energyType} Consumed`, {
+        description: `${remaining} daily energy remaining`
       });
     } catch (error) {
       console.error("Error deducting visit energy:", error);

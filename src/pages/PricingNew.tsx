@@ -52,23 +52,52 @@ const PricingNew = () => {
     setPurchasing(packageId);
     
     try {
-      // TODO: Implement actual payment processing with Stripe
-      // For now, simulate purchase
-      toast.info("Payment processing...", {
-        description: "This feature will be connected to payment system"
+      // Get current purchased energy
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('purchased_energy')
+        .eq('id', session.user.id)
+        .single();
+
+      const currentEnergy = (profile as any)?.purchased_energy || 0;
+
+      // Add purchased energy to user profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          purchased_energy: currentEnergy + energy
+        })
+        .eq('id', session.user.id);
+
+      if (updateError) throw updateError;
+
+      // Record purchase in history
+      const { error: insertError } = await supabase
+        .from('energy_purchases' as any)
+        .insert({
+          user_id: session.user.id,
+          energy_amount: energy,
+          price_paid: price,
+          payment_method: 'demo',
+          transaction_id: `demo_${Date.now()}`
+        });
+
+      if (insertError) throw insertError;
+
+      toast.success("Energy Purchased!", {
+        description: `${energy} energy has been added to your account`
       });
       
+      // Reload page to update energy display
       setTimeout(() => {
-        toast.success("Energy purchased!", {
-          description: `${energy} energy has been added to your account`
-        });
-        setPurchasing(null);
-      }, 2000);
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Error purchasing energy:", error);
-      toast.error("Purchase failed", {
+      toast.error("Purchase Failed", {
         description: "Please try again later"
       });
+    } finally {
       setPurchasing(null);
     }
   };
