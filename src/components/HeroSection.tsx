@@ -1,59 +1,121 @@
-import { Search, TrendingUp, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
 const HeroSection = () => {
-  return <section className="relative overflow-hidden py-20 px-6">
+  const [channelId, setChannelId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSync = async () => {
+    const targetChannelId = channelId.trim();
+    
+    if (!targetChannelId) {
+      toast.error("Please enter a valid YouTube channel ID");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('youtube-sync', {
+        body: { channelId: targetChannelId }
+      });
+
+      if (error) {
+        console.error('Sync error:', error);
+        toast.error(`Failed to sync channel: ${error.message}`);
+        return;
+      }
+
+      toast.success(data.message || 'Channel synced successfully!');
+      setChannelId("");
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <section className="relative overflow-hidden py-20 px-6">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-instagram" />
       
       {/* Floating decorative elements */}
       <div className="absolute top-20 left-10 w-20 h-20 rounded-full bg-primary/20 blur-3xl animate-float" />
       <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-secondary/20 blur-3xl animate-float" style={{
-      animationDelay: "1s"
-    }} />
+        animationDelay: "1s"
+      }} />
       
-      <div className="container mx-auto max-w-6xl relative z-10">
-        <div className="text-center space-y-6">
-          
-          
+      <div className="container mx-auto max-w-3xl relative z-10">
+        <div className="text-center space-y-6 mb-8">
           <h1 className="text-5xl font-bold tracking-tight text-white md:text-5xl">
-            Connect with
+            Discover
             <br />
             <span className="text-white drop-shadow-lg">K-Beauty Creators</span>
           </h1>
           
           <p className="text-white/90 max-w-2xl mx-auto drop-shadow text-lg">
-            Discover and analyze Korean beauty YouTubers through advanced AI. 
-            Match your brand with the perfect creators for global success.
+            Search and explore Korean beauty YouTubers. Add creators to get detailed analytics and insights.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="gap-2 shadow-glow">
-              <Search className="w-5 h-5" />
-              Explore Creators
-            </Button>
-            <Button size="lg" variant="outline" className="gap-2">
-              <TrendingUp className="w-5 h-5" />
-              View Analytics
-            </Button>
-          </div>
-          
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 max-w-3xl mx-auto">
-            <div className="glass rounded-2xl p-6 border border-border/50">
-              <div className="text-3xl font-bold gradient-text">500+</div>
-              <div className="text-sm text-muted-foreground mt-1">Verified Creators</div>
-            </div>
-            <div className="glass rounded-2xl p-6 border border-border/50">
-              <div className="text-3xl font-bold gradient-text">10M+</div>
-              <div className="text-sm text-muted-foreground mt-1">Total Subscribers</div>
-            </div>
-            <div className="glass rounded-2xl p-6 border border-border/50">
-              <div className="text-3xl font-bold gradient-text">AI</div>
-              <div className="text-sm text-muted-foreground mt-1">Deep Analysis</div>
-            </div>
-          </div>
         </div>
+
+        <Card className="shadow-2xl border-border/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Add YouTube Channel
+            </CardTitle>
+            <CardDescription>
+              Enter a YouTube channel ID, handle, or URL to discover creator data
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                placeholder="UCxxxxxx or @username or https://youtube.com/@username"
+                value={channelId}
+                onChange={(e) => setChannelId(e.target.value)}
+                disabled={isLoading}
+                className="flex-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isLoading && channelId.trim()) {
+                    handleSync();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleSync}
+                disabled={isLoading || !channelId.trim()}
+                className="rounded-full w-full sm:w-auto"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Sync Channel
+                  </>
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              💡 Try: @PONYMakeup, @Edward_Avila, or paste any YouTube channel URL
+            </p>
+          </CardContent>
+        </Card>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default HeroSection;
