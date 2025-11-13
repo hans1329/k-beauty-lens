@@ -1,36 +1,108 @@
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Users, Eye, ArrowLeft } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, ArrowLeft, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 const Analytics = () => {
   const navigate = useNavigate();
   
-  const stats = [
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["analytics-stats"],
+    queryFn: async () => {
+      const [creatorsRes, videosRes] = await Promise.all([
+        supabase.from("creators").select("total_views, video_count"),
+        supabase.from("videos").select("view_count, like_count, comment_count")
+      ]);
+
+      const totalCreators = creatorsRes.data?.length || 0;
+      const totalViews = creatorsRes.data?.reduce((sum, c) => sum + (c.total_views || 0), 0) || 0;
+      const totalVideos = creatorsRes.data?.reduce((sum, c) => sum + (c.video_count || 0), 0) || 0;
+      
+      const avgEngagement = videosRes.data?.length 
+        ? videosRes.data.reduce((sum, v) => {
+            const views = v.view_count || 1;
+            const engagement = ((v.like_count || 0) + (v.comment_count || 0)) / views * 100;
+            return sum + engagement;
+          }, 0) / videosRes.data.length
+        : 0;
+
+      return {
+        totalCreators,
+        totalViews,
+        totalVideos,
+        avgEngagement: avgEngagement.toFixed(2)
+      };
+    }
+  });
+
+  const { data: topBySubscribers } = useQuery({
+    queryKey: ["top-subscribers"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("creators")
+        .select("*")
+        .order("subscriber_count", { ascending: false })
+        .limit(10);
+      return data || [];
+    }
+  });
+
+  const { data: topByViews } = useQuery({
+    queryKey: ["top-views"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("creators")
+        .select("*")
+        .order("total_views", { ascending: false })
+        .limit(10);
+      return data || [];
+    }
+  });
+
+  const { data: topByContent } = useQuery({
+    queryKey: ["top-content"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("creators")
+        .select("*")
+        .order("video_count", { ascending: false })
+        .limit(10);
+      return data || [];
+    }
+  });
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  const statCards = [
     {
       title: "Total Creators",
-      value: "1,234",
-      change: "+12.5%",
+      value: stats?.totalCreators || 0,
       icon: Users,
     },
     {
       title: "Total Views",
-      value: "45.2M",
-      change: "+8.3%",
+      value: formatNumber(stats?.totalViews || 0),
       icon: Eye,
     },
     {
-      title: "Avg Engagement",
-      value: "4.8%",
-      change: "+2.1%",
-      icon: TrendingUp,
+      title: "Total Videos",
+      value: formatNumber(stats?.totalVideos || 0),
+      icon: BarChart3,
     },
     {
-      title: "Active Campaigns",
-      value: "89",
-      change: "+15.2%",
-      icon: BarChart3,
+      title: "Avg Engagement",
+      value: `${stats?.avgEngagement || 0}%`,
+      icon: TrendingUp,
     },
   ];
 
@@ -57,7 +129,7 @@ const Analytics = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat) => {
+            {statCards.map((stat) => {
               const Icon = stat.icon;
               return (
                 <Card key={stat.title}>
@@ -68,33 +140,159 @@ const Analytics = () => {
                     <Icon className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="text-green-600">{stat.change}</span> from last month
-                    </p>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? "..." : stat.value}
+                    </div>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
 
-          {/* Coming Soon Section */}
-          <Card className="border-dashed">
+          {/* Top Creators by Subscribers */}
+          <Card>
             <CardHeader>
-              <CardTitle>Advanced Analytics</CardTitle>
-              <CardDescription>
-                More detailed analytics and reporting features coming soon
-              </CardDescription>
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-500" />
+                <CardTitle>Top Creators by Subscribers</CardTitle>
+              </div>
+              <CardDescription>Most followed beauty creators</CardDescription>
             </CardHeader>
-            <CardContent className="text-muted-foreground">
-              We're building advanced analytics features including:
-              <ul className="list-disc list-inside mt-4 space-y-2">
-                <li>Real-time performance tracking</li>
-                <li>Custom report generation</li>
-                <li>Competitor benchmarking</li>
-                <li>Audience demographics analysis</li>
-                <li>ROI predictions and forecasting</li>
-              </ul>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">Rank</TableHead>
+                    <TableHead>Creator</TableHead>
+                    <TableHead className="text-right">Subscribers</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {topBySubscribers?.map((creator, index) => (
+                    <TableRow key={creator.id}>
+                      <TableCell>
+                        <Badge variant={index < 3 ? "default" : "secondary"}>
+                          #{index + 1}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={creator.thumbnail_url} />
+                            <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{creator.channel_name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {formatNumber(creator.subscriber_count || 0)}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {formatNumber(creator.total_views || 0)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Top Creators by Views */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Eye className="h-5 w-5 text-blue-500" />
+                <CardTitle>Top Creators by Total Views</CardTitle>
+              </div>
+              <CardDescription>Most viewed beauty creators</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">Rank</TableHead>
+                    <TableHead>Creator</TableHead>
+                    <TableHead className="text-right">Total Views</TableHead>
+                    <TableHead className="text-right">Videos</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {topByViews?.map((creator, index) => (
+                    <TableRow key={creator.id}>
+                      <TableCell>
+                        <Badge variant={index < 3 ? "default" : "secondary"}>
+                          #{index + 1}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={creator.thumbnail_url} />
+                            <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{creator.channel_name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {formatNumber(creator.total_views || 0)}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {creator.video_count || 0}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Top Creators by Content */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-green-500" />
+                <CardTitle>Top Creators by Content Volume</CardTitle>
+              </div>
+              <CardDescription>Most prolific beauty creators</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">Rank</TableHead>
+                    <TableHead>Creator</TableHead>
+                    <TableHead className="text-right">Videos</TableHead>
+                    <TableHead className="text-right">Subscribers</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {topByContent?.map((creator, index) => (
+                    <TableRow key={creator.id}>
+                      <TableCell>
+                        <Badge variant={index < 3 ? "default" : "secondary"}>
+                          #{index + 1}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={creator.thumbnail_url} />
+                            <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{creator.channel_name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {creator.video_count || 0}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {formatNumber(creator.subscriber_count || 0)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </div>
