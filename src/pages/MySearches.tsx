@@ -99,21 +99,19 @@ const MySearches = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto max-w-7xl px-6 py-12 mt-16">
-        <div className="mb-8 flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="rounded-full"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">My Searches</h1>
-            <p className="text-muted-foreground mt-2">
-              View your recently searched beauty creators
-            </p>
-          </div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="rounded-full mb-4"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-foreground">My Searches</h1>
+          <p className="text-muted-foreground mt-2">
+            View your recently searched beauty creators
+          </p>
         </div>
         
         {loading ? (
@@ -136,39 +134,9 @@ const MySearches = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {searches.map((search) => {
               const creator = search.creator;
-              if (!creator) {
-                return (
-                  <Card key={search.id} className="overflow-hidden">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        {search.channel_thumbnail && (
-                          <img
-                            src={search.channel_thumbnail}
-                            alt={search.channel_name}
-                            className="w-16 h-16 rounded-full object-cover"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-foreground truncate">
-                            {search.channel_name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Searched on {new Date(search.searched_at).toLocaleDateString()}
-                          </p>
-                          <Button
-                            onClick={() => deleteSearch(search.id)}
-                            variant="outline"
-                            size="sm"
-                            className="mt-4 rounded-full"
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              }
+              
+              // If creator data is not available, skip this search
+              if (!creator) return null;
 
               const displayHandle = creator.custom_url
                 ? creator.custom_url.startsWith('@')
@@ -194,16 +162,14 @@ const MySearches = () => {
 
               return (
                 <div key={search.id} className="relative">
-                  <div className="absolute top-2 right-2 z-10">
-                    <Button
-                      onClick={() => deleteSearch(search.id)}
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full bg-background/80 hover:bg-background shadow-elegant"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={() => deleteSearch(search.id)}
+                    variant="outline"
+                    size="icon"
+                    className="absolute top-2 right-2 z-10 rounded-full bg-background/80 hover:bg-background shadow-lg"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                   <YouTuberCard
                     id={creator.id}
                     name={creator.channel_name}
