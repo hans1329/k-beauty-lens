@@ -248,7 +248,7 @@ const YouTuberCard = ({
         {/* Style Tags - Bottom Left */}
         <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 max-w-[calc(100%-24px)]">
           {style.map((s, i) => (
-            <Badge key={i} variant="secondary" className="text-xs bg-background/90 backdrop-blur-sm shadow-lg">
+            <Badge key={i} variant="secondary" className="text-xs bg-background/30 backdrop-blur-sm shadow-lg">
               {s}
             </Badge>
           ))}
