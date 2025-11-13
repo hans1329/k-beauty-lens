@@ -44,7 +44,7 @@ const YouTuberCard = ({
   onVisibilityChange,
   variant = 'vertical',
 }: YouTuberCardProps) => {
-  const creatorUrl = customUrl?.replace('@', '') || id || channel.replace('@', '');
+  const creatorUrl = customUrl || id || channel;
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   

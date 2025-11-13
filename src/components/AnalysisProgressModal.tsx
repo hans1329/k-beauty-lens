@@ -21,7 +21,7 @@ interface AnalysisStep {
 interface AnalysisProgressModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: (channelId: string) => void;
+  onComplete: (channelId: string, customUrl?: string) => void;
   channelId: string;
 }
 
@@ -148,7 +148,7 @@ const AnalysisProgressModal = ({
           toast.success(data?.message || "Analysis completed successfully");
           
           setTimeout(() => {
-            onComplete(data?.creator?.id || channelId);
+            onComplete(data?.creator?.id || channelId, data?.creator?.custom_url);
           }, 1000);
         }
       } catch (err) {
