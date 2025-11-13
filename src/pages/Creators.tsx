@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +61,7 @@ const Creators = () => {
   const [isAnalyzingAll, setIsAnalyzingAll] = useState(false);
   const [abortAnalysis, setAbortAnalysis] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState({ current: 0, total: 0 });
+  const abortAnalysisRef = useRef(false);
   const itemsPerPage = 20;
 
   const handleSync = async (channelIdToSync?: string) => {
@@ -306,6 +307,7 @@ const Creators = () => {
 
     setIsAnalyzingAll(true);
     setAbortAnalysis(false);
+    abortAnalysisRef.current = false;
     setAnalysisProgress({ current: 0, total: creators.length });
     let successCount = 0;
     let failCount = 0;
@@ -313,9 +315,10 @@ const Creators = () => {
     for (let i = 0; i < creators.length; i++) {
       const creator = creators[i];
       setAnalysisProgress({ current: i + 1, total: creators.length });
+      
       // Check if user requested to stop
-      if (abortAnalysis) {
-        toast.error(`Analysis stopped. Completed ${successCount}/${creators.length} creators`);
+      if (abortAnalysisRef.current) {
+        toast.info(`Analysis stopped. Completed ${successCount}/${creators.length} creators`);
         break;
       }
 
@@ -333,9 +336,10 @@ const Creators = () => {
 
     setIsAnalyzingAll(false);
     setAbortAnalysis(false);
+    abortAnalysisRef.current = false;
     setAnalysisProgress({ current: 0, total: 0 });
     
-    if (!abortAnalysis) {
+    if (!abortAnalysisRef.current) {
       if (failCount === 0) {
         toast.success(`All ${successCount} creators analyzed successfully!`);
       } else {
@@ -346,6 +350,7 @@ const Creators = () => {
 
   const handleStopAnalysis = () => {
     setAbortAnalysis(true);
+    abortAnalysisRef.current = true;
     toast.info('Stopping analysis after current creator...');
   };
 
