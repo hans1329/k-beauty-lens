@@ -47,13 +47,13 @@ const AnalysisProgressModal = ({
     const fetchQuota = async () => {
       const today = new Date().toISOString().split('T')[0];
       const { data } = await supabase
-        .from('api_quota_usage')
+        .from('api_quota_usage' as any)
         .select('quota_used, quota_limit')
         .eq('date', today)
         .maybeSingle();
       
       if (data) {
-        setQuotaUsage({ current: data.quota_used, limit: data.quota_limit });
+        setQuotaUsage({ current: (data as any).quota_used, limit: (data as any).quota_limit });
       } else {
         setQuotaUsage({ current: 0, limit: 3000 });
       }
@@ -103,13 +103,13 @@ const AnalysisProgressModal = ({
         if (data?.quotaUsed) {
           const today = new Date().toISOString().split('T')[0];
           const { data: quotaData } = await supabase
-            .from('api_quota_usage')
+            .from('api_quota_usage' as any)
             .select('quota_used, quota_limit')
             .eq('date', today)
             .maybeSingle();
           
           if (quotaData) {
-            setQuotaUsage({ current: quotaData.quota_used, limit: quotaData.quota_limit });
+            setQuotaUsage({ current: (quotaData as any).quota_used, limit: (quotaData as any).quota_limit });
           }
         }
 
@@ -223,14 +223,7 @@ const AnalysisProgressModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-background/10 backdrop-blur-3xl border-white/5" hideClose>
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-white">Analyzing YouTube Channel</DialogTitle>
-            {quotaUsage && (
-              <span className="text-sm text-white/70 font-mono">
-                {quotaUsage.current}/{quotaUsage.limit}
-              </span>
-            )}
-          </div>
+          <DialogTitle className="text-white">Analyzing YouTube Channel</DialogTitle>
           <DialogDescription className="text-white/80">
             Please wait while we analyze the channel data
           </DialogDescription>
@@ -273,7 +266,12 @@ const AnalysisProgressModal = ({
           )}
         </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-between items-center gap-3">
+          {quotaUsage && (
+            <span className="text-sm text-white/70 font-mono">
+              {quotaUsage.current}/{quotaUsage.limit}
+            </span>
+          )}
           {!isCompleted && (
             <Button
               variant="outline"
