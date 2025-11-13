@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User, Settings as SettingsIcon, Zap } from "lucide-react";
+import { Menu, X, LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -236,6 +236,24 @@ const Navigation = () => {
                     <Link to="/my-searches" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>My Searches</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/analytics" className="cursor-pointer">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>Analytics</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/rewards" className="cursor-pointer">
+                      <Gift className="mr-2 h-4 w-4" />
+                      <span>Rewards</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/pricing" className="cursor-pointer">
+                      <Zap className="mr-2 h-4 w-4" />
+                      <span>Energy</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
