@@ -62,21 +62,15 @@ const HeroSection = () => {
         </div>
 
         <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full">
-          <CardContent className="pt-6 pb-6 px-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Input placeholder="@username or https://youtube.com/@username" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} className="flex-1 bg-background/60 backdrop-blur rounded-full" onKeyDown={e => {
+          <CardContent className="pt-4 pb-4 px-6">
+            <div className="flex flex-row gap-3 items-center">
+              <Input placeholder="@username or https://youtube.com/@username" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} className="flex-1 bg-background/60 backdrop-blur rounded-full h-14" onKeyDown={e => {
               if (e.key === 'Enter' && !isLoading && channelId.trim()) {
                 handleSync();
               }
             }} />
-              <Button onClick={handleSync} disabled={isLoading || !channelId.trim()} className="rounded-full w-full sm:w-auto" size="lg">
-                {isLoading ? <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                  </> : <>
-                    <Search className="mr-2 h-4 w-4" />
-                    View Data
-                  </>}
+              <Button onClick={handleSync} disabled={isLoading || !channelId.trim()} className="rounded-full h-14 w-14" size="icon">
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
               </Button>
             </div>
           </CardContent>
