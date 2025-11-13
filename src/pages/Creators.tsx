@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Plus, RefreshCw, Trash2, Search, Sparkles, X } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { AdminLayout } from "@/components/AdminLayout";
 import {
   Table,
@@ -509,7 +510,17 @@ const Creators = () => {
                           <TableCell>{creator.video_count}</TableCell>
                           <TableCell>{creator.country || '-'}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">
-                            {new Date(creator.last_synced_at).toLocaleDateString()}
+                            {analyzingCreatorId === creator.id ? (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                  <span className="text-xs">Analyzing...</span>
+                                </div>
+                                <Progress value={undefined} className="h-1" />
+                              </div>
+                            ) : (
+                              new Date(creator.last_synced_at).toLocaleDateString()
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
