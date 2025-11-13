@@ -269,13 +269,13 @@ const CreatorDetail = () => {
     try {
       setLoading(true);
 
-      // Load creator info (case-sensitive)
+      // Load creator info (case-insensitive search, but display exact match from DB)
       const customUrl = id.startsWith('@') ? id : `@${id}`;
       
       const { data: creatorData, error: creatorError } = await supabase
         .from('creators')
         .select('*')
-        .eq('custom_url', customUrl)
+        .ilike('custom_url', customUrl)
         .maybeSingle();
 
       if (creatorError) throw creatorError;
