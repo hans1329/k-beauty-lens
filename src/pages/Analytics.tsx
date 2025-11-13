@@ -167,38 +167,38 @@ const Analytics = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto max-w-7xl px-6 py-12">
-        <div className="space-y-8">
+      <main className="container mx-auto max-w-7xl px-4 md:px-6 py-6 md:py-12">
+        <div className="space-y-6 md:space-y-8">
           {/* Header */}
           <div className="space-y-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(-1)}
-              className="mb-4 rounded-full"
+              className="mb-2 md:mb-4 rounded-full"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-4xl font-bold gradient-text">Analytics Dashboard</h1>
-            <p className="text-muted-foreground text-lg">
+            <h1 className="text-2xl md:text-4xl font-bold gradient-text">Analytics Dashboard</h1>
+            <p className="text-muted-foreground text-sm md:text-lg">
               Track performance metrics and insights across all beauty creators
             </p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {statCards.map((stat) => {
               const Icon = stat.icon;
               return (
                 <Card key={stat.title}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 md:p-6">
+                    <CardTitle className="text-xs md:text-sm font-medium">
                       {stat.title}
                     </CardTitle>
-                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    <Icon className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
+                  <CardContent className="p-4 md:p-6 pt-0">
+                    <div className="text-lg md:text-2xl font-bold">
                       {statsLoading ? "..." : stat.value}
                     </div>
                   </CardContent>
@@ -209,166 +209,172 @@ const Analytics = () => {
 
           {/* Top Creators by Subscribers */}
           <Card>
-            <CardHeader>
+            <CardHeader className="p-4 md:p-6">
               <div className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-yellow-500" />
-                <CardTitle>Top Creators by Subscribers</CardTitle>
+                <Trophy className="h-4 w-4 md:h-5 md:w-5 text-yellow-500" />
+                <CardTitle className="text-base md:text-lg">Top Creators by Subscribers</CardTitle>
               </div>
-              <CardDescription>Most followed beauty creators</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Most followed beauty creators</CardDescription>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Rank</TableHead>
-                    <TableHead>Creator</TableHead>
-                    <TableHead className="text-right">Subscribers</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {topBySubscribers?.map((creator, index) => (
-                    <TableRow key={creator.id}>
-                      <TableCell>
-                        <Badge variant={index < 3 ? "default" : "secondary"}>
-                          #{index + 1}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={creator.thumbnail_url} />
-                            <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
-                          </Avatar>
-                          <button 
-                            onClick={() => handleCreatorClick(creator.custom_url)}
-                            className="font-medium hover:text-primary transition-colors text-left"
-                            disabled={isNavigating}
-                          >
-                            {creator.channel_name}
-                          </button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatNumber(creator.subscriber_count || 0)}
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {formatNumber(creator.total_views || 0)}
-                      </TableCell>
+            <CardContent className="p-0 md:p-6 md:pt-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12 md:w-16 pl-4 md:pl-3">Rank</TableHead>
+                      <TableHead className="min-w-[180px]">Creator</TableHead>
+                      <TableHead className="text-right pr-4 md:pr-3">Subscribers</TableHead>
+                      <TableHead className="text-right pr-4 md:pr-3 hidden sm:table-cell">Views</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {topBySubscribers?.map((creator, index) => (
+                      <TableRow key={creator.id}>
+                        <TableCell className="pl-4 md:pl-3">
+                          <Badge variant={index < 3 ? "default" : "secondary"} className="text-xs">
+                            #{index + 1}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 md:gap-3">
+                            <Avatar className="h-6 w-6 md:h-8 md:w-8 flex-shrink-0">
+                              <AvatarImage src={creator.thumbnail_url} />
+                              <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
+                            </Avatar>
+                            <button 
+                              onClick={() => handleCreatorClick(creator.custom_url)}
+                              className="font-medium hover:text-primary transition-colors text-left text-sm md:text-base truncate"
+                              disabled={isNavigating}
+                            >
+                              {creator.channel_name}
+                            </button>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-medium pr-4 md:pr-3 text-xs md:text-sm">
+                          {formatNumber(creator.subscriber_count || 0)}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground pr-4 md:pr-3 text-xs md:text-sm hidden sm:table-cell">
+                          {formatNumber(creator.total_views || 0)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
           {/* Top Creators by Views */}
           <Card>
-            <CardHeader>
+            <CardHeader className="p-4 md:p-6">
               <div className="flex items-center gap-2">
-                <Eye className="h-5 w-5 text-blue-500" />
-                <CardTitle>Top Creators by Total Views</CardTitle>
+                <Eye className="h-4 w-4 md:h-5 md:w-5 text-blue-500" />
+                <CardTitle className="text-base md:text-lg">Top Creators by Total Views</CardTitle>
               </div>
-              <CardDescription>Most viewed beauty creators</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Most viewed beauty creators</CardDescription>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Rank</TableHead>
-                    <TableHead>Creator</TableHead>
-                    <TableHead className="text-right">Total Views</TableHead>
-                    <TableHead className="text-right">Videos</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {topByViews?.map((creator, index) => (
-                    <TableRow key={creator.id}>
-                      <TableCell>
-                        <Badge variant={index < 3 ? "default" : "secondary"}>
-                          #{index + 1}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={creator.thumbnail_url} />
-                            <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
-                          </Avatar>
-                          <button 
-                            onClick={() => handleCreatorClick(creator.custom_url)}
-                            className="font-medium hover:text-primary transition-colors text-left"
-                            disabled={isNavigating}
-                          >
-                            {creator.channel_name}
-                          </button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatNumber(creator.total_views || 0)}
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {creator.video_count || 0}
-                      </TableCell>
+            <CardContent className="p-0 md:p-6 md:pt-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12 md:w-16 pl-4 md:pl-3">Rank</TableHead>
+                      <TableHead className="min-w-[180px]">Creator</TableHead>
+                      <TableHead className="text-right pr-4 md:pr-3">Total Views</TableHead>
+                      <TableHead className="text-right pr-4 md:pr-3 hidden sm:table-cell">Videos</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {topByViews?.map((creator, index) => (
+                      <TableRow key={creator.id}>
+                        <TableCell className="pl-4 md:pl-3">
+                          <Badge variant={index < 3 ? "default" : "secondary"} className="text-xs">
+                            #{index + 1}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 md:gap-3">
+                            <Avatar className="h-6 w-6 md:h-8 md:w-8 flex-shrink-0">
+                              <AvatarImage src={creator.thumbnail_url} />
+                              <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
+                            </Avatar>
+                            <button 
+                              onClick={() => handleCreatorClick(creator.custom_url)}
+                              className="font-medium hover:text-primary transition-colors text-left text-sm md:text-base truncate"
+                              disabled={isNavigating}
+                            >
+                              {creator.channel_name}
+                            </button>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-medium pr-4 md:pr-3 text-xs md:text-sm">
+                          {formatNumber(creator.total_views || 0)}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground pr-4 md:pr-3 text-xs md:text-sm hidden sm:table-cell">
+                          {creator.video_count || 0}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
           {/* Top Creators by Content */}
           <Card>
-            <CardHeader>
+            <CardHeader className="p-4 md:p-6">
               <div className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-green-500" />
-                <CardTitle>Top Creators by Content Volume</CardTitle>
+                <BarChart3 className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
+                <CardTitle className="text-base md:text-lg">Top Creators by Content Volume</CardTitle>
               </div>
-              <CardDescription>Most prolific beauty creators</CardDescription>
+              <CardDescription className="text-xs md:text-sm">Most prolific beauty creators</CardDescription>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Rank</TableHead>
-                    <TableHead>Creator</TableHead>
-                    <TableHead className="text-right">Videos</TableHead>
-                    <TableHead className="text-right">Subscribers</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {topByContent?.map((creator, index) => (
-                    <TableRow key={creator.id}>
-                      <TableCell>
-                        <Badge variant={index < 3 ? "default" : "secondary"}>
-                          #{index + 1}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={creator.thumbnail_url} />
-                            <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
-                          </Avatar>
-                          <button 
-                            onClick={() => handleCreatorClick(creator.custom_url)}
-                            className="font-medium hover:text-primary transition-colors text-left"
-                            disabled={isNavigating}
-                          >
-                            {creator.channel_name}
-                          </button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {creator.video_count || 0}
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {formatNumber(creator.subscriber_count || 0)}
-                      </TableCell>
+            <CardContent className="p-0 md:p-6 md:pt-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12 md:w-16 pl-4 md:pl-3">Rank</TableHead>
+                      <TableHead className="min-w-[180px]">Creator</TableHead>
+                      <TableHead className="text-right pr-4 md:pr-3">Videos</TableHead>
+                      <TableHead className="text-right pr-4 md:pr-3 hidden sm:table-cell">Subscribers</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {topByContent?.map((creator, index) => (
+                      <TableRow key={creator.id}>
+                        <TableCell className="pl-4 md:pl-3">
+                          <Badge variant={index < 3 ? "default" : "secondary"} className="text-xs">
+                            #{index + 1}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 md:gap-3">
+                            <Avatar className="h-6 w-6 md:h-8 md:w-8 flex-shrink-0">
+                              <AvatarImage src={creator.thumbnail_url} />
+                              <AvatarFallback>{creator.channel_name[0]}</AvatarFallback>
+                            </Avatar>
+                            <button 
+                              onClick={() => handleCreatorClick(creator.custom_url)}
+                              className="font-medium hover:text-primary transition-colors text-left text-sm md:text-base truncate"
+                              disabled={isNavigating}
+                            >
+                              {creator.channel_name}
+                            </button>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-medium pr-4 md:pr-3 text-xs md:text-sm">
+                          {creator.video_count || 0}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground pr-4 md:pr-3 text-xs md:text-sm hidden sm:table-cell">
+                          {formatNumber(creator.subscriber_count || 0)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>
