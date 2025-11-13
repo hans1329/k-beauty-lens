@@ -445,20 +445,34 @@ const Creators = () => {
                     <Sparkles className="h-4 w-4" />
                   )}
                 </Button>
-                {isAnalyzingAll && (
-                  <Button
-                    onClick={handleStopAnalysis}
-                    disabled={abortAnalysis}
-                    size="sm"
-                    variant="destructive"
-                    className="rounded-full"
-                    title="Stop analysis"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
             </div>
+            {isAnalyzingAll && (
+              <div className="mt-4 flex items-center justify-between p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+                <span className="text-sm text-destructive font-medium">
+                  Analysis in progress - Current creator will complete before stopping
+                </span>
+                <Button
+                  onClick={handleStopAnalysis}
+                  disabled={abortAnalysis}
+                  size="sm"
+                  variant="destructive"
+                  className="rounded-full"
+                >
+                  {abortAnalysis ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Stopping...
+                    </>
+                  ) : (
+                    <>
+                      <X className="mr-2 h-4 w-4" />
+                      Stop Analysis
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
