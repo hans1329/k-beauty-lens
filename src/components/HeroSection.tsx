@@ -90,9 +90,9 @@ const HeroSection = () => {
                 aria-label="Search"
               >
                 {isLoading ? (
-                  <Loader2 className="h-6 w-6 md:h-7 md:w-7 animate-spin text-primary" />
+                  <Loader2 className="h-6 w-6 md:h-7 md:w-7 animate-spin text-pink-400" />
                 ) : (
-                  <Search className="h-6 w-6 md:h-7 md:w-7 text-primary" />
+                  <Search className="h-6 w-6 md:h-7 md:w-7 text-pink-400" />
                 )}
               </button>
             </form>
