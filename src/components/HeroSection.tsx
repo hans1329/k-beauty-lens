@@ -7,6 +7,7 @@ import { toast } from "sonner";
 const HeroSection = () => {
   const [channelId, setChannelId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(true);
   const handleSync = async () => {
     const targetChannelId = channelId.trim();
     if (!targetChannelId) {
@@ -70,6 +71,8 @@ const HeroSection = () => {
                 value={channelId} 
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading} 
+                readOnly={isReadOnly}
+                onFocus={() => setIsReadOnly(false)}
                 autoComplete="off"
                 data-lpignore="true"
                 data-form-type="other"
