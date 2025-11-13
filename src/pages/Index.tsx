@@ -5,8 +5,9 @@ import YouTuberCard from "@/components/YouTuberCard";
 import StatsSection from "@/components/StatsSection";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, LayoutGrid, List } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface Creator {
   id: string;
@@ -24,6 +25,7 @@ interface Creator {
 const Index = () => {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     fetchCreators();
@@ -139,25 +141,43 @@ const Index = () => {
 
         {/* Search and Filter */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-3xl font-bold">Discover Creators</h2>
               <p className="text-muted-foreground mt-1">
                 Browse through our curated list of Korean beauty YouTubers
               </p>
             </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="icon"
+                onClick={() => setViewMode('grid')}
+                className="rounded-full"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="icon"
+                onClick={() => setViewMode('list')}
+                className="rounded-full"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
           <FilterBar />
         </div>
 
-        {/* YouTuber Grid */}
+        {/* YouTuber Grid/List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : creators.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
             {creators.map((creator) => {
               const displayHandle = creator.custom_url 
                 ? (creator.custom_url.startsWith('@') ? creator.custom_url : `@${creator.custom_url}`)
@@ -179,6 +199,7 @@ const Index = () => {
                   channelUrl={`https://youtube.com/channel/${creator.channel_id}`}
                   isVisible={creator.is_visible}
                   onVisibilityChange={fetchCreators}
+                  variant={viewMode === 'grid' ? 'vertical' : 'horizontal'}
                 />
               );
             })}
