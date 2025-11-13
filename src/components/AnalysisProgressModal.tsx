@@ -182,7 +182,7 @@ const AnalysisProgressModal = ({
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="rounded-full text-white/60 border-white/20 hover:text-white hover:bg-white/10"
+              className="rounded-full text-white/60 border-white/20 bg-transparent hover:text-white hover:bg-white/10"
             >
               Cancel
             </Button>
