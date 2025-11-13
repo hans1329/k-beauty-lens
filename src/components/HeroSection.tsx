@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Loader2, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,23 +62,32 @@ const HeroSection = () => {
 
         <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-0.5 md:mx-0">
           <CardContent className="pt-3 pb-3 px-2 md:px-6">
-            <div className="flex flex-row gap-1.5 md:gap-3 items-center">
+            <div className="relative">
               <Input 
                 placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"}
                 value={channelId} 
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading} 
                 autoComplete="off" 
-                className="flex-1 bg-background/60 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 md:px-6" 
+                className="w-full bg-background/60 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14" 
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !isLoading && channelId.trim()) {
                     handleSync();
                   }
                 }} 
               />
-              <Button onClick={handleSync} disabled={isLoading || !channelId.trim()} className="rounded-full h-12 w-12 md:h-14 md:w-14 flex-shrink-0" size="icon">
-                {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Search className="h-6 w-6" />}
-              </Button>
+              <button
+                onClick={handleSync}
+                disabled={isLoading || !channelId.trim()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 disabled:opacity-50 transition-opacity"
+                aria-label="Search"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-6 w-6 md:h-7 md:w-7 animate-spin text-primary" />
+                ) : (
+                  <Search className="h-6 w-6 md:h-7 md:w-7 text-primary" />
+                )}
+              </button>
             </div>
           </CardContent>
         </Card>
