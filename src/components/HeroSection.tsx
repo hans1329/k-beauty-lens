@@ -65,12 +65,12 @@ const HeroSection = () => {
             <div className="relative">
               <Input 
                 type="text"
-                name="youtube-channel"
+                name="search-query"
                 placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"}
                 value={channelId} 
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading} 
-                autoComplete="off"
+                autoComplete="new-password"
                 data-lpignore="true"
                 data-form-type="other"
                 className="w-full bg-background/30 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0" 
