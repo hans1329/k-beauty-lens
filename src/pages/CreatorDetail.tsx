@@ -203,7 +203,7 @@ const CreatorDetail = () => {
       if (error) throw error;
 
       toast.success('Creator deleted successfully');
-      navigate('/creators');
+      navigate('/');
     } catch (error) {
       console.error('Error deleting creator:', error);
       toast.error('Failed to delete creator');
