@@ -91,7 +91,7 @@ const HeroSection = () => {
     try {
       const {
         data: existingCreator
-      } = await supabase.from('creators').select('id, channel_name').eq('custom_url', targetChannelId).maybeSingle();
+      } = await supabase.from('creators').select('id, channel_name, custom_url').eq('custom_url', targetChannelId).maybeSingle();
       if (existingCreator) {
         toast("Creator already exists", {
           description: `${existingCreator.channel_name} is already in our database. Redirecting...`
@@ -111,9 +111,9 @@ const HeroSection = () => {
         setChannelId("");
         setIsLoading(false);
 
-        // Navigate to existing creator page
+        // Navigate to existing creator page using custom_url
         setTimeout(() => {
-          navigate(`/creator/${existingCreator.id}`);
+          navigate(`/creator/${existingCreator.custom_url}`);
         }, 1000);
         return;
       }
@@ -137,9 +137,10 @@ const HeroSection = () => {
     setShowProgressModal(true);
     setChannelId("");
   };
-  const handleAnalysisComplete = (creatorId: string) => {
+  const handleAnalysisComplete = (creatorId: string, customUrl?: string) => {
     setShowProgressModal(false);
-    navigate(`/creator/${creatorId}`);
+    // Use custom_url if available, otherwise fallback to creatorId
+    navigate(`/creator/${customUrl || creatorId}`);
   };
   return <section className="relative overflow-hidden py-12 md:py-20 px-0 md:px-6">
       {/* Background gradient */}
