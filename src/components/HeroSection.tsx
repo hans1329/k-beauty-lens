@@ -60,7 +60,7 @@ const HeroSection = () => {
           </p>
         </div>
 
-        <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full">
+        <Card className="shadow-2xl border-white/20 backdrop-blur-sm bg-white/5 rounded-full">
           <CardContent className="p-0">
             <form 
               role="search" 
@@ -81,7 +81,7 @@ const HeroSection = () => {
                 onChange={e => setChannelId(e.target.value)} 
                 disabled={isLoading}
                 autoComplete="off"
-                className="w-full bg-background/30 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0" 
+                className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60" 
               />
               <button
                 type="submit"
