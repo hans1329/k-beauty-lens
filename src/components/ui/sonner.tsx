@@ -21,7 +21,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
         style: {
-          background: 'linear-gradient(135deg, hsl(180 70% 50% / 0.6), hsl(220 70% 60% / 0.6), hsl(280 65% 65% / 0.6))',
+          background: 'linear-gradient(135deg, hsl(180 70% 40% / 0.85), hsl(220 70% 50% / 0.85), hsl(280 65% 55% / 0.85))',
         },
       }}
       {...props}
