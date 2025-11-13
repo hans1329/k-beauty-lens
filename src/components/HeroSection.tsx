@@ -77,13 +77,18 @@ const HeroSection = () => {
               handleSync();
             }
           }} className="relative">
-              <Input type="text" name="search-query" id="youtube-search" placeholder={window.innerWidth < 768 ? "@username" : "@username or https://youtube.com/@username"} value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0" />
+              <Input type="text" name="search-query" id="youtube-search" placeholder="" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} autoComplete="off" data-form-type="other" data-lpignore="true" className="w-full bg-white/5 backdrop-blur rounded-full h-12 md:h-14 text-base md:text-lg px-4 pr-12 md:px-6 md:pr-14 border-0 text-white placeholder:text-white/60 focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-0" />
               <button type="submit" disabled={isLoading || !channelId.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 disabled:opacity-50 transition-opacity" aria-label="Search">
                 {isLoading ? <Loader2 className="h-6 w-6 md:h-7 md:w-7 animate-spin text-pink-400" /> : <Search className="h-6 w-6 md:h-7 md:w-7 text-pink-400" />}
               </button>
             </form>
           </CardContent>
         </Card>
+        
+        <p className="text-center text-white/60 text-sm mt-3">
+          <span className="md:hidden">@username</span>
+          <span className="hidden md:inline">@username or https://youtube.com/@username</span>
+        </p>
       </div>
 
       <AnalysisProgressModal open={showProgressModal} onOpenChange={setShowProgressModal} onComplete={handleAnalysisComplete} channelId={analyzingChannelId} />
