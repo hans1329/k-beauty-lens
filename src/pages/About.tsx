@@ -1,10 +1,12 @@
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mail, MessageSquare, Users, Target } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Mail, MessageSquare, Users, Target, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const About = () => {
+  const navigate = useNavigate();
+  
   const values = [
     {
       icon: Users,
@@ -30,6 +32,14 @@ const About = () => {
         <div className="space-y-16">
           {/* Hero Section */}
           <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="mb-4 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <h1 className="text-4xl md:text-5xl font-bold gradient-text">
               About Link·kbeauty
             </h1>

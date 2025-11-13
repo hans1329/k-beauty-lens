@@ -1,10 +1,12 @@
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Pricing = () => {
+  const navigate = useNavigate();
+  
   const plans = [
     {
       name: "Free",
@@ -61,6 +63,14 @@ const Pricing = () => {
         <div className="space-y-12">
           {/* Header */}
           <div className="text-center space-y-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="mb-4 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <h1 className="text-4xl md:text-5xl font-bold gradient-text">
               Simple, Transparent Pricing
             </h1>

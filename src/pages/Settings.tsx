@@ -15,7 +15,7 @@ import {
 import { UserAvatar } from "@/components/UserAvatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Loader2 } from "lucide-react";
+import { Upload, Loader2, ArrowLeft } from "lucide-react";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -181,6 +181,14 @@ const Settings = () => {
       <div className="container mx-auto max-w-2xl px-6 py-12">
         <div className="space-y-6">
           <div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="mb-4 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
             <p className="text-muted-foreground mt-2">
               Manage your account information

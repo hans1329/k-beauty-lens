@@ -1,8 +1,12 @@
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Users, Eye } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Analytics = () => {
+  const navigate = useNavigate();
+  
   const stats = [
     {
       title: "Total Creators",
@@ -37,6 +41,14 @@ const Analytics = () => {
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="mb-4 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <h1 className="text-4xl font-bold gradient-text">Analytics Dashboard</h1>
             <p className="text-muted-foreground text-lg">
               Track performance metrics and insights across all beauty creators
