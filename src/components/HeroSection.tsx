@@ -57,7 +57,7 @@ const HeroSection = () => {
       animationDelay: "1s"
     }} />
       
-      <div className="container mx-auto max-w-3xl relative z-10 px-4 md:px-0">
+      <div className="container mx-auto max-w-2xl relative z-10 px-4 md:px-0">
         <div className="text-center space-y-4 md:space-y-6 mb-6 md:mb-8">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
             Explore Analyzed
