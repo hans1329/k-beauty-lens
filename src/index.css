@@ -54,8 +54,8 @@ All colors MUST be HSL.
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(345 75% 60%), hsl(280 65% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(45 85% 40%), hsl(30 85% 35%), hsl(345 70% 40%), hsl(280 60% 40%), hsl(260 70% 45%));
-    --gradient-instagram: linear-gradient(135deg, hsl(45 85% 40%), hsl(30 85% 35%), hsl(345 70% 40%), hsl(280 60% 40%), hsl(260 70% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(45 95% 75%), hsl(30 95% 70%), hsl(345 80% 75%), hsl(280 70% 75%), hsl(260 80% 80%));
+    --gradient-instagram: linear-gradient(135deg, hsl(45 95% 75%), hsl(30 95% 70%), hsl(345 80% 75%), hsl(280 70% 75%), hsl(260 80% 80%));
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100% / 0.9), hsl(280 10% 98% / 0.9));
     
     /* Shadows */
@@ -116,8 +116,8 @@ All colors MUST be HSL.
     --chart-5: 30 70% 70%;
 
     --gradient-primary: linear-gradient(135deg, hsl(345 75% 65%), hsl(280 65% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(45 80% 35%), hsl(30 80% 30%), hsl(345 70% 35%), hsl(280 60% 35%), hsl(260 70% 40%));
-    --gradient-instagram: linear-gradient(135deg, hsl(45 80% 35%), hsl(30 80% 30%), hsl(345 70% 35%), hsl(280 60% 35%), hsl(260 70% 40%));
+    --gradient-hero: linear-gradient(135deg, hsl(45 90% 65%), hsl(30 90% 60%), hsl(345 80% 70%), hsl(280 70% 70%), hsl(260 80% 75%));
+    --gradient-instagram: linear-gradient(135deg, hsl(45 90% 65%), hsl(30 90% 60%), hsl(345 80% 70%), hsl(280 70% 70%), hsl(260 80% 75%));
     --gradient-card: linear-gradient(135deg, hsl(280 15% 18% / 0.9), hsl(280 15% 15% / 0.9));
     
     --shadow-glow: 0 0 40px hsl(345 75% 60% / 0.2);
