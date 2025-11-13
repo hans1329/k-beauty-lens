@@ -268,7 +268,7 @@ const Navigation = () => {
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="ghost" asChild>
+                <Button variant="ghost" asChild className="hidden md:flex">
                   <Link to="/auth">Sign In</Link>
                 </Button>
                 <Button asChild className="rounded-full">

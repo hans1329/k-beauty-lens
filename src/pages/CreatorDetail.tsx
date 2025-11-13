@@ -638,11 +638,11 @@ const CreatorDetail = () => {
 
         {/* Analytics Tabs */}
         <Tabs defaultValue="videos" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 rounded-full">
-            <TabsTrigger value="videos" className="rounded-full">{t.videosTab}</TabsTrigger>
-            <TabsTrigger value="brands" className="rounded-full">{t.brandsTab}</TabsTrigger>
-            <TabsTrigger value="keywords" className="rounded-full">{t.keywordsTab}</TabsTrigger>
-            <TabsTrigger value="sentiment" className="rounded-full">{t.sentimentTab}</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 rounded-full p-1">
+            <TabsTrigger value="videos" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.videosTab}</TabsTrigger>
+            <TabsTrigger value="brands" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.brandsTab}</TabsTrigger>
+            <TabsTrigger value="keywords" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.keywordsTab}</TabsTrigger>
+            <TabsTrigger value="sentiment" className="rounded-full text-xs md:text-sm px-2 md:px-3">{t.sentimentTab}</TabsTrigger>
           </TabsList>
 
           {/* Videos Tab */}
