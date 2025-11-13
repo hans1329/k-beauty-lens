@@ -64,7 +64,7 @@ const HeroSection = () => {
         <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-background/40 rounded-full mx-2 md:mx-0">
           <CardContent className="pt-3 pb-3 px-4 md:pt-4 md:pb-4 md:px-6">
             <div className="flex flex-row gap-2 md:gap-3 items-center">
-              <Input placeholder="@username or https://youtube.com/@username" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} className="flex-1 bg-background/60 backdrop-blur rounded-full h-12 md:h-14 text-sm md:text-base" onKeyDown={e => {
+              <Input placeholder="@username or https://youtube.com/@username" value={channelId} onChange={e => setChannelId(e.target.value)} disabled={isLoading} autoComplete="off" className="flex-1 bg-background/60 backdrop-blur rounded-full h-12 md:h-14 text-sm md:text-base" onKeyDown={e => {
               if (e.key === 'Enter' && !isLoading && channelId.trim()) {
                 handleSync();
               }
