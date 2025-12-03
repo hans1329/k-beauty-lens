@@ -45,6 +45,7 @@ const Challenges = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [applyDialogOpen, setApplyDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [editChallenge, setEditChallenge] = useState<Challenge | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -334,7 +335,18 @@ const Challenges = () => {
                         </div>
                         <CardDescription>{challenge.product_name}</CardDescription>
                       </CardHeader>
-                      <CardFooter>
+                      <CardFooter className="gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="rounded-full"
+                          onClick={() => {
+                            setEditChallenge(challenge);
+                            setCreateDialogOpen(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm" 
@@ -355,8 +367,12 @@ const Challenges = () => {
 
       <CreateChallengeDialog 
         open={createDialogOpen} 
-        onOpenChange={setCreateDialogOpen}
+        onOpenChange={(open) => {
+          setCreateDialogOpen(open);
+          if (!open) setEditChallenge(null);
+        }}
         onSuccess={loadChallenges}
+        editChallenge={editChallenge}
       />
 
       {selectedChallenge && (

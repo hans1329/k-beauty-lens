@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,13 +16,27 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+interface Challenge {
+  id: string;
+  title: string;
+  description: string | null;
+  product_name: string;
+  product_image_url: string | null;
+  product_value: number | null;
+  max_applicants: number | null;
+  platform: string[] | null;
+  requirements: string | null;
+  application_deadline: string | null;
+}
+
 interface CreateChallengeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  editChallenge?: Challenge | null;
 }
 
-const CreateChallengeDialog = ({ open, onOpenChange, onSuccess }: CreateChallengeDialogProps) => {
+const CreateChallengeDialog = ({ open, onOpenChange, onSuccess, editChallenge }: CreateChallengeDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -40,43 +54,30 @@ const CreateChallengeDialog = ({ open, onOpenChange, onSuccess }: CreateChalleng
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const isEditMode = !!editChallenge;
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.error("Please sign in to create a challenge");
-      setLoading(false);
-      return;
-    }
-
-    const selectedPlatforms = Object.entries(formData.platforms)
-      .filter(([_, selected]) => selected)
-      .map(([platform]) => platform);
-
-    const { error } = await supabase.from("challenges").insert({
-      brand_id: session.user.id,
-      title: formData.title,
-      description: formData.description || null,
-      product_name: formData.product_name,
-      product_image_url: formData.product_image_url || null,
-      product_value: formData.product_value ? parseInt(formData.product_value) : null,
-      max_applicants: parseInt(formData.max_applicants) || 10,
-      platform: selectedPlatforms,
-      requirements: formData.requirements || null,
-      application_deadline: formData.application_deadline || null,
-      status: "open",
-    });
-
-    if (error) {
-      toast.error("Failed to create challenge");
-      console.error(error);
-    } else {
-      toast.success("Challenge created successfully!");
-      onOpenChange(false);
-      onSuccess();
-      // Reset form
+  useEffect(() => {
+    if (editChallenge && open) {
+      const platforms = editChallenge.platform || [];
+      setFormData({
+        title: editChallenge.title || "",
+        description: editChallenge.description || "",
+        product_name: editChallenge.product_name || "",
+        product_image_url: editChallenge.product_image_url || "",
+        product_value: editChallenge.product_value?.toString() || "",
+        max_applicants: editChallenge.max_applicants?.toString() || "10",
+        requirements: editChallenge.requirements || "",
+        application_deadline: editChallenge.application_deadline 
+          ? editChallenge.application_deadline.split('T')[0] 
+          : "",
+        platforms: {
+          instagram: platforms.includes("instagram"),
+          tiktok: platforms.includes("tiktok"),
+          youtube: platforms.includes("youtube"),
+        },
+      });
+    } else if (!open) {
+      // Reset form when closing
       setFormData({
         title: "",
         description: "",
@@ -89,6 +90,60 @@ const CreateChallengeDialog = ({ open, onOpenChange, onSuccess }: CreateChalleng
         platforms: { instagram: true, tiktok: true, youtube: false },
       });
     }
+  }, [editChallenge, open]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Please sign in");
+      setLoading(false);
+      return;
+    }
+
+    const selectedPlatforms = Object.entries(formData.platforms)
+      .filter(([_, selected]) => selected)
+      .map(([platform]) => platform);
+
+    const challengeData = {
+      title: formData.title,
+      description: formData.description || null,
+      product_name: formData.product_name,
+      product_image_url: formData.product_image_url || null,
+      product_value: formData.product_value ? parseInt(formData.product_value) : null,
+      max_applicants: parseInt(formData.max_applicants) || 10,
+      platform: selectedPlatforms,
+      requirements: formData.requirements || null,
+      application_deadline: formData.application_deadline || null,
+    };
+
+    let error;
+
+    if (isEditMode && editChallenge) {
+      const result = await supabase
+        .from("challenges")
+        .update(challengeData)
+        .eq("id", editChallenge.id);
+      error = result.error;
+    } else {
+      const result = await supabase.from("challenges").insert({
+        ...challengeData,
+        brand_id: session.user.id,
+        status: "open",
+      });
+      error = result.error;
+    }
+
+    if (error) {
+      toast.error(isEditMode ? "Failed to update challenge" : "Failed to create challenge");
+      console.error(error);
+    } else {
+      toast.success(isEditMode ? "Challenge updated successfully!" : "Challenge created successfully!");
+      onOpenChange(false);
+      onSuccess();
+    }
 
     setLoading(false);
   };
@@ -97,9 +152,9 @@ const CreateChallengeDialog = ({ open, onOpenChange, onSuccess }: CreateChalleng
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto mx-4">
         <DialogHeader>
-          <DialogTitle>Create New Challenge</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Challenge" : "Create New Challenge"}</DialogTitle>
           <DialogDescription>
-            Register a product for creators to review
+            {isEditMode ? "Update your challenge details" : "Register a product for creators to review"}
           </DialogDescription>
         </DialogHeader>
 
@@ -228,10 +283,10 @@ const CreateChallengeDialog = ({ open, onOpenChange, onSuccess }: CreateChalleng
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  {isEditMode ? "Updating..." : "Creating..."}
                 </>
               ) : (
-                "Create Challenge"
+                isEditMode ? "Update Challenge" : "Create Challenge"
               )}
             </Button>
           </DialogFooter>
