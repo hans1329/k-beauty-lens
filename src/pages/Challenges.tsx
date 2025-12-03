@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +35,7 @@ interface Challenge {
 
 const Challenges = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [userType, setUserType] = useState<string>("general_user");
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -43,6 +44,7 @@ const Challenges = () => {
   const [loading, setLoading] = useState(true);
   const [applyDialogOpen, setApplyDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
 
   useEffect(() => {
     checkUser();
@@ -184,7 +186,10 @@ const Challenges = () => {
           )}
         </div>
 
-        <Tabs defaultValue="explore" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value);
+          setSearchParams(value === "explore" ? {} : { tab: value });
+        }} className="space-y-6">
           <TabsList>
             <TabsTrigger value="explore">Explore</TabsTrigger>
             {user && userType === "creator" && (
@@ -307,7 +312,11 @@ const Challenges = () => {
               ) : (
                 <div className="space-y-4">
                   {myApplications.map((app) => (
-                    <Card key={app.id}>
+                    <Card 
+                      key={app.id} 
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => navigate(`/challenges/${app.challenge_id}`)}
+                    >
                       <div className="flex">
                         {app.challenges?.product_image_url && (
                           <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-muted flex items-center justify-center rounded-l-lg overflow-hidden">
@@ -340,7 +349,11 @@ const Challenges = () => {
                               <p className="text-sm text-muted-foreground mb-2">
                                 Product shipped! Submit your content URL after posting.
                               </p>
-                              <Button size="sm" className="rounded-full">
+                              <Button 
+                                size="sm" 
+                                className="rounded-full"
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 Submit Content URL
                               </Button>
                             </CardContent>

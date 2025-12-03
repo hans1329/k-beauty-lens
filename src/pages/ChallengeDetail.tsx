@@ -525,7 +525,9 @@ const ChallengeDetail = () => {
           open={applyDialogOpen}
           onOpenChange={setApplyDialogOpen}
           challenge={challenge}
-          onSuccess={loadData}
+          onSuccess={() => {
+            navigate("/challenges?tab=applications");
+          }}
         />
       )}
 
