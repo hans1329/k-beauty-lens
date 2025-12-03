@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Instagram, Clock, Users, Package, Loader2 } from "lucide-react";
+import { Plus, Instagram, Clock, Users, Package, Loader2, Gift } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import ApplyToChallengeDialog from "@/components/challenges/ApplyToChallengeDialog";
 import type { User } from "@supabase/supabase-js";
@@ -255,7 +255,7 @@ const Challenges = () => {
                       <div className="space-y-3 text-sm">
                         <div>
                           <div className="flex items-center gap-2">
-                            <Package className="h-4 w-4 text-muted-foreground" />
+                            <Gift className="h-4 w-4 text-muted-foreground" />
                             <span className="text-base font-semibold">{challenge.product_name}</span>
                           </div>
                           {challenge.product_value && (
