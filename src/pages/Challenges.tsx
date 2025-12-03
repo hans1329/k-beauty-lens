@@ -228,7 +228,7 @@ const Challenges = () => {
                       ) : (
                         <Package className="h-12 w-12 text-muted-foreground" />
                       )}
-                      <span className="absolute bottom-2 left-2 text-xs flex items-center gap-1 text-white drop-shadow-md">
+                      <span className="absolute bottom-2 left-2 text-xs flex items-center gap-1 text-gray-700 bg-white/80 px-2 py-1 rounded-full border border-gray-300">
                         <Users className="h-3 w-3" />
                         {challenge.application_count}/{challenge.max_applicants || "∞"}
                       </span>
