@@ -253,9 +253,16 @@ const Challenges = () => {
                     </CardHeader>
                     <CardContent className="flex-1">
                       <div className="space-y-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Package className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-base font-semibold">{challenge.product_name}</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Package className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-base font-semibold">{challenge.product_name}</span>
+                          </div>
+                          {challenge.product_value && (
+                            <span className="text-sm text-muted-foreground ml-6">
+                              ₩{challenge.product_value.toLocaleString()}
+                            </span>
+                          )}
                         </div>
                         {challenge.platform && challenge.platform.length > 0 && (
                           <div className="flex gap-2">
