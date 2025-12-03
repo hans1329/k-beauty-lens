@@ -134,7 +134,7 @@ const Navigation = () => {
           </Link>
 
           {/* Main Navigation - Centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-muted/50 rounded-full p-1">
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-muted/50 rounded-full p-1 shadow-lg border border-border/30">
             <Button 
               variant={location.pathname === "/" || location.pathname.startsWith("/creator") || location.pathname === "/analytics" ? "default" : "ghost"} 
               asChild 
