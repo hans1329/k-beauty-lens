@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, TrendingUp, TrendingDown, Zap, Gift } from "lucide-react";
+import { Loader2, ShoppingCart, TrendingDown, Zap, Gift } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
@@ -20,7 +20,7 @@ const Rewards = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [totalEarned, setTotalEarned] = useState(0);
+  const [totalPurchased, setTotalPurchased] = useState(0);
   const [totalUsed, setTotalUsed] = useState(0);
 
   useEffect(() => {
@@ -52,13 +52,13 @@ const Rewards = () => {
       setTransactions(data || []);
 
       // Calculate totals
-      const earned = data?.filter((t: any) => ['reward', 'purchase', 'daily_reset'].includes(t.transaction_type))
+      const purchased = data?.filter((t: any) => t.transaction_type === 'purchase')
         .reduce((sum: number, t: any) => sum + t.amount, 0) || 0;
       
       const used = data?.filter((t: any) => t.transaction_type === 'used')
         .reduce((sum: number, t: any) => sum + Math.abs(t.amount), 0) || 0;
 
-      setTotalEarned(earned);
+      setTotalPurchased(purchased);
       setTotalUsed(used);
     } catch (error) {
       console.error('Error loading transactions:', error);
@@ -76,8 +76,10 @@ const Rewards = () => {
         return <Gift className="h-4 w-4 text-yellow-500" />;
       case 'purchase':
         return <Zap className="h-4 w-4 text-blue-500" />;
+      case 'bonus':
+        return <Gift className="h-4 w-4 text-green-500" />;
       case 'daily_reset':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
+        return <Zap className="h-4 w-4 text-green-500" />;
       default:
         return <Zap className="h-4 w-4" />;
     }
@@ -91,6 +93,8 @@ const Rewards = () => {
         return 'Reward';
       case 'purchase':
         return 'Purchase';
+      case 'bonus':
+        return 'Bonus';
       case 'daily_reset':
         return 'Daily Reset';
       default:
@@ -106,6 +110,8 @@ const Rewards = () => {
         return 'default';
       case 'purchase':
         return 'secondary';
+      case 'bonus':
+        return 'default';
       case 'daily_reset':
         return 'outline';
       default:
@@ -136,16 +142,16 @@ const Rewards = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-green-500" />
-                      Total Earned
+                      <ShoppingCart className="h-5 w-5 text-blue-500" />
+                      Total Purchased
                     </CardTitle>
                     <CardDescription>
-                      Total energy received from rewards, purchases, and daily resets
+                      Total energy purchased from energy packs
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-4xl font-bold text-green-500">
-                      {totalEarned}
+                    <div className="text-4xl font-bold text-blue-500">
+                      {totalPurchased}
                     </div>
                   </CardContent>
                 </Card>
