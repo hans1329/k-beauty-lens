@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserAvatar } from "@/components/UserAvatar";
+import { SocialAccountVerification } from "@/components/SocialAccountVerification";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, Loader2, ArrowLeft } from "lucide-react";
@@ -32,6 +33,20 @@ const Settings = () => {
     avatar_url: "",
     user_type: "general_user" as "general_user" | "creator" | "brand",
     address: "",
+  });
+  const [socialAccounts, setSocialAccounts] = useState({
+    tiktok_username: null as string | null,
+    tiktok_id: null as string | null,
+    tiktok_follower_count: null as number | null,
+    tiktok_verified_at: null as string | null,
+    instagram_username: null as string | null,
+    instagram_id: null as string | null,
+    instagram_follower_count: null as number | null,
+    instagram_verified_at: null as string | null,
+    youtube_channel_id: null as string | null,
+    youtube_channel_name: null as string | null,
+    youtube_subscriber_count: null as number | null,
+    youtube_verified_at: null as string | null,
   });
 
   useEffect(() => {
@@ -58,7 +73,7 @@ const Settings = () => {
 
       const { data: profileData, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, avatar_url, user_type, address')
+        .select('*')
         .eq('id', session.user.id)
         .single();
 
@@ -71,7 +86,21 @@ const Settings = () => {
           full_name: profileData.full_name || "",
           avatar_url: profileData.avatar_url || "",
           user_type: (profileData.user_type as "general_user" | "creator" | "brand") || "general_user",
-          address: (profileData as any).address || "",
+          address: profileData.address || "",
+        });
+        setSocialAccounts({
+          tiktok_username: profileData.tiktok_username,
+          tiktok_id: profileData.tiktok_id,
+          tiktok_follower_count: profileData.tiktok_follower_count,
+          tiktok_verified_at: profileData.tiktok_verified_at,
+          instagram_username: profileData.instagram_username,
+          instagram_id: profileData.instagram_id,
+          instagram_follower_count: profileData.instagram_follower_count,
+          instagram_verified_at: profileData.instagram_verified_at,
+          youtube_channel_id: profileData.youtube_channel_id,
+          youtube_channel_name: profileData.youtube_channel_name,
+          youtube_subscriber_count: profileData.youtube_subscriber_count,
+          youtube_verified_at: profileData.youtube_verified_at,
         });
       }
     } catch (error) {
@@ -350,6 +379,14 @@ const Settings = () => {
               </form>
             </CardContent>
           </Card>
+
+          {profile.user_type === "creator" && (
+            <SocialAccountVerification
+              userId={profile.id}
+              socialAccounts={socialAccounts}
+              onUpdate={setSocialAccounts}
+            />
+          )}
 
           <Card>
             <CardHeader>

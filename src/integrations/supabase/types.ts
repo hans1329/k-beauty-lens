@@ -418,9 +418,21 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          instagram_follower_count: number | null
+          instagram_id: string | null
+          instagram_username: string | null
+          instagram_verified_at: string | null
           purchased_energy: number
+          tiktok_follower_count: number | null
+          tiktok_id: string | null
+          tiktok_username: string | null
+          tiktok_verified_at: string | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
+          youtube_channel_id: string | null
+          youtube_channel_name: string | null
+          youtube_subscriber_count: number | null
+          youtube_verified_at: string | null
         }
         Insert: {
           address?: string | null
@@ -429,9 +441,21 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          instagram_follower_count?: number | null
+          instagram_id?: string | null
+          instagram_username?: string | null
+          instagram_verified_at?: string | null
           purchased_energy?: number
+          tiktok_follower_count?: number | null
+          tiktok_id?: string | null
+          tiktok_username?: string | null
+          tiktok_verified_at?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          youtube_channel_id?: string | null
+          youtube_channel_name?: string | null
+          youtube_subscriber_count?: number | null
+          youtube_verified_at?: string | null
         }
         Update: {
           address?: string | null
@@ -440,9 +464,21 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          instagram_follower_count?: number | null
+          instagram_id?: string | null
+          instagram_username?: string | null
+          instagram_verified_at?: string | null
           purchased_energy?: number
+          tiktok_follower_count?: number | null
+          tiktok_id?: string | null
+          tiktok_username?: string | null
+          tiktok_verified_at?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+          youtube_channel_id?: string | null
+          youtube_channel_name?: string | null
+          youtube_subscriber_count?: number | null
+          youtube_verified_at?: string | null
         }
         Relationships: []
       }
