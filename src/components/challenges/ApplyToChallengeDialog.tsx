@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,28 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
     message: "",
     shipping_address: "",
   });
+
+  // Load user's saved address when dialog opens
+  useEffect(() => {
+    if (open) {
+      loadUserAddress();
+    }
+  }, [open]);
+
+  const loadUserAddress = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("address")
+      .eq("id", session.user.id)
+      .single();
+
+    if (profile && (profile as any).address) {
+      setFormData(prev => ({ ...prev, shipping_address: (profile as any).address }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
