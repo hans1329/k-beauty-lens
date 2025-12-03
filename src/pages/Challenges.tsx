@@ -249,13 +249,25 @@ const Challenges = () => {
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button 
-                        onClick={() => handleApply(challenge)} 
-                        className="w-full rounded-full"
-                        disabled={userType === "brand"}
-                      >
-                        {userType === "brand" ? "Brands cannot apply" : "Apply Now"}
-                      </Button>
+                      {(() => {
+                        const hasApplied = myApplications.some(app => app.challenge_id === challenge.id);
+                        const isDisabled = userType === "brand" || hasApplied;
+                        const buttonText = userType === "brand" 
+                          ? "Brands cannot apply" 
+                          : hasApplied 
+                            ? "Already Applied" 
+                            : "Apply Now";
+                        return (
+                          <Button 
+                            onClick={() => handleApply(challenge)} 
+                            className="w-full rounded-full"
+                            disabled={isDisabled}
+                            variant={hasApplied ? "secondary" : "default"}
+                          >
+                            {buttonText}
+                          </Button>
+                        );
+                      })()}
                     </CardFooter>
                   </Card>
                 ))}
