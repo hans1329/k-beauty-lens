@@ -228,13 +228,10 @@ const Challenges = () => {
                       ) : (
                         <Package className="h-12 w-12 text-muted-foreground" />
                       )}
-                      <Badge 
-                        variant="secondary"
-                        className="absolute bottom-2 left-2 text-xs"
-                      >
-                        <Users className="h-3 w-3 mr-1" />
+                      <span className="absolute bottom-2 left-2 text-xs flex items-center gap-1 text-white drop-shadow-md">
+                        <Users className="h-3 w-3" />
                         {challenge.application_count}/{challenge.max_applicants || "∞"}
-                      </Badge>
+                      </span>
                       {challenge.application_deadline && (
                         <Badge 
                           variant={getRemainingTime(challenge.application_deadline) === "Expired" ? "destructive" : "secondary"}
