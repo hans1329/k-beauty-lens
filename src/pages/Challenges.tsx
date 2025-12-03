@@ -225,7 +225,7 @@ const Challenges = () => {
                       <div className="space-y-3 text-sm">
                         <div className="flex items-center gap-2">
                           <Package className="h-4 w-4 text-muted-foreground" />
-                          <span>{challenge.product_name}</span>
+                          <span className="text-base font-semibold">{challenge.product_name}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
