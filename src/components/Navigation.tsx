@@ -30,6 +30,7 @@ const Navigation = () => {
   const [purchasedEnergy, setPurchasedEnergy] = useState(0);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userType, setUserType] = useState<string>("general_user");
+  const [fullName, setFullName] = useState<string>("");
 
   useEffect(() => {
     // Check current session
@@ -75,7 +76,7 @@ const Navigation = () => {
   const loadAvatar = async (userId: string) => {
     const { data } = await supabase
       .from('profiles')
-      .select('avatar_url, user_type')
+      .select('avatar_url, user_type, full_name')
       .eq('id', userId)
       .single();
     
@@ -84,6 +85,9 @@ const Navigation = () => {
     }
     if (data?.user_type) {
       setUserType(data.user_type);
+    }
+    if (data?.full_name) {
+      setFullName(data.full_name);
     }
   };
 
@@ -196,7 +200,7 @@ const Navigation = () => {
                     <div className="flex flex-col space-y-1">
                       <div className="flex items-center gap-2 pl-1">
                         <p className="text-base font-semibold leading-none">
-                          {user.user_metadata?.full_name || "User"}
+                          {fullName || user.user_metadata?.full_name || "User"}
                         </p>
                         <Button
                           variant="outline"
