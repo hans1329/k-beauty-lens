@@ -29,6 +29,7 @@ const Settings = () => {
     full_name: "",
     avatar_url: "",
     user_type: "general_user" as "general_user" | "creator" | "brand",
+    address: "",
   });
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const Settings = () => {
 
       const { data: profileData, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, avatar_url, user_type')
+        .select('id, email, full_name, avatar_url, user_type, address')
         .eq('id', session.user.id)
         .single();
 
@@ -59,6 +60,7 @@ const Settings = () => {
           full_name: profileData.full_name || "",
           avatar_url: profileData.avatar_url || "",
           user_type: (profileData.user_type as "general_user" | "creator" | "brand") || "general_user",
+          address: (profileData as any).address || "",
         });
       }
     } catch (error) {
@@ -149,7 +151,8 @@ const Settings = () => {
         .from('profiles')
         .update({ 
           full_name: profile.full_name,
-          user_type: profile.user_type
+          user_type: profile.user_type,
+          address: profile.user_type === "creator" ? profile.address : null
         })
         .eq('id', session.user.id);
 
@@ -297,7 +300,26 @@ const Settings = () => {
                   </p>
                 </div>
 
-                <div className="flex gap-3">
+                {profile.user_type === "creator" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Shipping Address</Label>
+                    <textarea
+                      id="address"
+                      value={profile.address || ""}
+                      onChange={(e) =>
+                        setProfile({ ...profile, address: e.target.value })
+                      }
+                      placeholder="Enter your shipping address for product deliveries"
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      rows={3}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This address will be used when applying to challenges
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex flex-col-reverse sm:flex-row gap-3">
                   <Button
                     type="submit"
                     disabled={saving}
