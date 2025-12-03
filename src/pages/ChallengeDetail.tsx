@@ -259,7 +259,7 @@ const ChallengeDetail = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <main className="container mx-auto max-w-5xl px-2 sm:px-4 py-4 sm:py-8">
+      <main className="container mx-auto max-w-5xl px-4 sm:px-4 py-6 sm:py-8">
         <Button
           variant="ghost"
           onClick={() => navigate("/challenges")}
@@ -286,7 +286,7 @@ const ChallengeDetail = () => {
             </div>
             
             <div className="flex-1">
-              <div className="py-4 sm:py-6 px-1 sm:px-6">
+              <div className="py-4 sm:py-6 px-4 sm:px-6">
                 <div className="flex items-start justify-between gap-2 mb-4">
                   <div>
                     <div className="text-sm font-medium text-primary mb-1">
