@@ -239,6 +239,13 @@ const Navigation = () => {
                         </span>
                       </div>
                     </div>
+                    {purchasedEnergy > 0 && (
+                      <div className="flex items-center justify-end mt-2">
+                        <p className="text-xs font-medium text-primary">
+                          +{purchasedEnergy} Energy
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <DropdownMenuSeparator className="my-2" />
                   <DropdownMenuItem asChild className="py-2.5">
