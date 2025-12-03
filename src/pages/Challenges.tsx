@@ -57,6 +57,8 @@ const Challenges = () => {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
   const [creatorRegistrationDialogOpen, setCreatorRegistrationDialogOpen] = useState(false);
+  const [addressMissingDialogOpen, setAddressMissingDialogOpen] = useState(false);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -68,11 +70,12 @@ const Challenges = () => {
       setUser(session.user);
       const { data: profile } = await supabase
         .from("profiles")
-        .select("user_type")
+        .select("user_type, address")
         .eq("id", session.user.id)
         .single();
       if (profile) {
         setUserType(profile.user_type);
+        setUserAddress(profile.address);
       }
     }
     loadChallenges();
@@ -149,6 +152,10 @@ const Challenges = () => {
     }
     if (userType === "general_user") {
       setCreatorRegistrationDialogOpen(true);
+      return;
+    }
+    if (!userAddress) {
+      setAddressMissingDialogOpen(true);
       return;
     }
     setSelectedChallenge(challenge);
@@ -467,9 +474,29 @@ const Challenges = () => {
             <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
             <AlertDialogAction 
               className="rounded-full"
-              onClick={() => navigate("/select-user-type")}
+              onClick={() => navigate("/select-type")}
             >
               Register as Creator
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={addressMissingDialogOpen} onOpenChange={setAddressMissingDialogOpen}>
+        <AlertDialogContent className="mx-4">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Shipping Address Required</AlertDialogTitle>
+            <AlertDialogDescription>
+              To apply for challenges and receive products, you need to add your shipping address first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="rounded-full"
+              onClick={() => navigate("/settings#address")}
+            >
+              Add Address
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
