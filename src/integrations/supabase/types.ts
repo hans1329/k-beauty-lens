@@ -90,6 +90,7 @@ export type Database = {
           creator_id: string
           follower_count: number | null
           id: string
+          is_verified: boolean | null
           message: string | null
           shipping_address: string | null
           social_handle: string | null
@@ -97,6 +98,7 @@ export type Database = {
           status: string
           submitted_at: string | null
           updated_at: string
+          verification_code: string | null
         }
         Insert: {
           challenge_id: string
@@ -105,6 +107,7 @@ export type Database = {
           creator_id: string
           follower_count?: number | null
           id?: string
+          is_verified?: boolean | null
           message?: string | null
           shipping_address?: string | null
           social_handle?: string | null
@@ -112,6 +115,7 @@ export type Database = {
           status?: string
           submitted_at?: string | null
           updated_at?: string
+          verification_code?: string | null
         }
         Update: {
           challenge_id?: string
@@ -120,6 +124,7 @@ export type Database = {
           creator_id?: string
           follower_count?: number | null
           id?: string
+          is_verified?: boolean | null
           message?: string | null
           shipping_address?: string | null
           social_handle?: string | null
@@ -127,6 +132,7 @@ export type Database = {
           status?: string
           submitted_at?: string | null
           updated_at?: string
+          verification_code?: string | null
         }
         Relationships: [
           {
@@ -667,6 +673,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_verification_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

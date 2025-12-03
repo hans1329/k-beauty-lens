@@ -38,6 +38,7 @@ interface ApplyToChallengeDialogProps {
 
 const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: ApplyToChallengeDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [verificationCode, setVerificationCode] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     social_platform: "",
     social_handle: "",
@@ -46,10 +47,21 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
     shipping_address: "",
   });
 
+  // Generate verification code
+  const generateVerificationCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = 'LINKK_';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  };
+
   // Load user's saved address when dialog opens
   useEffect(() => {
     if (open) {
       loadUserAddress();
+      setVerificationCode(null); // Reset verification code when dialog opens
     }
   }, [open]);
 
@@ -93,6 +105,9 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
       return;
     }
 
+    // Generate verification code
+    const code = generateVerificationCode();
+
     const { error } = await supabase.from("challenge_applications").insert({
       challenge_id: challenge.id,
       creator_id: session.user.id,
@@ -102,6 +117,8 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
       message: formData.message || null,
       shipping_address: formData.shipping_address || null,
       status: "pending",
+      verification_code: code,
+      is_verified: false,
     });
 
     if (error) {
@@ -111,9 +128,18 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
         toast.error("Failed to submit application");
         console.error(error);
       }
+      setLoading(false);
     } else {
+      // Show verification code to user
+      setVerificationCode(code);
       toast.success("Application submitted successfully!");
-      onOpenChange(false);
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    if (verificationCode) {
       onSuccess();
       // Reset form
       setFormData({
@@ -123,24 +149,61 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
         message: "",
         shipping_address: "",
       });
+      setVerificationCode(null);
     }
-
-    setLoading(false);
   };
 
   const availablePlatforms = challenge.platform || ["instagram", "tiktok"];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[450px] max-h-[90vh] overflow-y-auto mx-4">
-        <DialogHeader>
-          <DialogTitle>Apply to Challenge</DialogTitle>
-          <DialogDescription>
-            {challenge.title} - {challenge.product_name}
-          </DialogDescription>
-        </DialogHeader>
+        {verificationCode ? (
+          // Show verification code after successful submission
+          <>
+            <DialogHeader>
+              <DialogTitle>Application Submitted!</DialogTitle>
+              <DialogDescription>
+                Please add the verification code below to your social media bio
+              </DialogDescription>
+            </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-4 py-4">
+              <div className="p-4 bg-primary/10 rounded-lg border-2 border-dashed border-primary">
+                <p className="text-sm text-muted-foreground mb-2">Your Verification Code:</p>
+                <p className="text-2xl font-bold text-primary text-center tracking-wider">
+                  {verificationCode}
+                </p>
+              </div>
+              
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p className="font-medium">How to verify:</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Copy the code above</li>
+                  <li>Add it to your {formData.social_platform || 'social media'} bio</li>
+                  <li>The brand will check and verify your account</li>
+                  <li>You can remove the code after verification</li>
+                </ol>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button onClick={handleClose} className="rounded-full w-full">
+                Got it!
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          // Show application form
+          <>
+            <DialogHeader>
+              <DialogTitle>Apply to Challenge</DialogTitle>
+              <DialogDescription>
+                {challenge.title} - {challenge.product_name}
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="platform">Platform *</Label>
             <Select
@@ -218,27 +281,29 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
             />
           </div>
 
-          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="rounded-full"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading} className="rounded-full">
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Submit Application"
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+              <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  className="rounded-full"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={loading} className="rounded-full">
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Application"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
