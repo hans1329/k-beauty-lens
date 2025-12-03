@@ -228,6 +228,13 @@ const Challenges = () => {
                       ) : (
                         <Package className="h-12 w-12 text-muted-foreground" />
                       )}
+                      <Badge 
+                        variant="secondary"
+                        className="absolute bottom-2 left-2 text-xs"
+                      >
+                        <Users className="h-3 w-3 mr-1" />
+                        {challenge.application_count}/{challenge.max_applicants || "∞"}
+                      </Badge>
                       {challenge.application_deadline && (
                         <Badge 
                           variant={getRemainingTime(challenge.application_deadline) === "Expired" ? "destructive" : "secondary"}
@@ -252,12 +259,6 @@ const Challenges = () => {
                         <div className="flex items-center gap-2">
                           <Package className="h-4 w-4 text-muted-foreground" />
                           <span className="text-base font-semibold">{challenge.product_name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span>
-                            {challenge.application_count} / {challenge.max_applicants || "∞"} applicants
-                          </span>
                         </div>
                         {challenge.platform && challenge.platform.length > 0 && (
                           <div className="flex gap-2">
