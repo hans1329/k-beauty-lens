@@ -30,6 +30,7 @@ interface Challenge {
     avatar_url: string | null;
   };
   application_count?: number;
+  selected_count?: number;
   has_applied?: boolean;
 }
 
@@ -80,7 +81,7 @@ const Challenges = () => {
       toast.error("Failed to load challenges");
       console.error(error);
     } else {
-      // Get brand info for each challenge
+      // Get brand info and selected count for each challenge
       const enrichedChallenges = await Promise.all(
         (challengesData || []).map(async (challenge) => {
           const { data: brand } = await supabase
@@ -89,10 +90,18 @@ const Challenges = () => {
             .eq("id", challenge.brand_id)
             .single();
 
+          // Get selected applications count
+          const { count: selectedCount } = await supabase
+            .from("challenge_applications")
+            .select("*", { count: "exact", head: true })
+            .eq("challenge_id", challenge.id)
+            .eq("status", "selected");
+
           return {
             ...challenge,
             brand,
             application_count: (challenge as any).current_applicants || 0,
+            selected_count: selectedCount || 0,
           };
         })
       );
@@ -233,9 +242,10 @@ const Challenges = () => {
                       ) : (
                         <Package className="h-12 w-12 text-muted-foreground" />
                       )}
-                      <span className="absolute bottom-2 left-2 text-xs flex items-center gap-1 text-gray-700 bg-white/80 px-2 py-1 rounded-full border border-gray-300">
-                        <Users className="h-3 w-3" />
-                        {challenge.application_count}/{challenge.max_applicants || "∞"}
+                      <span className="absolute bottom-2 left-2 text-xs flex items-center gap-1 bg-white/80 px-2 py-1 rounded-full border border-gray-300">
+                        <Users className="h-3 w-3 text-gray-700" />
+                        <span className="text-primary font-semibold">{challenge.selected_count || 0}</span>
+                        <span className="text-gray-700">/{challenge.application_count}/{challenge.max_applicants || "∞"}</span>
                       </span>
                       {challenge.application_deadline && (
                         <Badge 
