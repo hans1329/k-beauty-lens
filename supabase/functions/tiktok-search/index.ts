@@ -35,48 +35,57 @@ serve(async (req) => {
     
     console.log(`Searching TikTok for username: ${cleanUsername}`);
 
-    // Search for TikTok account
-    const searchResponse = await fetch(
-      `https://tiktok-api23.p.rapidapi.com/api/search/account?keyword=${encodeURIComponent(cleanUsername)}&cursor=0&search_id=0`,
+    // Get user info directly using tiktok-scraper2 API
+    const userResponse = await fetch(
+      `https://tiktok-scraper2.p.rapidapi.com/user/info?user_name=${encodeURIComponent(cleanUsername)}`,
       {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'tiktok-api23.p.rapidapi.com',
+          'x-rapidapi-host': 'tiktok-scraper2.p.rapidapi.com',
           'x-rapidapi-key': RAPIDAPI_KEY,
         },
       }
     );
 
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error('TikTok API error:', searchResponse.status, errorText);
+    if (!userResponse.ok) {
+      const errorText = await userResponse.text();
+      console.error('TikTok API error:', userResponse.status, errorText);
       return new Response(
         JSON.stringify({ error: 'Failed to search TikTok', details: errorText }),
-        { status: searchResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: userResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const searchData = await searchResponse.json();
-    console.log('TikTok search response:', JSON.stringify(searchData).substring(0, 500));
+    const userData = await userResponse.json();
+    console.log('TikTok user response:', JSON.stringify(userData).substring(0, 500));
 
-    // Extract user list from response
-    const users = searchData?.data?.user_list || searchData?.user_list || [];
+    // Extract user info from response
+    const userInfo = userData?.data?.user || userData?.user || userData;
+    const userStats = userData?.data?.stats || userData?.stats || {};
     
-    // Map to a cleaner format
-    const results = users.map((item: any) => {
-      const userInfo = item?.user_info || item;
-      return {
-        id: userInfo?.uid || userInfo?.user_id || userInfo?.id,
-        uniqueId: userInfo?.unique_id || userInfo?.uniqueId,
-        nickname: userInfo?.nickname,
-        avatarUrl: userInfo?.avatar_thumb?.url_list?.[0] || userInfo?.avatar_medium?.url_list?.[0] || userInfo?.avatarMedium,
-        followerCount: userInfo?.follower_count || userInfo?.followerCount || 0,
-        followingCount: userInfo?.following_count || userInfo?.followingCount || 0,
-        videoCount: userInfo?.aweme_count || userInfo?.videoCount || 0,
-        signature: userInfo?.signature,
-        verified: userInfo?.custom_verify || userInfo?.verified || false,
-      };
-    });
+    if (!userInfo?.uniqueId && !userInfo?.id) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          results: [],
+          total: 0 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Return single result as array for consistency
+    const results = [{
+      id: userInfo?.id || userInfo?.uid,
+      uniqueId: userInfo?.uniqueId || cleanUsername,
+      nickname: userInfo?.nickname,
+      avatarUrl: userInfo?.avatarLarger || userInfo?.avatarMedium || userInfo?.avatarThumb,
+      followerCount: userStats?.followerCount || userInfo?.followerCount || 0,
+      followingCount: userStats?.followingCount || userInfo?.followingCount || 0,
+      videoCount: userStats?.videoCount || userInfo?.videoCount || 0,
+      signature: userInfo?.signature,
+      verified: userInfo?.verified || false,
+    }];
 
     return new Response(
       JSON.stringify({ 
