@@ -204,7 +204,7 @@ const Challenges = () => {
                 {challenges.map((challenge) => (
                   <Card key={challenge.id} className="flex flex-col">
                     {challenge.product_image_url && (
-                      <div className="aspect-video bg-muted rounded-t-lg overflow-hidden flex items-center justify-center">
+                      <div className="aspect-square bg-muted rounded-t-lg overflow-hidden flex items-center justify-center">
                         <img
                           src={challenge.product_image_url}
                           alt={challenge.product_name}
