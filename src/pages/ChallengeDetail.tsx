@@ -259,21 +259,21 @@ const ChallengeDetail = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <main className="container mx-auto max-w-5xl px-4 py-8">
+      <main className="container mx-auto max-w-5xl px-2 sm:px-4 py-4 sm:py-8">
         <Button
           variant="ghost"
           onClick={() => navigate("/challenges")}
-          className="mb-6 rounded-full"
+          className="mb-4 sm:mb-6 rounded-full"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Challenges
         </Button>
 
-        {/* Challenge Info Card */}
-        <Card className="mb-8 overflow-hidden">
+        {/* Challenge Info - Card on desktop, no card on mobile */}
+        <div className="mb-8 md:border md:rounded-xl md:bg-card md:shadow-sm overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Product Image */}
-            <div className="w-full md:w-80 h-64 md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
+            <div className="w-full md:w-80 h-56 sm:h-64 md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
               {challenge.product_image_url ? (
                 <img
                   src={challenge.product_image_url}
@@ -286,46 +286,45 @@ const ChallengeDetail = () => {
             </div>
             
             <div className="flex-1">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between gap-2">
+              <div className="py-4 sm:py-6 px-1 sm:px-6">
+                <div className="flex items-start justify-between gap-2 mb-4">
                   <div>
                     <div className="text-sm font-medium text-primary mb-1">
                       {brandName || "Unknown Brand"}
                     </div>
-                    <CardTitle className="text-2xl mb-2">{challenge.title}</CardTitle>
+                    <h1 className="text-xl sm:text-2xl font-bold mb-2">{challenge.title}</h1>
                     {challenge.description && (
-                      <CardDescription className="text-base">{challenge.description}</CardDescription>
+                      <p className="text-sm sm:text-base text-muted-foreground">{challenge.description}</p>
                     )}
                   </div>
                   <Badge variant={challenge.status === "open" ? "default" : "secondary"} className="flex-shrink-0">
                     {challenge.status}
                   </Badge>
                 </div>
-              </CardHeader>
               
-              <CardContent className="space-y-5">
-                {/* Product Info */}
-                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Gift className="h-5 w-5 text-primary" />
-                    <span className="text-lg font-semibold">{challenge.product_name}</span>
+                <div className="space-y-4 sm:space-y-5">
+                  {/* Product Info */}
+                  <div className="p-3 sm:p-4 bg-muted/50 rounded-lg space-y-2 sm:space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Gift className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-base sm:text-lg font-semibold line-clamp-2">{challenge.product_name}</span>
+                    </div>
+                    {challenge.product_value && (
+                      <div className="ml-7 text-lg sm:text-xl font-bold text-primary">
+                        ₩{challenge.product_value.toLocaleString()}
+                      </div>
+                    )}
+                    {/* Platforms */}
+                    {challenge.platform && challenge.platform.length > 0 && (
+                      <div className="flex gap-2 ml-7">
+                        {challenge.platform.map((p) => (
+                          <Badge key={p} variant="outline" className="capitalize text-xs">
+                            {p}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  {challenge.product_value && (
-                    <div className="ml-7 text-xl font-bold text-primary">
-                      ₩{challenge.product_value.toLocaleString()}
-                    </div>
-                  )}
-                  {/* Platforms */}
-                  {challenge.platform && challenge.platform.length > 0 && (
-                    <div className="flex gap-2 ml-7">
-                      {challenge.platform.map((p) => (
-                        <Badge key={p} variant="outline" className="capitalize">
-                          {p}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
 
                 {/* Meta Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -399,10 +398,11 @@ const ChallengeDetail = () => {
                     </>
                   )}
                 </div>
-              </CardContent>
+                </div>
+              </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Applications (only for owner) */}
         {isOwner && (
