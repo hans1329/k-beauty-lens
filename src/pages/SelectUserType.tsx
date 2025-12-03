@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Building2, Video, Loader2 } from "lucide-react";
+import { Building2, Video, Loader2, AlertTriangle, ArrowLeft } from "lucide-react";
 
 const SelectUserType = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedType, setSelectedType] = useState<"brand" | "creator" | null>(null);
+  const [currentType, setCurrentType] = useState<string>("general_user");
 
   useEffect(() => {
     checkUserStatus();
@@ -24,16 +26,17 @@ const SelectUserType = () => {
       return;
     }
 
-    // Check if user already selected a type
     const { data: profile } = await supabase
       .from("profiles")
       .select("user_type")
       .eq("id", session.user.id)
       .single();
 
-    if (profile && profile.user_type !== "general_user") {
-      navigate("/");
-      return;
+    if (profile) {
+      setCurrentType(profile.user_type);
+      if (profile.user_type === "creator") {
+        setSelectedType("creator");
+      }
     }
 
     setLoading(false);
@@ -42,6 +45,12 @@ const SelectUserType = () => {
   const handleSelectType = async () => {
     if (!selectedType) {
       toast.error("Please select your account type");
+      return;
+    }
+
+    // Prevent brand users from changing type
+    if (currentType === "brand") {
+      toast.error("Brand accounts cannot change type");
       return;
     }
 
@@ -68,8 +77,8 @@ const SelectUserType = () => {
     navigate("/");
   };
 
-  const handleSkip = () => {
-    navigate("/");
+  const handleBack = () => {
+    navigate(-1);
   };
 
   if (loading) {
@@ -80,14 +89,50 @@ const SelectUserType = () => {
     );
   }
 
+  // Brand users cannot change type
+  if (currentType === "brand") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+            <Building2 className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Brand Account</h1>
+          <p className="text-muted-foreground mb-6">
+            You are registered as a brand account.
+          </p>
+          <Alert variant="destructive" className="mb-6 text-left">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Brand accounts cannot change their account type to protect challenge data integrity.
+            </AlertDescription>
+          </Alert>
+          <Button onClick={handleBack} variant="outline" className="rounded-full">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome to Linkkbeauty!</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {currentType === "general_user" ? "Welcome to Linkkbeauty!" : "Change Account Type"}
+          </h1>
           <p className="text-muted-foreground">
-            Select your account type to get started
+            {currentType === "general_user" 
+              ? "Select your account type to get started" 
+              : "You can change your account type below"}
           </p>
+          {currentType === "creator" && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Current type: <span className="font-medium capitalize">{currentType}</span>
+            </p>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 mb-8">
@@ -112,6 +157,11 @@ const SelectUserType = () => {
                 <li>• Find and collaborate with creators</li>
                 <li>• Track campaign performance</li>
               </ul>
+              {currentType !== "general_user" && (
+                <p className="text-xs text-destructive mt-3">
+                  ⚠️ Once changed to Brand, you cannot switch back
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -143,7 +193,7 @@ const SelectUserType = () => {
         <div className="flex flex-col gap-3">
           <Button 
             onClick={handleSelectType} 
-            disabled={!selectedType || saving}
+            disabled={!selectedType || saving || (currentType === selectedType)}
             className="w-full rounded-full"
             size="lg"
           >
@@ -152,16 +202,18 @@ const SelectUserType = () => {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
               </>
+            ) : currentType === selectedType ? (
+              "Already Selected"
             ) : (
               "Continue"
             )}
           </Button>
           <Button 
             variant="ghost" 
-            onClick={handleSkip}
+            onClick={handleBack}
             className="w-full rounded-full"
           >
-            Skip for now
+            {currentType === "general_user" ? "Skip for now" : "Cancel"}
           </Button>
         </div>
       </div>
