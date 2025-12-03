@@ -156,6 +156,7 @@ const Settings = () => {
       if (error) throw error;
 
       toast.success("Profile updated successfully");
+      navigate(-1);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error("Failed to update profile");
