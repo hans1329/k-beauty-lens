@@ -273,12 +273,12 @@ const ChallengeDetail = () => {
         <div className="mb-8 md:border md:rounded-xl md:bg-card md:shadow-sm overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Product Image */}
-            <div className="w-full md:w-80 h-56 sm:h-64 md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
+            <div className="w-full md:w-80 aspect-square md:aspect-auto md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
               {challenge.product_image_url ? (
                 <img
                   src={challenge.product_image_url}
                   alt={challenge.product_name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain md:object-cover"
                 />
               ) : (
                 <Package className="h-16 w-16 text-muted-foreground" />
