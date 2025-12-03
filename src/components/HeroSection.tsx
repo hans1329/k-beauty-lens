@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import AnalysisProgressModal from "./AnalysisProgressModal";
 import logoRed from "@/assets/logo_linkk_red.png";
 
-type Platform = "youtube" | "tiktok";
+type Platform = "youtube" | "tiktok" | "instagram";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -125,13 +125,66 @@ const HeroSection = () => {
     setChannelId("");
   };
 
+  const handleInstagramSearch = async (username: string, session: any) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('instagram-search', {
+        body: { username }
+      });
+
+      if (error) {
+        console.error("Instagram search error:", error);
+        toast.error("Instagram search failed", {
+          description: error.message || "Please try again later"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (data?.success && data.result) {
+        const result = data.result;
+
+        // Save search to database
+        try {
+          await supabase.from("user_searches").insert({
+            user_id: session.user.id,
+            channel_id: `instagram:${result.username}`,
+            channel_name: result.fullName || result.username,
+            channel_thumbnail: result.avatarUrl || null
+          });
+        } catch (error) {
+          console.error("Error saving search:", error);
+        }
+
+        toast.success("Instagram Creator Found", {
+          description: `${result.fullName || result.username} (@${result.username}) - ${result.followerCount?.toLocaleString() || 0} followers`
+        });
+
+        // For now, show the result in a toast - full integration will come next
+        toast.info("Instagram analysis coming soon!", {
+          description: "Full Instagram creator analysis will be available soon."
+        });
+      } else {
+        toast.error("No results found", {
+          description: data?.error || "Could not find an Instagram account with that username"
+        });
+      }
+    } catch (error) {
+      console.error("Instagram search error:", error);
+      toast.error("Search failed", {
+        description: "Please try again later"
+      });
+    }
+    setIsLoading(false);
+    setChannelId("");
+  };
+
   const handleSync = async () => {
     const targetChannelId = channelId.trim();
     if (!targetChannelId) {
+      const platformNames = { youtube: "YouTube", tiktok: "TikTok", instagram: "Instagram" };
       toast("Enter a username", {
-        description: platform === "youtube" 
-          ? "Please enter a YouTube channel handle (e.g., @username)"
-          : "Please enter a TikTok username (e.g., @username)"
+        description: `Please enter a ${platformNames[platform]} username (e.g., @username)`
       });
       return;
     }
@@ -190,8 +243,10 @@ const HeroSection = () => {
     // Route to appropriate platform handler
     if (platform === "youtube") {
       await handleYouTubeSync(targetChannelId, session);
-    } else {
+    } else if (platform === "tiktok") {
       await handleTikTokSearch(targetChannelId, session);
+    } else {
+      await handleInstagramSearch(targetChannelId, session);
     }
   };
 
@@ -224,7 +279,7 @@ const HeroSection = () => {
             <button
               type="button"
               onClick={() => setPlatform("youtube")}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 platform === "youtube"
                   ? "bg-white text-primary shadow-sm"
                   : "text-white/70 hover:text-white"
@@ -235,13 +290,24 @@ const HeroSection = () => {
             <button
               type="button"
               onClick={() => setPlatform("tiktok")}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 platform === "tiktok"
                   ? "bg-white text-primary shadow-sm"
                   : "text-white/70 hover:text-white"
               }`}
             >
               TikTok
+            </button>
+            <button
+              type="button"
+              onClick={() => setPlatform("instagram")}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                platform === "instagram"
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-white/70 hover:text-white"
+              }`}
+            >
+              Instagram
             </button>
           </div>
         </div>
@@ -299,7 +365,7 @@ const HeroSection = () => {
         </Card>
         
         <p className="text-center text-white/60 text-sm mt-3">
-          @username on {platform === "youtube" ? "YouTube" : "TikTok"}
+          @username on {{ youtube: "YouTube", tiktok: "TikTok", instagram: "Instagram" }[platform]}
         </p>
       </div>
 
