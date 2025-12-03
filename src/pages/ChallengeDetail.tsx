@@ -371,12 +371,12 @@ const ChallengeDetail = () => {
                 )}
 
                 {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <div className="pt-4">
                   {isOwner ? (
                     <Button
                       variant="outline"
                       size="lg"
-                      className="rounded-full w-full sm:w-auto"
+                      className="rounded-full w-full"
                       onClick={() => navigate(`/challenges/${challenge.id}/edit`)}
                     >
                       Edit Challenge
@@ -384,15 +384,15 @@ const ChallengeDetail = () => {
                   ) : (
                     <>
                       {userType === "brand" ? (
-                        <Button disabled size="lg" className="rounded-full w-full sm:w-auto">
+                        <Button disabled size="lg" className="rounded-full w-full">
                           Brands cannot apply
                         </Button>
                       ) : hasApplied ? (
-                        <Button disabled variant="secondary" size="lg" className="rounded-full w-full sm:w-auto">
+                        <Button disabled variant="secondary" size="lg" className="rounded-full w-full">
                           Already Applied
                         </Button>
                       ) : (
-                        <Button onClick={handleApply} size="lg" className="rounded-full w-full sm:w-auto text-lg py-6">
+                        <Button onClick={handleApply} size="lg" className="rounded-full w-full text-lg py-6">
                           Apply Now
                         </Button>
                       )}
