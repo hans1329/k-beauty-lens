@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Gift, Clock, Users, ExternalLink, Check, X, Truck, Package } from "lucide-react";
+import { Loader2, ArrowLeft, Gift, Clock, Users, ExternalLink, Check, X, Truck, Package, ShieldCheck, Copy } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import ApplyToChallengeDialog from "@/components/challenges/ApplyToChallengeDialog";
 import {
@@ -57,6 +57,8 @@ interface Application {
   shipping_address: string | null;
   content_url: string | null;
   created_at: string;
+  verification_code: string | null;
+  is_verified: boolean | null;
   creator?: {
     full_name: string | null;
     email: string | null;
@@ -188,6 +190,26 @@ const ChallengeDetail = () => {
       loadData();
     }
     setConfirmDialog({ ...confirmDialog, open: false });
+  };
+
+  const verifyApplication = async (applicationId: string) => {
+    const { error } = await supabase
+      .from("challenge_applications")
+      .update({ is_verified: true })
+      .eq("id", applicationId);
+
+    if (error) {
+      toast.error("Failed to verify application");
+      console.error(error);
+    } else {
+      toast.success("Account verified!");
+      loadData();
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
   };
 
   const openConfirmDialog = (applicationId: string, action: string) => {
@@ -424,6 +446,7 @@ const ChallengeDetail = () => {
                         <TableHead>Creator</TableHead>
                         <TableHead>Platform</TableHead>
                         <TableHead>Followers</TableHead>
+                        <TableHead>Verified</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Applied</TableHead>
                         <TableHead>Actions</TableHead>
@@ -467,6 +490,40 @@ const ChallengeDetail = () => {
                           </TableCell>
                           <TableCell>
                             {app.follower_count?.toLocaleString() || "-"}
+                          </TableCell>
+                          <TableCell>
+                            {app.is_verified ? (
+                              <Badge variant="default" className="bg-green-600">
+                                <ShieldCheck className="h-3 w-3 mr-1" />
+                                Verified
+                              </Badge>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                {app.verification_code && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 px-2 text-xs"
+                                      onClick={() => copyToClipboard(app.verification_code!)}
+                                      title="Copy code"
+                                    >
+                                      <Copy className="h-3 w-3 mr-1" />
+                                      {app.verification_code}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-6 px-2 text-xs rounded-full"
+                                      onClick={() => verifyApplication(app.id)}
+                                      title="Mark as verified"
+                                    >
+                                      <ShieldCheck className="h-3 w-3" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell>{getStatusBadge(app.status)}</TableCell>
                           <TableCell>{formatDate(app.created_at)}</TableCell>
