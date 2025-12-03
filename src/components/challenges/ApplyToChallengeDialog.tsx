@@ -163,13 +163,26 @@ const ApplyToChallengeDialog = ({ open, onOpenChange, challenge, onSuccess }: Ap
 
           <div className="space-y-2">
             <Label htmlFor="handle">Social Handle *</Label>
-            <Input
-              id="handle"
-              value={formData.social_handle}
-              onChange={(e) => setFormData({ ...formData, social_handle: e.target.value })}
-              placeholder="@yourusername"
-              required
-            />
+            <div className="flex">
+              <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
+                @
+              </span>
+              <Input
+                id="handle"
+                value={formData.social_handle}
+                onChange={(e) => {
+                  // Remove @ if user types it
+                  const value = e.target.value.replace(/^@/, '');
+                  setFormData({ ...formData, social_handle: value });
+                }}
+                placeholder="yourusername"
+                required
+                className="rounded-l-none"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Enter your username without the @ symbol
+            </p>
           </div>
 
           <div className="space-y-2">

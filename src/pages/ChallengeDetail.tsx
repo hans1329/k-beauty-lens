@@ -442,8 +442,28 @@ const ChallengeDetail = () => {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="capitalize">
-                            {app.social_platform || "-"}
+                          <TableCell>
+                            {app.social_platform && app.social_handle ? (
+                              <a
+                                href={
+                                  app.social_platform === "instagram" 
+                                    ? `https://instagram.com/${app.social_handle.replace('@', '')}`
+                                    : app.social_platform === "tiktok"
+                                    ? `https://tiktok.com/@${app.social_handle.replace('@', '')}`
+                                    : app.social_platform === "youtube"
+                                    ? `https://youtube.com/@${app.social_handle.replace('@', '')}`
+                                    : "#"
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="capitalize text-primary hover:underline cursor-pointer"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {app.social_platform}
+                              </a>
+                            ) : (
+                              <span className="capitalize">{app.social_platform || "-"}</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             {app.follower_count?.toLocaleString() || "-"}
