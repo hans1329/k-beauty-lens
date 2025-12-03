@@ -284,27 +284,45 @@ const Challenges = () => {
                 <div className="space-y-4">
                   {myApplications.map((app) => (
                     <Card key={app.id}>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">
-                            {app.challenges?.title || "Unknown Challenge"}
-                          </CardTitle>
-                          {getStatusBadge(app.status)}
+                      <div className="flex">
+                        {app.challenges?.product_image_url && (
+                          <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-muted flex items-center justify-center rounded-l-lg overflow-hidden">
+                            <img
+                              src={app.challenges.product_image_url}
+                              alt={app.challenges.product_name}
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <CardHeader>
+                            <div className="flex items-center justify-between gap-2">
+                              <CardTitle className="text-lg">
+                                {app.challenges?.title || "Unknown Challenge"}
+                              </CardTitle>
+                              {getStatusBadge(app.status)}
+                            </div>
+                            <CardDescription>
+                              {app.challenges?.product_name && (
+                                <span className="font-medium text-foreground">{app.challenges.product_name}</span>
+                              )}
+                              <span className="block text-xs mt-1">
+                                Applied on {new Date(app.created_at).toLocaleDateString()}
+                              </span>
+                            </CardDescription>
+                          </CardHeader>
+                          {app.status === "shipped" && !app.content_url && (
+                            <CardContent>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                Product shipped! Submit your content URL after posting.
+                              </p>
+                              <Button size="sm" className="rounded-full">
+                                Submit Content URL
+                              </Button>
+                            </CardContent>
+                          )}
                         </div>
-                        <CardDescription>
-                          Applied on {new Date(app.created_at).toLocaleDateString()}
-                        </CardDescription>
-                      </CardHeader>
-                      {app.status === "shipped" && !app.content_url && (
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            Product shipped! Submit your content URL after posting.
-                          </p>
-                          <Button size="sm" className="rounded-full">
-                            Submit Content URL
-                          </Button>
-                        </CardContent>
-                      )}
+                      </div>
                     </Card>
                   ))}
                 </div>
