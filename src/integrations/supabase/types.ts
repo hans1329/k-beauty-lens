@@ -150,6 +150,7 @@ export type Database = {
           application_deadline: string | null
           brand_id: string
           created_at: string
+          current_applicants: number
           description: string | null
           id: string
           max_applicants: number | null
@@ -167,6 +168,7 @@ export type Database = {
           application_deadline?: string | null
           brand_id: string
           created_at?: string
+          current_applicants?: number
           description?: string | null
           id?: string
           max_applicants?: number | null
@@ -184,6 +186,7 @@ export type Database = {
           application_deadline?: string | null
           brand_id?: string
           created_at?: string
+          current_applicants?: number
           description?: string | null
           id?: string
           max_applicants?: number | null

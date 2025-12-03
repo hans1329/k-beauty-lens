@@ -78,7 +78,7 @@ const Challenges = () => {
       toast.error("Failed to load challenges");
       console.error(error);
     } else {
-      // Get brand info and application counts
+      // Get brand info for each challenge
       const enrichedChallenges = await Promise.all(
         (challengesData || []).map(async (challenge) => {
           const { data: brand } = await supabase
@@ -87,15 +87,10 @@ const Challenges = () => {
             .eq("id", challenge.brand_id)
             .single();
 
-          const { count } = await supabase
-            .from("challenge_applications")
-            .select("*", { count: "exact", head: true })
-            .eq("challenge_id", challenge.id);
-
           return {
             ...challenge,
             brand,
-            application_count: count || 0,
+            application_count: (challenge as any).current_applicants || 0,
           };
         })
       );
