@@ -150,8 +150,8 @@ const Navigation = () => {
               asChild 
               className="rounded-full"
             >
-              <Link to="/">
-                <BarChart3 className="mr-2 h-4 w-4" />
+              <Link to="/" className="flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Analytics</span>
               </Link>
             </Button>
@@ -160,8 +160,8 @@ const Navigation = () => {
               asChild 
               className="rounded-full"
             >
-              <Link to="/challenges">
-                <Trophy className="mr-2 h-4 w-4" />
+              <Link to="/challenges" className="flex items-center justify-center">
+                <Trophy className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Challenges</span>
               </Link>
             </Button>
