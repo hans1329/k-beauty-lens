@@ -29,6 +29,7 @@ const Navigation = () => {
   const [energyLimit, setEnergyLimit] = useState(13);
   const [purchasedEnergy, setPurchasedEnergy] = useState(0);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userType, setUserType] = useState<string>("general_user");
 
   useEffect(() => {
     // Check current session
@@ -74,12 +75,15 @@ const Navigation = () => {
   const loadAvatar = async (userId: string) => {
     const { data } = await supabase
       .from('profiles')
-      .select('avatar_url')
+      .select('avatar_url, user_type')
       .eq('id', userId)
       .single();
     
     if (data?.avatar_url) {
       setAvatarUrl(data.avatar_url);
+    }
+    if (data?.user_type) {
+      setUserType(data.user_type);
     }
   };
 
@@ -189,13 +193,25 @@ const Navigation = () => {
                         <Bell className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="flex flex-col space-y-1">
+                    <div className="flex flex-col space-y-2">
                       <p className="text-base font-semibold leading-none">
                         {user.user_metadata?.full_name || "User"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {user.email}
                       </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-fit h-6 px-2 text-xs rounded-full capitalize"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigate("/select-type");
+                        }}
+                      >
+                        {userType === "general_user" ? "Select Type" : userType}
+                      </Button>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
