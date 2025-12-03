@@ -140,7 +140,7 @@ const HeroSection = () => {
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
             Explore Analyzed
             <br />
-            <span className="text-white drop-shadow-lg">K-Beauty YouTube</span>
+            <span className="text-white drop-shadow-lg">K-Beauty KOLs</span>
           </h1>
           
           
