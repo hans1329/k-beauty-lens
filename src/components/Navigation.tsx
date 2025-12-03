@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search, Shield, Trophy } from "lucide-react";
+import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search, Shield, Trophy, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/UserAvatar";
+import NotificationsModal from "@/components/NotificationsModal";
 import logoImage from "@/assets/logo_linkk.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ const Navigation = () => {
   const [energyUsed, setEnergyUsed] = useState(0);
   const [energyLimit, setEnergyLimit] = useState(13);
   const [purchasedEnergy, setPurchasedEnergy] = useState(0);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   useEffect(() => {
     // Check current session
@@ -172,8 +174,23 @@ const Navigation = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-72">
                   <DropdownMenuLabel>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-muted-foreground">Account</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full hover:bg-primary hover:text-white"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setNotificationsOpen(true);
+                        }}
+                      >
+                        <Bell className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
+                      <p className="text-base font-semibold leading-none">
                         {user.user_metadata?.full_name || "User"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
@@ -275,6 +292,14 @@ const Navigation = () => {
 
         </div>
       </div>
+
+      {user && (
+        <NotificationsModal
+          open={notificationsOpen}
+          onOpenChange={setNotificationsOpen}
+          userId={user.id}
+        />
+      )}
     </nav>
   );
 };
