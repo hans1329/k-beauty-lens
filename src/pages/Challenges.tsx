@@ -9,6 +9,16 @@ import { toast } from "sonner";
 import { Plus, Instagram, Clock, Users, Package, Loader2, Gift } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import ApplyToChallengeDialog from "@/components/challenges/ApplyToChallengeDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { User } from "@supabase/supabase-js";
 
 interface Challenge {
@@ -46,6 +56,7 @@ const Challenges = () => {
   const [applyDialogOpen, setApplyDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
+  const [creatorRegistrationDialogOpen, setCreatorRegistrationDialogOpen] = useState(false);
 
   useEffect(() => {
     checkUser();
@@ -134,6 +145,10 @@ const Challenges = () => {
   const handleApply = (challenge: Challenge) => {
     if (!user) {
       navigate("/auth");
+      return;
+    }
+    if (userType === "general_user") {
+      setCreatorRegistrationDialogOpen(true);
       return;
     }
     setSelectedChallenge(challenge);
@@ -439,6 +454,26 @@ const Challenges = () => {
           onSuccess={loadChallenges}
         />
       )}
+
+      <AlertDialog open={creatorRegistrationDialogOpen} onOpenChange={setCreatorRegistrationDialogOpen}>
+        <AlertDialogContent className="mx-4">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Creator Registration Required</AlertDialogTitle>
+            <AlertDialogDescription>
+              To apply for challenges, you need to register as a creator first. Would you like to update your account type?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="rounded-full"
+              onClick={() => navigate("/select-user-type")}
+            >
+              Register as Creator
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
