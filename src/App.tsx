@@ -8,6 +8,7 @@ import CreatorDetail from "./pages/CreatorDetail";
 import Auth from "./pages/Auth";
 import SelectUserType from "./pages/SelectUserType";
 import Analytics from "./pages/Analytics";
+import Challenges from "./pages/Challenges";
 import Pricing from "./pages/Pricing";
 import PricingNew from "./pages/PricingNew";
 import About from "./pages/About";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/select-type" element={<SelectUserType />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/challenges" element={<Challenges />} />
           <Route path="/pricing" element={<PricingNew />} />
           <Route path="/about" element={<About />} />
           <Route path="/settings" element={<Settings />} />

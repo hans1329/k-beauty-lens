@@ -82,6 +82,128 @@ export type Database = {
           },
         ]
       }
+      challenge_applications: {
+        Row: {
+          challenge_id: string
+          content_url: string | null
+          created_at: string
+          creator_id: string
+          follower_count: number | null
+          id: string
+          message: string | null
+          shipping_address: string | null
+          social_handle: string | null
+          social_platform: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          challenge_id: string
+          content_url?: string | null
+          created_at?: string
+          creator_id: string
+          follower_count?: number | null
+          id?: string
+          message?: string | null
+          shipping_address?: string | null
+          social_handle?: string | null
+          social_platform?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          challenge_id?: string
+          content_url?: string | null
+          created_at?: string
+          creator_id?: string
+          follower_count?: number | null
+          id?: string
+          message?: string | null
+          shipping_address?: string | null
+          social_handle?: string | null
+          social_platform?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_applications_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_applications_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          application_deadline: string | null
+          brand_id: string
+          created_at: string
+          description: string | null
+          id: string
+          max_applicants: number | null
+          platform: string[] | null
+          product_image_url: string | null
+          product_name: string
+          product_value: number | null
+          requirements: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          application_deadline?: string | null
+          brand_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_applicants?: number | null
+          platform?: string[] | null
+          product_image_url?: string | null
+          product_name: string
+          product_value?: number | null
+          requirements?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          application_deadline?: string | null
+          brand_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_applicants?: number | null
+          platform?: string[] | null
+          product_image_url?: string | null
+          product_name?: string
+          product_value?: number | null
+          requirements?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           author_name: string | null
