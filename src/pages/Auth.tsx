@@ -90,9 +90,16 @@ const Auth = () => {
     const fullName = formData.get("fullName") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password.length < 6) {
       toast.error("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       setIsLoading(false);
       return;
     }
@@ -283,6 +290,19 @@ const Auth = () => {
                     <p className="text-xs text-muted-foreground">
                       Password must be at least 6 characters
                     </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                    <Input
+                      id="signup-confirm-password"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                      disabled={isLoading}
+                    />
                   </div>
                   <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create Account"}
