@@ -193,25 +193,24 @@ const Navigation = () => {
                         <Bell className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="flex flex-col space-y-2">
-                      <p className="text-base font-semibold leading-none">
-                        {user.user_metadata?.full_name || "User"}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-fit h-6 px-2 text-xs rounded-full capitalize"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          navigate("/select-type");
-                        }}
-                      >
-                        {userType === "general_user" ? "Select Type" : userType}
-                      </Button>
+                    <div className="flex flex-col space-y-1">
+                      <div className="flex items-center gap-2 pl-1">
+                        <p className="text-base font-semibold leading-none">
+                          {user.user_metadata?.full_name || "User"}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-5 px-2 text-[10px] rounded-full capitalize"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate("/select-type");
+                          }}
+                        >
+                          {userType === "general_user" ? "User" : userType}
+                        </Button>
+                      </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -293,6 +292,11 @@ const Navigation = () => {
                     </>
                   )}
                   <DropdownMenuSeparator className="my-2" />
+                  <div className="px-2 py-1.5">
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user.email}
+                    </p>
+                  </div>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
