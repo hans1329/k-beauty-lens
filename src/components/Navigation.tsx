@@ -141,7 +141,7 @@ const Navigation = () => {
               className="rounded-full"
             >
               <Link to="/">
-                <Search className="mr-2 h-4 w-4" />
+                <BarChart3 className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Analytics</span>
               </Link>
             </Button>
