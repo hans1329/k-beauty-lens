@@ -197,7 +197,11 @@ const Challenges = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {challenges.map((challenge) => (
-                  <Card key={challenge.id} className="flex flex-col">
+                <Card 
+                  key={challenge.id} 
+                  className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => navigate(`/challenges/${challenge.id}`)}
+                >
                     {challenge.product_image_url && (
                       <div className="aspect-square bg-muted rounded-t-lg overflow-hidden flex items-center justify-center">
                         <img
@@ -246,21 +250,13 @@ const Challenges = () => {
                     <CardFooter>
                       {(() => {
                         const hasApplied = myApplications.some(app => app.challenge_id === challenge.id);
-                        const isDisabled = userType === "brand" || hasApplied;
-                        const buttonText = userType === "brand" 
-                          ? "Brands cannot apply" 
-                          : hasApplied 
-                            ? "Already Applied" 
-                            : "Apply Now";
                         return (
-                          <Button 
-                            onClick={() => handleApply(challenge)} 
-                            className="w-full rounded-full"
-                            disabled={isDisabled}
+                          <Badge 
                             variant={hasApplied ? "secondary" : "default"}
+                            className="w-full justify-center py-2"
                           >
-                            {buttonText}
-                          </Button>
+                            {hasApplied ? "Already Applied" : "View Details"}
+                          </Badge>
                         );
                       })()}
                     </CardFooter>

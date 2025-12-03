@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, Package, Clock, Users, ExternalLink, Check, X, Truck } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import ApplyToChallengeDialog from "@/components/challenges/ApplyToChallengeDialog";
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import type { User } from "@supabase/supabase-js";
 
 interface Challenge {
   id: string;
@@ -41,6 +43,7 @@ interface Challenge {
   application_deadline: string | null;
   created_at: string;
   brand_id: string;
+  current_applicants?: number;
 }
 
 interface Application {
@@ -65,8 +68,13 @@ const ChallengeDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [userType, setUserType] = useState<string>("general_user");
   const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [brandName, setBrandName] = useState<string | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [hasApplied, setHasApplied] = useState(false);
+  const [applyDialogOpen, setApplyDialogOpen] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     applicationId: string;
@@ -75,6 +83,8 @@ const ChallengeDetail = () => {
     description: string;
   }>({ open: false, applicationId: "", action: "", title: "", description: "" });
 
+  const isOwner = user && challenge && user.id === challenge.brand_id;
+
   useEffect(() => {
     loadData();
   }, [id]);
@@ -82,13 +92,7 @@ const ChallengeDetail = () => {
   const loadData = async () => {
     setLoading(true);
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-      return;
-    }
-
-    // Load challenge
+    // Load challenge first (public access)
     const { data: challengeData, error: challengeError } = await supabase
       .from("challenges")
       .select("*")
@@ -101,40 +105,73 @@ const ChallengeDetail = () => {
       return;
     }
 
-    // Check if user owns this challenge
-    if (challengeData.brand_id !== session.user.id) {
-      toast.error("You don't have permission to view this page");
-      navigate("/challenges");
-      return;
-    }
-
     setChallenge(challengeData);
 
-    // Load applications
-    const { data: appData, error: appError } = await supabase
-      .from("challenge_applications")
-      .select("*")
-      .eq("challenge_id", id)
-      .order("created_at", { ascending: false });
+    // Get brand name
+    const { data: brandData } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", challengeData.brand_id)
+      .maybeSingle();
+    setBrandName(brandData?.full_name || null);
 
-    if (appError) {
-      console.error(appError);
-    } else {
-      // Get creator info for each application
-      const enrichedApps = await Promise.all(
-        (appData || []).map(async (app) => {
-          const { data: creator } = await supabase
-            .from("profiles")
-            .select("full_name, email, avatar_url")
-            .eq("id", app.creator_id)
-            .maybeSingle();
-          return { ...app, creator };
-        })
-      );
-      setApplications(enrichedApps);
+    // Check user session
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+
+      // Get user type
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_type")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (profile) {
+        setUserType(profile.user_type);
+      }
+
+      // Check if user has already applied
+      const { data: existingApp } = await supabase
+        .from("challenge_applications")
+        .select("id")
+        .eq("challenge_id", id)
+        .eq("creator_id", session.user.id)
+        .maybeSingle();
+      setHasApplied(!!existingApp);
+
+      // If owner, load applications
+      if (session.user.id === challengeData.brand_id) {
+        const { data: appData } = await supabase
+          .from("challenge_applications")
+          .select("*")
+          .eq("challenge_id", id)
+          .order("created_at", { ascending: false });
+
+        if (appData) {
+          const enrichedApps = await Promise.all(
+            appData.map(async (app) => {
+              const { data: creator } = await supabase
+                .from("profiles")
+                .select("full_name, email, avatar_url")
+                .eq("id", app.creator_id)
+                .maybeSingle();
+              return { ...app, creator };
+            })
+          );
+          setApplications(enrichedApps);
+        }
+      }
     }
 
     setLoading(false);
+  };
+
+  const handleApply = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    setApplyDialogOpen(true);
   };
 
   const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
@@ -232,181 +269,253 @@ const ChallengeDetail = () => {
           Back to Challenges
         </Button>
 
-        {/* Challenge Info */}
+        {/* Challenge Info Card */}
         <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-2xl">{challenge.title}</CardTitle>
-                <CardDescription className="mt-2">{challenge.description}</CardDescription>
+          <div className="flex flex-col md:flex-row">
+            {/* Product Image */}
+            {challenge.product_image_url && (
+              <div className="w-full md:w-64 h-64 flex-shrink-0 bg-muted flex items-center justify-center md:rounded-l-lg overflow-hidden">
+                <img
+                  src={challenge.product_image_url}
+                  alt={challenge.product_name}
+                  className="max-w-full max-h-full object-contain"
+                />
               </div>
-              <Badge variant={challenge.status === "open" ? "default" : "secondary"}>
-                {challenge.status}
-              </Badge>
+            )}
+            
+            <div className="flex-1">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">
+                      {brandName || "Unknown Brand"}
+                    </div>
+                    <CardTitle className="text-2xl">{challenge.title}</CardTitle>
+                    <CardDescription className="mt-2">{challenge.description}</CardDescription>
+                  </div>
+                  <Badge variant={challenge.status === "open" ? "default" : "secondary"}>
+                    {challenge.status}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-semibold">{challenge.product_name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Deadline: {formatDate(challenge.application_deadline)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">
+                      {(challenge as any).current_applicants || 0} / {challenge.max_applicants || "∞"} applicants
+                    </span>
+                  </div>
+                  {challenge.product_value && (
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Value: </span>
+                      ₩{challenge.product_value.toLocaleString()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Platforms */}
+                {challenge.platform && challenge.platform.length > 0 && (
+                  <div className="flex gap-2 mb-4">
+                    {challenge.platform.map((p) => (
+                      <Badge key={p} variant="outline" className="capitalize">
+                        {p}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Requirements */}
+                {challenge.requirements && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium mb-1">Requirements</h4>
+                    <p className="text-sm text-muted-foreground">{challenge.requirements}</p>
+                  </div>
+                )}
+
+                {/* Product Detail Link */}
+                {(challenge as any).product_detail_url && (
+                  <div className="mb-4">
+                    <a
+                      href={(challenge as any).product_detail_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View Product Detail
+                    </a>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-2">
+                  {isOwner ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => navigate(`/challenges/${challenge.id}/edit`)}
+                    >
+                      Edit Challenge
+                    </Button>
+                  ) : (
+                    <>
+                      {userType === "brand" ? (
+                        <Button disabled className="rounded-full">
+                          Brands cannot apply
+                        </Button>
+                      ) : hasApplied ? (
+                        <Button disabled variant="secondary" className="rounded-full">
+                          Already Applied
+                        </Button>
+                      ) : (
+                        <Button onClick={handleApply} className="rounded-full">
+                          Apply Now
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </CardContent>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{challenge.product_name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Deadline: {formatDate(challenge.application_deadline)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  {applications.length} / {challenge.max_applicants || "∞"} applicants
-                </span>
-              </div>
-              {challenge.product_value && (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Value: </span>
-                  ₩{challenge.product_value.toLocaleString()}
+          </div>
+        </Card>
+
+        {/* Applications (only for owner) */}
+        {isOwner && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Applications ({applications.length})</CardTitle>
+              <CardDescription>Manage applicants for this challenge</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {applications.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No applications yet
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Creator</TableHead>
+                        <TableHead>Platform</TableHead>
+                        <TableHead>Followers</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Applied</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {applications.map((app) => (
+                        <TableRow key={app.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">
+                                {app.creator?.full_name || "Unknown"}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {app.social_handle && `@${app.social_handle}`}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="capitalize">
+                            {app.social_platform || "-"}
+                          </TableCell>
+                          <TableCell>
+                            {app.follower_count?.toLocaleString() || "-"}
+                          </TableCell>
+                          <TableCell>{getStatusBadge(app.status)}</TableCell>
+                          <TableCell>{formatDate(app.created_at)}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              {app.status === "pending" && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    onClick={() => openConfirmDialog(app.id, "selected")}
+                                    title="Select"
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    onClick={() => openConfirmDialog(app.id, "rejected")}
+                                    title="Reject"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
+                              {app.status === "selected" && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => openConfirmDialog(app.id, "shipped")}
+                                  title="Mark as Shipped"
+                                >
+                                  <Truck className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {app.status === "submitted" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="rounded-full"
+                                  onClick={() => openConfirmDialog(app.id, "completed")}
+                                >
+                                  Complete
+                                </Button>
+                              )}
+                              {app.content_url && (
+                                <a
+                                  href={app.content_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                    <ExternalLink className="h-4 w-4" />
+                                  </Button>
+                                </a>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               )}
-            </div>
-            {(challenge as any).product_detail_url && (
-              <div className="mt-4">
-                <a
-                  href={(challenge as any).product_detail_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  View Product Detail
-                </a>
-              </div>
-            )}
-            <div className="mt-4 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-full"
-                onClick={() => navigate(`/challenges/${challenge.id}/edit`)}
-              >
-                Edit Challenge
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Applications */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Applications ({applications.length})</CardTitle>
-            <CardDescription>Manage applicants for this challenge</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {applications.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No applications yet
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Creator</TableHead>
-                      <TableHead>Platform</TableHead>
-                      <TableHead>Followers</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Applied</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {applications.map((app) => (
-                      <TableRow key={app.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">
-                              {app.creator?.full_name || "Unknown"}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {app.social_handle && `@${app.social_handle}`}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="capitalize">
-                          {app.social_platform || "-"}
-                        </TableCell>
-                        <TableCell>
-                          {app.follower_count?.toLocaleString() || "-"}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(app.status)}</TableCell>
-                        <TableCell>{formatDate(app.created_at)}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            {app.status === "pending" && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-                                  onClick={() => openConfirmDialog(app.id, "selected")}
-                                  title="Select"
-                                >
-                                  <Check className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  onClick={() => openConfirmDialog(app.id, "rejected")}
-                                  title="Reject"
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </>
-                            )}
-                            {app.status === "selected" && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0"
-                                onClick={() => openConfirmDialog(app.id, "shipped")}
-                                title="Mark as Shipped"
-                              >
-                                <Truck className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {app.status === "submitted" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="rounded-full"
-                                onClick={() => openConfirmDialog(app.id, "completed")}
-                              >
-                                Complete
-                              </Button>
-                            )}
-                            {app.content_url && (
-                              <a
-                                href={app.content_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                                  <ExternalLink className="h-4 w-4" />
-                                </Button>
-                              </a>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </main>
 
+      {/* Apply Dialog */}
+      {challenge && (
+        <ApplyToChallengeDialog
+          open={applyDialogOpen}
+          onOpenChange={setApplyDialogOpen}
+          challenge={challenge}
+          onSuccess={loadData}
+        />
+      )}
+
+      {/* Confirm Dialog for status changes */}
       <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
         <AlertDialogContent className="mx-4">
           <AlertDialogHeader>
