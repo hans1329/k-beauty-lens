@@ -18,22 +18,40 @@ interface AnalysisStep {
   status: "pending" | "processing" | "completed" | "error";
 }
 
+type Platform = "youtube" | "tiktok" | "instagram";
+
 interface AnalysisProgressModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onComplete: (channelId: string, customUrl?: string) => void;
   channelId: string;
+  platform?: Platform;
 }
+
+const platformLabels: Record<Platform, string> = {
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  instagram: "Instagram",
+};
+
+const platformSyncFunctions: Record<Platform, string> = {
+  youtube: "youtube-sync",
+  tiktok: "tiktok-sync",
+  instagram: "instagram-sync",
+};
 
 const AnalysisProgressModal = ({ 
   open, 
   onOpenChange, 
   onComplete,
-  channelId 
+  channelId,
+  platform = "youtube",
 }: AnalysisProgressModalProps) => {
+  const platformLabel = platformLabels[platform];
+  
   const [steps, setSteps] = useState<AnalysisStep[]>([
-    { id: "fetch-channel", label: "Fetching channel information", status: "pending" },
-    { id: "fetch-videos", label: "Fetching video list", status: "pending" },
+    { id: "fetch-channel", label: `Fetching ${platformLabel} information`, status: "pending" },
+    { id: "fetch-videos", label: `Fetching ${platform === "instagram" ? "posts" : "videos"}`, status: "pending" },
     { id: "extract-brands", label: "Extracting brand mentions", status: "pending" },
     { id: "analyze-sentiment", label: "Analyzing sentiment", status: "pending" },
   ]);
@@ -41,6 +59,21 @@ const AnalysisProgressModal = ({
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [quotaUsage, setQuotaUsage] = useState<{ current: number; limit: number } | null>(null);
+
+  // Reset state when modal opens
+  useEffect(() => {
+    if (open) {
+      setSteps([
+        { id: "fetch-channel", label: `Fetching ${platformLabel} information`, status: "pending" },
+        { id: "fetch-videos", label: `Fetching ${platform === "instagram" ? "posts" : "videos"}`, status: "pending" },
+        { id: "extract-brands", label: "Extracting brand mentions", status: "pending" },
+        { id: "analyze-sentiment", label: "Analyzing sentiment", status: "pending" },
+      ]);
+      setCurrentStepIndex(0);
+      setError(null);
+      setIsCompleted(false);
+    }
+  }, [open, platform, platformLabel]);
 
   // Fetch current quota usage
   useEffect(() => {
@@ -78,8 +111,13 @@ const AnalysisProgressModal = ({
           status: idx === 0 ? "processing" : "pending"
         })));
 
-        const { data, error } = await supabase.functions.invoke('youtube-sync', {
-          body: { channelId }
+        const syncFunction = platformSyncFunctions[platform];
+        const requestBody = platform === "youtube" 
+          ? { channelId } 
+          : { username: channelId };
+
+        const { data, error } = await supabase.functions.invoke(syncFunction, {
+          body: requestBody
         });
 
         if (cancelled) return;
@@ -94,9 +132,9 @@ const AnalysisProgressModal = ({
           throw { error: 'QUOTA_EXCEEDED', ...data };
         }
         
-        // Check if response indicates channel not found
-        if (data && data.error === 'CHANNEL_NOT_FOUND') {
-          throw new Error('CHANNEL_NOT_FOUND');
+        // Check if response indicates user not found
+        if (data && (data.error === 'CHANNEL_NOT_FOUND' || data.error === 'USER_NOT_FOUND')) {
+          throw new Error('USER_NOT_FOUND');
         }
 
         // Update quota display
@@ -138,14 +176,14 @@ const AnalysisProgressModal = ({
             status: idx === i ? "processing" : idx < i ? "completed" : "pending"
           })));
 
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 800));
         }
 
         if (!cancelled) {
           setSteps(prev => prev.map(step => ({ ...step, status: "completed" })));
           setIsCompleted(true);
           
-          toast.success(data?.message || "Analysis completed successfully");
+          toast.success(data?.message || `${platformLabel} analysis completed successfully`);
           
           setTimeout(() => {
             onComplete(data?.creator?.id || channelId, data?.creator?.custom_url);
@@ -172,8 +210,8 @@ const AnalysisProgressModal = ({
               status: step.status === "processing" ? "error" : step.status
             })));
             return;
-          } else if (errorData.error === 'CHANNEL_NOT_FOUND') {
-            errorMessage = 'Channel not found';
+          } else if (errorData.error === 'CHANNEL_NOT_FOUND' || errorData.error === 'USER_NOT_FOUND') {
+            errorMessage = 'User not found';
           } else if (errorData.message) {
             errorMessage = errorData.message;
           }
@@ -182,17 +220,17 @@ const AnalysisProgressModal = ({
         }
         
         // User-friendly error messages
-        if (errorMessage.includes("CHANNEL_NOT_FOUND") || errorMessage.includes("Channel not found")) {
-          toast("Channel not found", {
-            description: "We couldn't find this YouTube channel. Please check the handle and try again."
+        if (errorMessage.includes("NOT_FOUND") || errorMessage.includes("not found")) {
+          toast("User not found", {
+            description: `We couldn't find this ${platformLabel} account. Please check the username and try again.`
           });
         } else if (errorMessage.includes("invalid") || errorMessage.includes("Invalid")) {
-          toast("Invalid channel", {
-            description: "The channel format appears to be invalid. Please use @username format."
+          toast("Invalid username", {
+            description: "The username format appears to be invalid. Please use @username format."
           });
         } else {
-          toast("Unable to analyze channel", {
-            description: "We encountered an issue analyzing this channel. Please try again later."
+          toast("Unable to analyze account", {
+            description: "We encountered an issue analyzing this account. Please try again later."
           });
         }
         
@@ -210,7 +248,7 @@ const AnalysisProgressModal = ({
     return () => {
       cancelled = true;
     };
-  }, [open, channelId]);
+  }, [open, channelId, platform, platformLabel]);
 
   const handleCancel = () => {
     setError("Analysis cancelled by user");
@@ -223,9 +261,9 @@ const AnalysisProgressModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-background/10 backdrop-blur-3xl border-white/5" hideClose>
         <DialogHeader>
-          <DialogTitle className="text-white">Analyzing YouTube Channel</DialogTitle>
+          <DialogTitle className="text-white">Analyzing {platformLabel} Account</DialogTitle>
           <DialogDescription className="text-white/80">
-            Please wait while we analyze the channel data
+            Please wait while we analyze the account data
           </DialogDescription>
         </DialogHeader>
 

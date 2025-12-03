@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.instagram-search]
 verify_jwt = false
+
+[functions.tiktok-sync]
+verify_jwt = false
+
+[functions.instagram-sync]
+verify_jwt = false

@@ -277,6 +277,7 @@ export type Database = {
           id: string
           is_visible: boolean
           last_synced_at: string | null
+          platform: string
           published_at: string | null
           subscriber_count: number | null
           thumbnail_url: string | null
@@ -294,6 +295,7 @@ export type Database = {
           id?: string
           is_visible?: boolean
           last_synced_at?: string | null
+          platform?: string
           published_at?: string | null
           subscriber_count?: number | null
           thumbnail_url?: string | null
@@ -311,6 +313,7 @@ export type Database = {
           id?: string
           is_visible?: boolean
           last_synced_at?: string | null
+          platform?: string
           published_at?: string | null
           subscriber_count?: number | null
           thumbnail_url?: string | null

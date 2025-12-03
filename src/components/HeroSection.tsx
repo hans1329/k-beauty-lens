@@ -16,6 +16,7 @@ const HeroSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [analyzingChannelId, setAnalyzingChannelId] = useState("");
+  const [analyzingPlatform, setAnalyzingPlatform] = useState<Platform>("youtube");
   const [isFocused, setIsFocused] = useState(false);
   const [platform, setPlatform] = useState<Platform>("youtube");
 
@@ -27,6 +28,7 @@ const HeroSection = () => {
         .from('creators')
         .select('id, channel_name, custom_url')
         .eq('custom_url', targetChannelId)
+        .eq('platform', 'youtube')
         .maybeSingle();
 
       if (existingCreator) {
@@ -63,119 +65,108 @@ const HeroSection = () => {
       console.error("Error saving search:", error);
     }
     setAnalyzingChannelId(targetChannelId);
+    setAnalyzingPlatform("youtube");
     setShowProgressModal(true);
     setChannelId("");
   };
 
   const handleTikTokSearch = async (username: string, session: any) => {
+    // Check if creator already exists
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('tiktok-search', {
-        body: { username }
-      });
+      const { data: existingCreator } = await supabase
+        .from('creators')
+        .select('id, channel_name, custom_url')
+        .eq('custom_url', username)
+        .eq('platform', 'tiktok')
+        .maybeSingle();
 
-      if (error) {
-        console.error("TikTok search error:", error);
-        toast.error("TikTok search failed", {
-          description: error.message || "Please try again later"
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (data?.results && data.results.length > 0) {
-        // Find exact match or first result
-        const exactMatch = data.results.find(
-          (u: any) => u.uniqueId?.toLowerCase() === username.replace('@', '').toLowerCase()
-        );
-        const result = exactMatch || data.results[0];
-
+      if (existingCreator) {
         // Save search to database
         try {
           await supabase.from("user_searches").insert({
             user_id: session.user.id,
-            channel_id: `tiktok:${result.uniqueId}`,
-            channel_name: result.nickname || result.uniqueId,
-            channel_thumbnail: result.avatarUrl || null
+            channel_id: `tiktok:${username}`,
+            channel_name: existingCreator.channel_name,
+            channel_thumbnail: null
           });
         } catch (error) {
           console.error("Error saving search:", error);
         }
-
-        toast.success("TikTok Creator Found", {
-          description: `${result.nickname} (@${result.uniqueId}) - ${result.followerCount?.toLocaleString() || 0} followers`
-        });
-
-        // For now, show the result in a toast - full integration will come next
-        toast.info("TikTok analysis coming soon!", {
-          description: "Full TikTok creator analysis will be available soon."
-        });
-      } else {
-        toast.error("No results found", {
-          description: "Could not find a TikTok account with that username"
-        });
+        setChannelId("");
+        setIsLoading(false);
+        navigate(`/creator/${existingCreator.custom_url}`);
+        return;
       }
     } catch (error) {
-      console.error("TikTok search error:", error);
-      toast.error("Search failed", {
-        description: "Please try again later"
-      });
+      console.error("Error checking existing creator:", error);
     }
     setIsLoading(false);
+
+    // Save search to database
+    try {
+      await supabase.from("user_searches").insert({
+        user_id: session.user.id,
+        channel_id: `tiktok:${username}`,
+        channel_name: username,
+        channel_thumbnail: null
+      });
+    } catch (error) {
+      console.error("Error saving search:", error);
+    }
+    setAnalyzingChannelId(username);
+    setAnalyzingPlatform("tiktok");
+    setShowProgressModal(true);
     setChannelId("");
   };
 
   const handleInstagramSearch = async (username: string, session: any) => {
+    // Check if creator already exists
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('instagram-search', {
-        body: { username }
-      });
+      const { data: existingCreator } = await supabase
+        .from('creators')
+        .select('id, channel_name, custom_url')
+        .eq('custom_url', username)
+        .eq('platform', 'instagram')
+        .maybeSingle();
 
-      if (error) {
-        console.error("Instagram search error:", error);
-        toast.error("Instagram search failed", {
-          description: error.message || "Please try again later"
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (data?.success && data.result) {
-        const result = data.result;
-
+      if (existingCreator) {
         // Save search to database
         try {
           await supabase.from("user_searches").insert({
             user_id: session.user.id,
-            channel_id: `instagram:${result.username}`,
-            channel_name: result.fullName || result.username,
-            channel_thumbnail: result.avatarUrl || null
+            channel_id: `instagram:${username}`,
+            channel_name: existingCreator.channel_name,
+            channel_thumbnail: null
           });
         } catch (error) {
           console.error("Error saving search:", error);
         }
-
-        toast.success("Instagram Creator Found", {
-          description: `${result.fullName || result.username} (@${result.username}) - ${result.followerCount?.toLocaleString() || 0} followers`
-        });
-
-        // For now, show the result in a toast - full integration will come next
-        toast.info("Instagram analysis coming soon!", {
-          description: "Full Instagram creator analysis will be available soon."
-        });
-      } else {
-        toast.error("No results found", {
-          description: data?.error || "Could not find an Instagram account with that username"
-        });
+        setChannelId("");
+        setIsLoading(false);
+        navigate(`/creator/${existingCreator.custom_url}`);
+        return;
       }
     } catch (error) {
-      console.error("Instagram search error:", error);
-      toast.error("Search failed", {
-        description: "Please try again later"
-      });
+      console.error("Error checking existing creator:", error);
     }
     setIsLoading(false);
+
+    // Save search to database
+    try {
+      await supabase.from("user_searches").insert({
+        user_id: session.user.id,
+        channel_id: `instagram:${username}`,
+        channel_name: username,
+        channel_thumbnail: null
+      });
+    } catch (error) {
+      console.error("Error saving search:", error);
+    }
+    setAnalyzingChannelId(username);
+    setAnalyzingPlatform("instagram");
+    setShowProgressModal(true);
     setChannelId("");
   };
 
@@ -374,6 +365,7 @@ const HeroSection = () => {
         onOpenChange={setShowProgressModal}
         onComplete={handleAnalysisComplete}
         channelId={analyzingChannelId}
+        platform={analyzingPlatform}
       />
     </section>
   );
