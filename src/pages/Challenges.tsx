@@ -147,6 +147,22 @@ const Challenges = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const getRemainingTime = (dateString: string | null) => {
+    if (!dateString) return null;
+    const deadline = new Date(dateString);
+    const now = new Date();
+    const diffMs = deadline.getTime() - now.getTime();
+    
+    if (diffMs < 0) return "Expired";
+    
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (diffDays > 0) return `${diffDays}d left`;
+    if (diffHours > 0) return `${diffHours}h left`;
+    return "< 1h left";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -202,15 +218,26 @@ const Challenges = () => {
                   className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
                   onClick={() => navigate(`/challenges/${challenge.id}`)}
                 >
-                    {challenge.product_image_url && (
-                      <div className="aspect-square bg-muted rounded-t-lg overflow-hidden flex items-center justify-center">
+                    <div className="aspect-square bg-muted rounded-t-lg overflow-hidden flex items-center justify-center relative">
+                      {challenge.product_image_url ? (
                         <img
                           src={challenge.product_image_url}
                           alt={challenge.product_name}
                           className="max-w-full max-h-full object-contain"
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <Package className="h-12 w-12 text-muted-foreground" />
+                      )}
+                      {challenge.application_deadline && (
+                        <Badge 
+                          variant={getRemainingTime(challenge.application_deadline) === "Expired" ? "destructive" : "secondary"}
+                          className="absolute bottom-2 right-2 text-xs"
+                        >
+                          <Clock className="h-3 w-3 mr-1" />
+                          {getRemainingTime(challenge.application_deadline)}
+                        </Badge>
+                      )}
+                    </div>
                     <CardHeader>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                         <span>{challenge.brand?.full_name || "Unknown Brand"}</span>
@@ -225,10 +252,6 @@ const Challenges = () => {
                         <div className="flex items-center gap-2">
                           <Package className="h-4 w-4 text-muted-foreground" />
                           <span className="text-base font-semibold">{challenge.product_name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span>Deadline: {formatDate(challenge.application_deadline)}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
