@@ -94,10 +94,6 @@ const HeroSection = () => {
         data: existingCreator
       } = await supabase.from('creators').select('id, channel_name, custom_url').eq('custom_url', targetChannelId).maybeSingle();
       if (existingCreator) {
-        toast("Creator already exists", {
-          description: `${existingCreator.channel_name} is already in our database. Redirecting...`
-        });
-
         // Save search to database
         try {
           await supabase.from("user_searches").insert({
@@ -112,10 +108,8 @@ const HeroSection = () => {
         setChannelId("");
         setIsLoading(false);
 
-        // Navigate to existing creator page using custom_url
-        setTimeout(() => {
-          navigate(`/creator/${existingCreator.custom_url}`);
-        }, 1000);
+        // Navigate directly to existing creator page
+        navigate(`/creator/${existingCreator.custom_url}`);
         return;
       }
     } catch (error) {
