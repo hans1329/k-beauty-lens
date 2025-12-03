@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import SelectUserType from "./pages/SelectUserType";
 import Analytics from "./pages/Analytics";
 import Challenges from "./pages/Challenges";
+import ChallengeForm from "./pages/ChallengeForm";
 import Pricing from "./pages/Pricing";
 import PricingNew from "./pages/PricingNew";
 import About from "./pages/About";
@@ -40,6 +41,8 @@ const App = () => (
           <Route path="/select-type" element={<SelectUserType />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/challenges/new" element={<ChallengeForm />} />
+          <Route path="/challenges/:id/edit" element={<ChallengeForm />} />
           <Route path="/pricing" element={<PricingNew />} />
           <Route path="/about" element={<About />} />
           <Route path="/settings" element={<Settings />} />

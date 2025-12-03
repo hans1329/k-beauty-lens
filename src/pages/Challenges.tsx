@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Plus, Instagram, Clock, Users, Package, Loader2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import CreateChallengeDialog from "@/components/challenges/CreateChallengeDialog";
 import ApplyToChallengeDialog from "@/components/challenges/ApplyToChallengeDialog";
 import type { User } from "@supabase/supabase-js";
 
@@ -42,10 +41,8 @@ const Challenges = () => {
   const [myChallenges, setMyChallenges] = useState<Challenge[]>([]);
   const [myApplications, setMyApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [applyDialogOpen, setApplyDialogOpen] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
-  const [editChallenge, setEditChallenge] = useState<Challenge | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -169,7 +166,7 @@ const Challenges = () => {
           </div>
           
           {user && userType === "brand" && (
-            <Button onClick={() => setCreateDialogOpen(true)} className="rounded-full">
+            <Button onClick={() => navigate("/challenges/new")} className="rounded-full">
               <Plus className="mr-2 h-4 w-4" />
               Create Challenge
             </Button>
@@ -316,7 +313,7 @@ const Challenges = () => {
                     <p className="text-muted-foreground mb-4">
                       You haven't created any challenges yet
                     </p>
-                    <Button onClick={() => setCreateDialogOpen(true)} className="rounded-full">
+                    <Button onClick={() => navigate("/challenges/new")} className="rounded-full">
                       <Plus className="mr-2 h-4 w-4" />
                       Create Your First Challenge
                     </Button>
@@ -340,10 +337,7 @@ const Challenges = () => {
                           variant="outline" 
                           size="sm" 
                           className="rounded-full"
-                          onClick={() => {
-                            setEditChallenge(challenge);
-                            setCreateDialogOpen(true);
-                          }}
+                          onClick={() => navigate(`/challenges/${challenge.id}/edit`)}
                         >
                           Edit
                         </Button>
@@ -364,16 +358,6 @@ const Challenges = () => {
           )}
         </Tabs>
       </main>
-
-      <CreateChallengeDialog 
-        open={createDialogOpen} 
-        onOpenChange={(open) => {
-          setCreateDialogOpen(open);
-          if (!open) setEditChallenge(null);
-        }}
-        onSuccess={loadChallenges}
-        editChallenge={editChallenge}
-      />
 
       {selectedChallenge && (
         <ApplyToChallengeDialog
