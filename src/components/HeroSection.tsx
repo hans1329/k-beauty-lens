@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Search, Gift } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,18 +63,6 @@ const HeroSection = () => {
         });
         setIsLoading(false);
         return;
-      }
-
-      // Show reward notification if given
-      if (result?.reward_given) {
-        const {
-          data: rewardSetting
-        } = await (supabase as any).from('reward_settings').select('setting_value').eq('setting_key', 'daily_completion_reward').single();
-        const rewardAmount = rewardSetting?.setting_value || 5;
-        toast.success("Daily Quest Complete!", {
-          description: `You've earned ${rewardAmount} bonus energy for completing your daily quota!`,
-          icon: <Gift className="h-5 w-5" />
-        });
       }
 
       // Show energy consumption notification
