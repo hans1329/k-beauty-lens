@@ -85,6 +85,8 @@ const ChallengeDetail = () => {
     description: string;
   }>({ open: false, applicationId: "", action: "", title: "", description: "" });
   const [creatorRegistrationDialogOpen, setCreatorRegistrationDialogOpen] = useState(false);
+  const [addressMissingDialogOpen, setAddressMissingDialogOpen] = useState(false);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
 
   const isOwner = user && challenge && user.id === challenge.brand_id;
 
@@ -123,14 +125,15 @@ const ChallengeDetail = () => {
     if (session?.user) {
       setUser(session.user);
 
-      // Get user type
+      // Get user type and address
       const { data: profile } = await supabase
         .from("profiles")
-        .select("user_type")
+        .select("user_type, address")
         .eq("id", session.user.id)
         .maybeSingle();
       if (profile) {
         setUserType(profile.user_type);
+        setUserAddress(profile.address);
       }
 
       // Check if user has already applied
@@ -176,6 +179,10 @@ const ChallengeDetail = () => {
     }
     if (userType === "general_user") {
       setCreatorRegistrationDialogOpen(true);
+      return;
+    }
+    if (!userAddress) {
+      setAddressMissingDialogOpen(true);
       return;
     }
     setApplyDialogOpen(true);
@@ -645,9 +652,30 @@ const ChallengeDetail = () => {
             <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
             <AlertDialogAction 
               className="rounded-full"
-              onClick={() => navigate("/select-user-type")}
+              onClick={() => navigate("/select-type")}
             >
               Register as Creator
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Address Missing Dialog */}
+      <AlertDialog open={addressMissingDialogOpen} onOpenChange={setAddressMissingDialogOpen}>
+        <AlertDialogContent className="mx-4">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Shipping Address Required</AlertDialogTitle>
+            <AlertDialogDescription>
+              To apply for challenges and receive products, you need to add your shipping address first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="rounded-full"
+              onClick={() => navigate("/settings#address")}
+            >
+              Add Address
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +19,12 @@ import { Upload, Loader2, ArrowLeft } from "lucide-react";
 
 const Settings = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addressRef = useRef<HTMLDivElement>(null);
   const [profile, setProfile] = useState({
     id: "",
     email: "",
@@ -35,6 +37,15 @@ const Settings = () => {
   useEffect(() => {
     loadProfile();
   }, []);
+
+  // Scroll to address section if hash is #address
+  useEffect(() => {
+    if (location.hash === "#address" && !loading && addressRef.current) {
+      setTimeout(() => {
+        addressRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [location.hash, loading]);
 
   const loadProfile = async () => {
     try {
@@ -301,10 +312,10 @@ const Settings = () => {
                 </div>
 
                 {profile.user_type === "creator" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Shipping Address</Label>
+                  <div ref={addressRef} id="address" className="space-y-2">
+                    <Label htmlFor="address-input">Shipping Address</Label>
                     <textarea
-                      id="address"
+                      id="address-input"
                       value={profile.address || ""}
                       onChange={(e) =>
                         setProfile({ ...profile, address: e.target.value })
