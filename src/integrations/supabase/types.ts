@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_quota_usage: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          quota_limit: number
+          quota_used: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          quota_limit?: number
+          quota_used?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          quota_limit?: number
+          quota_used?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       brand_mentions: {
         Row: {
           brand_name: string
@@ -156,6 +183,93 @@ export type Database = {
         }
         Relationships: []
       }
+      energy_costs: {
+        Row: {
+          action_type: string
+          cost: number
+          created_at: string | null
+          description: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_type: string
+          cost?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          cost?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      energy_purchases: {
+        Row: {
+          energy_amount: number
+          id: string
+          payment_method: string | null
+          price_paid: number
+          purchased_at: string
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          energy_amount: number
+          id?: string
+          payment_method?: string | null
+          price_paid: number
+          purchased_at?: string
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          energy_amount?: number
+          id?: string
+          payment_method?: string | null
+          price_paid?: number
+          purchased_at?: string
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      energy_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -163,6 +277,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          purchased_energy: number
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
@@ -172,6 +287,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          purchased_energy?: number
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
         }
@@ -181,8 +297,36 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          purchased_energy?: number
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      reward_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: number
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -398,6 +542,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_quota_usage: {
+        Args: { quota_cost: number }
+        Returns: {
+          current_usage: number
+          is_exceeded: boolean
+          quota_limit: number
+          reward_given: boolean
+          used_purchased: boolean
+        }[]
       }
     }
     Enums: {

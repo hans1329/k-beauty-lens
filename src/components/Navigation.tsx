@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search } from "lucide-react";
+import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -26,7 +26,6 @@ const Navigation = () => {
   const [energyUsed, setEnergyUsed] = useState(0);
   const [energyLimit, setEnergyLimit] = useState(13);
   const [purchasedEnergy, setPurchasedEnergy] = useState(0);
-  const location = window.location.pathname;
 
   useEffect(() => {
     // Check current session
@@ -123,20 +122,6 @@ const Navigation = () => {
     }
   };
 
-  const baseNavItems = [
-    { label: "Discover", href: "/" },
-    { label: "Analytics", href: "/analytics" },
-    { label: "Rewards", href: "/rewards" },
-    { label: "Energy", href: "/pricing" },
-    { label: "About", href: "/about" },
-  ];
-
-  const adminNavItems = [
-    { label: "Admin", href: "/admin/dashboard" },
-  ];
-
-  const navItems = isAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
-
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto max-w-7xl px-6 py-4">
@@ -146,27 +131,6 @@ const Navigation = () => {
             <img src={logoImage} alt="Link·kbeauty" className="h-8 w-8" />
             <span className="text-xl font-bold gradient-text">Link·kbeauty</span>
           </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => {
-              const isActive = location === item.href || 
-                (item.href !== '/' && location.startsWith(item.href));
-              return (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className={`text-sm font-medium transition-colors ${
-                    isActive 
-                      ? 'text-primary font-semibold' 
-                      : 'text-foreground/80 hover:text-foreground'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
 
           {/* User Actions */}
           <div className="flex items-center gap-3">
@@ -259,6 +223,17 @@ const Navigation = () => {
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator className="my-2" />
+                      <DropdownMenuItem asChild className="py-2.5">
+                        <Link to="/admin/dashboard" className="cursor-pointer">
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator className="my-2" />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
