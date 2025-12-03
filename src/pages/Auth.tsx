@@ -21,8 +21,21 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
-        if (session) {
-          navigate("/");
+        if (event === "SIGNED_IN" && session) {
+          // Check if user needs to select type (new signup)
+          setTimeout(async () => {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("user_type")
+              .eq("id", session.user.id)
+              .single();
+            
+            if (profile?.user_type === "general_user") {
+              navigate("/select-type");
+            } else {
+              navigate("/");
+            }
+          }, 0);
         }
       }
     );
