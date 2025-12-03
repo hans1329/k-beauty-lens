@@ -273,7 +273,7 @@ const ChallengeDetail = () => {
         <Card className="mb-8 overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Product Image */}
-            <div className="w-full md:w-80 aspect-square md:aspect-auto md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
+            <div className="w-full md:w-80 h-64 md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
               {challenge.product_image_url ? (
                 <img
                   src={challenge.product_image_url}
@@ -328,18 +328,22 @@ const ChallengeDetail = () => {
                 </div>
 
                 {/* Meta Info */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-muted rounded-full">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    </div>
                     <div>
-                      <div className="text-muted-foreground">Deadline</div>
+                      <div className="text-xs text-muted-foreground">Deadline</div>
                       <div className="font-medium">{formatDate(challenge.application_deadline)}</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-muted rounded-full">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </div>
                     <div>
-                      <div className="text-muted-foreground">Applicants</div>
+                      <div className="text-xs text-muted-foreground">Applicants</div>
                       <div className="font-medium">{(challenge as any).current_applicants || 0} / {challenge.max_applicants || "∞"}</div>
                     </div>
                   </div>
@@ -367,11 +371,12 @@ const ChallengeDetail = () => {
                 )}
 
                 {/* Actions */}
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   {isOwner ? (
                     <Button
                       variant="outline"
-                      className="rounded-full"
+                      size="lg"
+                      className="rounded-full w-full sm:w-auto"
                       onClick={() => navigate(`/challenges/${challenge.id}/edit`)}
                     >
                       Edit Challenge
@@ -379,15 +384,15 @@ const ChallengeDetail = () => {
                   ) : (
                     <>
                       {userType === "brand" ? (
-                        <Button disabled className="rounded-full">
+                        <Button disabled size="lg" className="rounded-full w-full sm:w-auto">
                           Brands cannot apply
                         </Button>
                       ) : hasApplied ? (
-                        <Button disabled variant="secondary" className="rounded-full">
+                        <Button disabled variant="secondary" size="lg" className="rounded-full w-full sm:w-auto">
                           Already Applied
                         </Button>
                       ) : (
-                        <Button onClick={handleApply} className="rounded-full">
+                        <Button onClick={handleApply} size="lg" className="rounded-full w-full sm:w-auto text-lg py-6">
                           Apply Now
                         </Button>
                       )}
