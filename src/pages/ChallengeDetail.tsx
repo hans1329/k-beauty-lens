@@ -84,6 +84,7 @@ const ChallengeDetail = () => {
     title: string;
     description: string;
   }>({ open: false, applicationId: "", action: "", title: "", description: "" });
+  const [creatorRegistrationDialogOpen, setCreatorRegistrationDialogOpen] = useState(false);
 
   const isOwner = user && challenge && user.id === challenge.brand_id;
 
@@ -171,6 +172,10 @@ const ChallengeDetail = () => {
   const handleApply = () => {
     if (!user) {
       navigate("/auth");
+      return;
+    }
+    if (userType === "general_user") {
+      setCreatorRegistrationDialogOpen(true);
       return;
     }
     setApplyDialogOpen(true);
@@ -622,6 +627,27 @@ const ChallengeDetail = () => {
               onClick={() => updateApplicationStatus(confirmDialog.applicationId, confirmDialog.action)}
             >
               Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Creator Registration Dialog */}
+      <AlertDialog open={creatorRegistrationDialogOpen} onOpenChange={setCreatorRegistrationDialogOpen}>
+        <AlertDialogContent className="mx-4">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Creator Registration Required</AlertDialogTitle>
+            <AlertDialogDescription>
+              To apply for challenges, you need to register as a creator first. Would you like to update your account type?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="rounded-full"
+              onClick={() => navigate("/select-user-type")}
+            >
+              Register as Creator
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
