@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search, Shield } from "lucide-react";
+import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search, Shield, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -131,6 +131,22 @@ const Navigation = () => {
             <img src={logoImage} alt="Link·kbeauty" className="h-8 w-8" />
             <span className="text-xl font-bold gradient-text">Link·kbeauty</span>
           </Link>
+
+          {/* Main Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            <Button variant="ghost" asChild className="rounded-full">
+              <Link to="/">
+                <Search className="mr-2 h-4 w-4" />
+                Analytics
+              </Link>
+            </Button>
+            <Button variant="ghost" asChild className="rounded-full">
+              <Link to="/challenges">
+                <Trophy className="mr-2 h-4 w-4" />
+                Challenges
+              </Link>
+            </Button>
+          </div>
 
           {/* User Actions */}
           <div className="flex items-center gap-3">
