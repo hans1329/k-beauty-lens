@@ -36,6 +36,7 @@ const ChallengeForm = () => {
     description: "",
     product_name: "",
     product_image_url: "",
+    product_detail_url: "",
     product_value: "",
     max_applicants: "10",
     requirements: "",
@@ -92,6 +93,7 @@ const ChallengeForm = () => {
       description: challenge.description || "",
       product_name: challenge.product_name || "",
       product_image_url: challenge.product_image_url || "",
+      product_detail_url: (challenge as any).product_detail_url || "",
       product_value: challenge.product_value?.toString() || "",
       max_applicants: challenge.max_applicants?.toString() || "10",
       requirements: challenge.requirements || "",
@@ -127,6 +129,7 @@ const ChallengeForm = () => {
       description: formData.description || null,
       product_name: formData.product_name,
       product_image_url: formData.product_image_url || null,
+      product_detail_url: formData.product_detail_url || null,
       product_value: formData.product_value ? parseInt(formData.product_value) : null,
       max_applicants: parseInt(formData.max_applicants) || 10,
       platform: selectedPlatforms,
@@ -236,6 +239,17 @@ const ChallengeForm = () => {
                   type="url"
                   value={formData.product_image_url}
                   onChange={(e) => setFormData({ ...formData, product_image_url: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="product_detail_url">Product Detail Page URL</Label>
+                <Input
+                  id="product_detail_url"
+                  type="url"
+                  value={formData.product_detail_url}
+                  onChange={(e) => setFormData({ ...formData, product_detail_url: e.target.value })}
                   placeholder="https://..."
                 />
               </div>
