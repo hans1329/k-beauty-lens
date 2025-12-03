@@ -154,6 +154,7 @@ export type Database = {
           id: string
           max_applicants: number | null
           platform: string[] | null
+          product_detail_url: string | null
           product_image_url: string | null
           product_name: string
           product_value: number | null
@@ -170,6 +171,7 @@ export type Database = {
           id?: string
           max_applicants?: number | null
           platform?: string[] | null
+          product_detail_url?: string | null
           product_image_url?: string | null
           product_name: string
           product_value?: number | null
@@ -186,6 +188,7 @@ export type Database = {
           id?: string
           max_applicants?: number | null
           platform?: string[] | null
+          product_detail_url?: string | null
           product_image_url?: string | null
           product_name?: string
           product_value?: number | null
