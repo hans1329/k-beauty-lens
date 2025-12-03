@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LogOut, User, Settings as SettingsIcon, Zap, BarChart3, Gift, Search, Shield, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,7 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -129,21 +130,29 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img src={logoImage} alt="Link·kbeauty" className="h-8 w-8" />
-            <span className="text-xl font-bold gradient-text">Link·kbeauty</span>
+            <span className="text-xl font-bold gradient-text hidden sm:inline">Link·kbeauty</span>
           </Link>
 
-          {/* Main Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            <Button variant="ghost" asChild className="rounded-full">
+          {/* Main Navigation - Centered */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-muted/50 rounded-full p-1">
+            <Button 
+              variant={location.pathname === "/" || location.pathname.startsWith("/creator") || location.pathname === "/analytics" ? "default" : "ghost"} 
+              asChild 
+              className="rounded-full"
+            >
               <Link to="/">
                 <Search className="mr-2 h-4 w-4" />
-                Analytics
+                <span className="hidden sm:inline">Analytics</span>
               </Link>
             </Button>
-            <Button variant="ghost" asChild className="rounded-full">
+            <Button 
+              variant={location.pathname.startsWith("/challenges") ? "default" : "ghost"} 
+              asChild 
+              className="rounded-full"
+            >
               <Link to="/challenges">
                 <Trophy className="mr-2 h-4 w-4" />
-                Challenges
+                <span className="hidden sm:inline">Challenges</span>
               </Link>
             </Button>
           </div>
