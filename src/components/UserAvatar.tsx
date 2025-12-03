@@ -25,7 +25,11 @@ export const UserAvatar = ({ avatarUrl, email, size = "md" }: UserAvatarProps) =
 
   return (
     <Avatar className={sizeClasses[size]}>
-      <AvatarImage src={avatarUrl || getRandomAvatar()} alt="Profile picture" />
+      <AvatarImage 
+        src={avatarUrl || getRandomAvatar()} 
+        alt="Profile picture" 
+        className="object-cover scale-110"
+      />
       <AvatarFallback>
         {email?.charAt(0).toUpperCase() || "U"}
       </AvatarFallback>
