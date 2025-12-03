@@ -125,7 +125,7 @@ const Navigation = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto max-w-7xl px-6 py-4">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
