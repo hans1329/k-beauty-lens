@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Package, Clock, Users, ExternalLink, Check, X, Truck } from "lucide-react";
+import { Loader2, ArrowLeft, Gift, Clock, Users, ExternalLink, Check, X, Truck, Package } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import ApplyToChallengeDialog from "@/components/challenges/ApplyToChallengeDialog";
 import {
@@ -270,98 +270,107 @@ const ChallengeDetail = () => {
         </Button>
 
         {/* Challenge Info Card */}
-        <Card className="mb-8">
+        <Card className="mb-8 overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Product Image */}
-            {challenge.product_image_url && (
-              <div className="w-full md:w-64 h-64 flex-shrink-0 bg-muted flex items-center justify-center md:rounded-l-lg overflow-hidden">
+            <div className="w-full md:w-80 aspect-square md:aspect-auto md:h-auto flex-shrink-0 bg-muted flex items-center justify-center overflow-hidden">
+              {challenge.product_image_url ? (
                 <img
                   src={challenge.product_image_url}
                   alt={challenge.product_name}
-                  className="max-w-full max-h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
-              </div>
-            )}
+              ) : (
+                <Package className="h-16 w-16 text-muted-foreground" />
+              )}
+            </div>
             
             <div className="flex-1">
-              <CardHeader>
+              <CardHeader className="pb-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="text-sm text-muted-foreground mb-1">
+                    <div className="text-sm font-medium text-primary mb-1">
                       {brandName || "Unknown Brand"}
                     </div>
-                    <CardTitle className="text-2xl">{challenge.title}</CardTitle>
-                    <CardDescription className="mt-2">{challenge.description}</CardDescription>
+                    <CardTitle className="text-2xl mb-2">{challenge.title}</CardTitle>
+                    {challenge.description && (
+                      <CardDescription className="text-base">{challenge.description}</CardDescription>
+                    )}
                   </div>
-                  <Badge variant={challenge.status === "open" ? "default" : "secondary"}>
+                  <Badge variant={challenge.status === "open" ? "default" : "secondary"} className="flex-shrink-0">
                     {challenge.status}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid sm:grid-cols-2 gap-4 mb-4">
+              
+              <CardContent className="space-y-5">
+                {/* Product Info */}
+                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
                   <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-semibold">{challenge.product_name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Deadline: {formatDate(challenge.application_deadline)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      {(challenge as any).current_applicants || 0} / {challenge.max_applicants || "∞"} applicants
-                    </span>
+                    <Gift className="h-5 w-5 text-primary" />
+                    <span className="text-lg font-semibold">{challenge.product_name}</span>
                   </div>
                   {challenge.product_value && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Value: </span>
+                    <div className="ml-7 text-xl font-bold text-primary">
                       ₩{challenge.product_value.toLocaleString()}
+                    </div>
+                  )}
+                  {/* Platforms */}
+                  {challenge.platform && challenge.platform.length > 0 && (
+                    <div className="flex gap-2 ml-7">
+                      {challenge.platform.map((p) => (
+                        <Badge key={p} variant="outline" className="capitalize">
+                          {p}
+                        </Badge>
+                      ))}
                     </div>
                   )}
                 </div>
 
-                {/* Platforms */}
-                {challenge.platform && challenge.platform.length > 0 && (
-                  <div className="flex gap-2 mb-4">
-                    {challenge.platform.map((p) => (
-                      <Badge key={p} variant="outline" className="capitalize">
-                        {p}
-                      </Badge>
-                    ))}
+                {/* Meta Info */}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-muted-foreground">Deadline</div>
+                      <div className="font-medium">{formatDate(challenge.application_deadline)}</div>
+                    </div>
                   </div>
-                )}
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-muted-foreground">Applicants</div>
+                      <div className="font-medium">{(challenge as any).current_applicants || 0} / {challenge.max_applicants || "∞"}</div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Requirements */}
                 {challenge.requirements && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium mb-1">Requirements</h4>
-                    <p className="text-sm text-muted-foreground">{challenge.requirements}</p>
+                  <div className="border-t pt-4">
+                    <h4 className="text-sm font-semibold mb-2">Requirements</h4>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{challenge.requirements}</p>
                   </div>
                 )}
 
                 {/* Product Detail Link */}
                 {(challenge as any).product_detail_url && (
-                  <div className="mb-4">
-                    <a
-                      href={(challenge as any).product_detail_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View Product Detail
-                    </a>
-                  </div>
+                  <a
+                    href={(challenge as any).product_detail_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View Product Detail
+                  </a>
                 )}
 
                 {/* Actions */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-2">
                   {isOwner ? (
                     <Button
                       variant="outline"
-                      size="sm"
                       className="rounded-full"
                       onClick={() => navigate(`/challenges/${challenge.id}/edit`)}
                     >
